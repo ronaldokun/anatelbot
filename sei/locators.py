@@ -15,7 +15,7 @@ LOGOUT_TITLE = "SEI / ANATEL"
 
 LISTA_BLS_TITLE = "SEI - Blocos de Assinatura"
 
-BLOCO_TITLE = "SEI- Documentos do Bloco de Assinatura"
+BLOCO_TITLE = "SEI - Documentos do Bloco de Assinatura"
 
 LOGIN = (By.ID, "txtUsuario")
 

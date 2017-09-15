@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from contextlib import contextmanager
 
-from locators import URL
+from locators import LoginLocators
 
 
 
@@ -21,26 +21,23 @@ class Page(object):
     # assumes self.driver is a selenium webdriver
     def __init__(self, driver):
         self.driver = driver
-        self.timeout = 30
+        self.timeout = 30        
          
         
-    def quit(self):
-        self.driver.quit()
-
+    def close(self):
+        self.driver.close()
+        
     @contextmanager
+    # Only used when navigating between different types of Pages == != titles
     def wait_for_page_load(self):
-        old_page = self.driver.find_element_by_tag_name('html')
+        old_page = self.driver.find_element_by_tag_name('title')
         yield
         WebDriverWait(self.driver, self.timeout).until(
             EC.staleness_of(old_page)
-        )
-    
+        )    
         
     def find_element(self, *locator):
-        #return self.driver.find_element(*locator)
-        return WebDriverWait(self.driver, self.timeout).until(
-                EC.presence_of_element_located(*locator))
-
+        return self.find_element(*locator)
     
     def find_elements(self, *locator):
         return self.driver.find_elements(*locator)

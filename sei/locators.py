@@ -8,28 +8,52 @@ Created on Mon Aug 28 20:19:59 2017
 
 from selenium.webdriver.common.by import By
 
+class LoginLocators(object):
 
-URL = "https://sei.anatel.gov.br"
+    URL          = "https://sei.anatel.gov.br"
 
-LOGOUT_TITLE = "SEI / ANATEL"
+    TITLE = "SEI / ANATEL"
+    
+    LOGIN        = (By.ID, "txtUsuario")
 
-LISTA_BLS_TITLE = "SEI - Blocos de Assinatura"
+    SENHA        = (By.ID, "pwdSenha")
 
-BLOCO_TITLE = "SEI - Documentos do Bloco de Assinatura"
+class BaseLocators(object):
+    
+    INITIALPAGE     = (By.ID, "lnkControleProcessos")
 
-LOGIN = (By.ID, "txtUsuario")
+    EXIBIRMENU      = (By.ID, "lnkInfraMenuSistema")
 
-SENHA = (By.ID, "pwdSenha")
+class LatMenuLocators(object):
 
-FILTROATRIBUICAO = (By.ID, "ancVisualizacao1")
+    BLOCOASS    = (By.LINK_TEXT, "Blocos de Assinatura")
+    
+class MainLocators(object):
+    
+    FILTROATRIBUICAO    = (By.ID, "ancVisualizacao1")
 
-TIPOVISUALIZACAO = (By.ID, "ancTipoVisualizacao")
+    TIPOVISUALIZACAO    = (By.ID, "ancTipoVisualizacao")
 
-INITIALPAGE = (By.ID, "lnkControleProcessos")
+    CONTADOR            = (By.ID, "selInfraPaginacaoSuperior")
+    
+    
+class ListaBlocosLocators(object):
 
-CONTADOR = (By.ID, "selInfraPaginacaoSuperior")
+    TITLE = "SEI - Blocos de Assinatura"
 
-EXIBIRMENU = (By.ID, "lnkInfraMenuSistema")
+class BlocoLocators(object):
 
-BLOCOASS = (By.LINK_TEXT, "Blocos de Assinatura")
+    TITLE = "SEI - Documentos do Bloco de Assinatura"
+
+class ProcPageLocators(object):
+    
+    TXT_ANDAM_PRE = "Solicita-se ao protocolo a expedição do Ofício "
+
+    TXT_AND_MID = " ( SEI nº "
+
+    TXT_AND_POS = " ) por meio de correspondência simples com aviso de recebimento"
+
+
+
+
     

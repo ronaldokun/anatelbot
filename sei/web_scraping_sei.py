@@ -54,10 +54,10 @@ class LoginPage(Page):
         # Hit Enter
         senha.send_keys(Keys.RETURN)
 
-        return Sei(self.driver)
+        return PagInicial(self.driver)
 
 
-class Sei(Page):
+class PagInicial(Page):
 
     """
     This class is a subclass of page, this class is a logged page
@@ -125,6 +125,7 @@ class Sei(Page):
 
         return processos
 
+
     def go_to_blocos(self):
         self.exibir_menu_lateral()
         self.find_element(BLOCOASS).click()
@@ -159,17 +160,58 @@ class Sei(Page):
 
         for linha in linhas:
 
-            col = [v for v in linha.contents if v != '\n']
+            #col = [v for v in linha.contents if v != '\n']
 
-            assert len(col) == len(chaves)
+            cols = linha("td")
+                             
+            assert len(cols) == len(chaves)
 
-            for k, v in zip(chaves, col):
+            for k, v in zip(chaves, cols):
 
                 proc[k] = v
 
             lista_processos.append(proc)
+            
+            self.info_oficio(proc)
 
         return lista_processos
+    
+    def navigate_elem_to_new_window(self, elem):
+        """ Receive an instance of Page, navigate the link to a new window
+            
+            focus the driver in the new window
+            
+            return the main window and the driver focused on new window
+            
+            Assumes link is in page
+        """
+        #Guarda janela principal
+        main_window = self.driver.current_window_handle
+        
+        #Abre link no elem em uma nova janela
+        elem.send_keys(Keys.SHIFT + Keys.RETURN)
+        
+        # Guarda as janelas do navegador presentes
+        windows = self.driver.window_handles
+        
+        #Troca o foco do navegador
+        self.driver.switch_to_window(windows[-1])
+        
+        return (main_window,
+        
+
+    
+    def info_oficio(self, processo):
+        
+        # Guarda número do processo como string
+        num_proc = processo['processo'].a.string
+        
+        # Guarda o link para abrir o processo
+        link = self.wait_for_element_to_click((By.LINK_TEXT, num_proc))
+        
+        main_window = self.navigate_elem_to_new_window(elem)
+        
+        se
 
     def expedir_bloco(self, numero):
 
@@ -183,19 +225,64 @@ class Sei(Page):
             
             if podeExpedir(p):
                 
+                proc = p['processo'].a.string
+                num_doc = p['documento'].a.string
                 
+                #link = p['processo'].a.attrs['href']
+                
+                link = self.wait_for_element_to_click(
+                        (By.LINK_TEXT, proc))
+                
+                self.expedir_oficio(link, proc, num_doc)
+                
+                
+                
+                
+    def expedir_oficio(self, element, proc, doc):
+        
+        main_window = self.driver.current_window_handle
+        
+        element.send_keys(Keys.SHIFT + Keys.RETURN)
+        
+        windows = self.driver.window_handles
+        
+        self.driver.switch_to_window(windows[1])
+        
+        html = soup(self.driver.page_source, "lxml").find_all('a') 
+        
+        docs = html.find_all(string=re.compile(doc))
+        
+        print(docs)
+        
+        #self.driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'w')
+        
+        self.driver.close()
+        
+        
+        self.driver.switch_to.window(main_window)
+        
+        
+                
+                
+    #def navigate_new_window(self, link):
+        
+        #main_window = self.driver.current_window_handle
+        
+        
+                
+               
 
 def podeExpedir(p):
 
-        t1 = p['processo'].find_all('a', class_="protocoloAberto")
+    t1 = p['processo'].find_all('a', class_="protocoloAberto")
 
-        t2 = p['tipo'].find_all(string="Ofício")
+    t2 = p['tipo'].find_all(string="Ofício")
 
-        t3 = p['assinatura'].find_all(string=re.compile("Coordenador"))
-        
-        t4 = p['assinatura'].find_all(string=re.compile("Gerente"))
-        
-        return t1 and t2 and (t3 or t4))
+    t3 = p['assinatura'].find_all(string=re.compile("Coordenador"))
+    
+    t4 = p['assinatura'].find_all(string=re.compile("Gerente"))
+    
+    return t1 and t2 and (t3 or t4)
 
 
 driver = webdriver.Chrome()
@@ -206,7 +293,10 @@ sei.go_to_blocos()
 
 # sei.exibir_bloco(68049)
 
-bloco = sei.expedir_bloco(68218)
+bloco = sei.armazena_bloco(68757)
+
+#sei.expedir_bloco(68757)
+[]
 
 # sei.expand_visual()
 

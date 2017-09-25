@@ -15,16 +15,15 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
 
-
 from base import Page
 
-from locators import LoginLocators, \
-                     BaseLocators, \
-                     LatMenuLocators, \
-                     MainLocators, \
-                     ListaBlocosLocators, \
-                     BlocoLocators, \
-                     ProcPageLocators
+from locators import Login, \
+    Base, \
+    LatMenu, \
+    Main, \
+    ListaBlocos, \
+    Bloco, \
+    Processo
 
 
 class Base(Page):
@@ -33,20 +32,18 @@ class Base(Page):
         Those Headers are present in all Pages inside SEI, e.g., since is 
         logged in
     """
+
     def isPaginaInicial(self):
         return self.get_title() == 'SEI - Controle de Processos'
 
     def go_to_initial_page(self):
-        self.find_element(*BaseLocators.INITIALPAGE).click()
+        self.find_element(*Base.INITIALPAGE).click()
 
-    def exibir_menu_lateral(self):
-
-        menu = self.find_element(*BaseLocators.EXIBIRMENU)
+        menu = self.find_element(*Base.EXIBIRMENU)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
 
- 
 
 class LoginPage(Page):
 
@@ -54,12 +51,12 @@ class LoginPage(Page):
         """
         with self.driver, navigate to url
         make login and return and instance of browser"""
-        
-        self.driver.get(LoginLocators.URL)
+
+        self.driver.get(Login.URL)
         self.driver.maximize_window()
 
-        usuario = self.wait_for_element_to_click(*LoginLocators.LOGIN)
-        senha = self.wait_for_element_to_click(*LoginLocators.SENHA)
+        usuario = self.wait_for_element_to_click(*Login.LOGIN)
+        senha = self.wait_for_element_to_click(*Login.SENHA)
 
         # Clear any clutter on the form
         usuario.clear()
@@ -73,6 +70,7 @@ class LoginPage(Page):
 
         return Main(self.driver)
 
+
 class Main(Base):
 
     """
@@ -80,39 +78,37 @@ class Main(Base):
     """
 
     def expand_visual(self):
-        
+
         ver_todos_processos = self.wait_for_element_to_click(
-                *MainLocators.FILTROATRIBUICAO)
+            *Main.FILTROATRIBUICAO)
         # Checa se a visualização está restrita aos processos atribuidos ao
         # login
         if ver_todos_processos.text == 'Ver todos os processos':
-                ver_todos_processos.click()
-        
+            ver_todos_processos.click()
+
         # Verifica se está na visualização detalhada senão muda para ela
         visualizacao_detalhada = self.wait_for_element_to_click(
-                *MainLocators.TIPOVISUALIZACAO)
+            *Main.TIPOVISUALIZACAO)
 
         if visualizacao_detalhada.text == 'Visualização detalhada':
-                visualizacao_detalhada.click()
-                
+            visualizacao_detalhada.click()
+
         def lista_processos(self):
 
             processos = []
-    
+
             if not self.isPaginaInicial():
                 self.go_to_initial_page()
-    
-            contador = Select(self.find_element(*MainLocators.CONTADOR))
-    
-            #pages = [pag.text for pag in contador.options]
-    
+
+            contador = Select(self.find_element(*Main.CONTADOR))
+
+            # pages = [pag.text for pag in contador.options]
+
             for pag in contador.options:
-    
-                contador = Select(self.find_element(*MainLocators.CONTADOR))
+
+                contador = Select(self.find_element(*Main.CONTADOR))
                 contador.select_by_visible_text(pag.text)
                 html_sei = soup(self.driver.page_source, "lxml")
                 processos += html_sei("tr", {"class": 'infraTrClara'})
-    
-            return processos
 
-        
+            return processos

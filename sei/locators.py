@@ -25,6 +25,8 @@ class Base(object):
     INITIALPAGE = (By.ID, "lnkControleProcessos")
 
     EXIBIRMENU = (By.ID, "lnkInfraMenuSistema")
+    
+    NAV_URL = Login.URL + "/sei/"
 
 
 class LatMenu(object):
@@ -52,11 +54,15 @@ class Bloco(object):
 
 
 class Processo(object):
+    
+    TITLE = "SEI - Processo"
 
-    TXT_ANDAM_PRE = "Solicita-se ao protocolo a expedição do Ofício "
+    TXT_AND_PRE = "Solicita-se ao protocolo a expedição do "
 
     TXT_AND_MID = " ( SEI nº "
 
-    TXT_AND_POS = " ) por meio de correspondência simples com aviso de recebimento"
+    TXT_AND_POS = "por meio de correspondência simples com aviso de recebimento."
+    
+    PRAZO = "3"
 
     

@@ -155,11 +155,11 @@ class PagInicial(Page):
         chaves = ['checkbox', 'seq', "processo", 'documento', 'data', 'tipo',
                   'assinatura', 'anotacoes', 'acoes']
 
-        proc = {k: None for k in chaves}
-
         lista_processos = []
 
         for linha in linhas:
+            
+            proc = {k: None for k in chaves}
 
             cols = [v for v in linha.contents if v != "\n"]
             
@@ -192,7 +192,8 @@ class PagInicial(Page):
 
         # Abre link no elem em uma nova janela
         elem.send_keys(Keys.SHIFT + Keys.RETURN)
-
+        
+        
         # Guarda as janelas do navegador presentes
         windows = self.driver.window_handles
 
@@ -200,19 +201,29 @@ class PagInicial(Page):
         self.driver.switch_to_window(windows[-1])
 
         return (main_window, windows[-1])
+    
+    def navigate_link_to_new_window(self, link):
+        
+        # Guarda janela principal
+        main_window = self.driver.current_window_handle
 
-    def info_oficio(self, processo):
+        # Abre link no elem em uma nova janela
+        #body = self.driver.find_element_by_tag_name('body')
+        
+        #body.send_keys(Keys.CONTROL + 'n')
+        
+        self.driver.execute_script("window.open()")
+        # Guarda as janelas do navegador presentes
+        windows = self.driver.window_handles
 
-        # Guarda número do processo como string
-        num_proc = processo['processo'].a.string
-
-        # Guarda o link para abrir o processo
-        elem = self.wait_for_element_to_click((By.LINK_TEXT, num_proc))
-
-        (main_window, proc_window) = self.navigate_elem_to_new_window(elem)
-
-        # TODO: Resgatar informações da arvore e chamar função alterar andamento
-
+        # Troca o foco do navegador
+        self.driver.switch_to_window(windows[-1])
+        
+        self.driver.get(link)
+        
+        return (main_window, windows[-1])
+    
+    
     def expedir_bloco(self, numero):
 
 
@@ -223,40 +234,133 @@ class PagInicial(Page):
             if podeExpedir(p):
 
                 proc = p['processo'].a.string
+                
                 num_doc = p['documento'].a.string
 
-                # link = p['processo'].a.attrs['href']
+                link = Base.NAV_URL + p['processo'].a.attrs['href'] 
 
-                elem = self.wait_for_element_to_click(
-                    (By.LINK_TEXT, proc))
+                #elem = self.wait_for_element_to_click(
+                 #   (By.LINK_TEXT, proc))
 
-                self.expedir_oficio(elem, proc, num_doc)
+                self.expedir_oficio(proc, num_doc, link)
+                
+                
+                
+                
 
-    def expedir_oficio(self, element, proc, doc):
+    def expedir_oficio(self, proc, num_doc, link):
+        
+        # Guarda o link para abrir o processo
+        #elem = self.wait_for_element_to_click((By.LINK_TEXT, proc))
 
-        main_window = self.driver.current_window_handle
-
-        element.send_keys(Keys.SHIFT + Keys.RETURN)
-
-        windows = self.driver.window_handles
-
-        self.driver.switch_to_window(windows[-1])
-
-        html = soup(self.driver.page_source, "lxml").find_all('a')
-
-        docs = html.find_all(string=re.compile(doc))
-
-        print(docs)
-
-        # self.driver.wait_for_element_by_tag_name('body').send_keys(Keys.CONTROL + 'w')
-
+        (main_window, proc_window) = self.navigate_link_to_new_window(link)
+        
+        info = self.info_oficio(num_doc) 
+        
+        self.driver.switch_to_window(proc_window)
+                            
+        buttons = self.acoes_oficio()
+            
+        self.atualiza_andamento(buttons, info)
+        
+        #self.enviar_processo_sede(buttons)
+        
         self.driver.close()
+        
+        self.driver.switch_to_window(main_window)
+            
+        
+        
+    def enviar_processo_sede(self, buttons):
+        
+        assert self.driver.page_source.title == Processo.TITLE, \
+        "Erro ao navegar para o processo"
+        
+        enviar = buttons[3]
+        
+        link = Base.NAV_URL + enviar.attrs["href"]
+        
+        (proc_window, new_window) = self.navigate_link_to_new_window(link)        
+        
+        
+    def acoes_oficio(self):
+        
+        assert self.get_title() == Processo.TITLE, \
+        "Erro ao navegar para o processo"
+        
+        # Switch to central frame
+        self.driver.switch_to_frame("ifrVisualizacao")
+        
+        html_frame = soup(self.driver.page_source, "lxml")
+        
+        buttons = html_frame.find(id="divArvoreAcoes").contents
+                
+        assert len(buttons) == 17, "Erro ao guardar os botões de ação do processo"
+        
+        self.driver.switch_to_default_content()
 
-        self.driver.switch_to.window(main_window)
+        
+        return buttons
+                
+        
+        
+        
+        
+        
+    def info_oficio(self, num_doc):
+        
+        assert self.get_title() == Processo.TITLE, \
+        "Erro ao navegar para o processo"
+        
+        # Switch to tree frame
+        self.driver.switch_to_frame("ifrArvore")
+        
+        with self.wait_for_page_load():
+        
+            html_tree = soup(self.driver.page_source, "lxml")
+            
+            info = html_tree.find(title=re.compile(num_doc)).string
+            
+            assert info != '' , "Falha ao retornar Info do Ofício da Árvore"
+            
+            #return to parent frame
+            self.driver.switch_to_default_content()
+            
+        return info
+        
+    def atualiza_andamento(self, buttons, info):
+        
+        assert self.get_title() == Processo.TITLE, \
+        "Erro ao navegar para o processo"
+        
+        
+        andamento = buttons[4]
+        
+        link = Base.NAV_URL + andamento.attrs['href']        
+        
+        (proc_window, new_window) = self.navigate_link_to_new_window(link)
+        
+        input_and = self.wait_for_element((By.ID, "txaDescricao"))
 
-    # def navigate_new_window(self, link):
+        text = Processo.TXT_AND_PRE + info + Processo.TXT_AND_POS        
+        
+        input_and.send_keys(text)
+        
+        #self.wait_for_element_to_click((By.ID, "sbmSalvar")).click()
+        
+        self.driver.close()
+        
+        self.driver.switch_to_window(proc_window)
+        
+        
+        
+        
+    
+    
 
-        # main_window = self.driver.current_window_handle
+        
+        
+    
 
 
 def podeExpedir(p):
@@ -269,7 +373,7 @@ def podeExpedir(p):
     
     t4 = p['assinatura'].find_all(string=re.compile("Gerente"))
     
-    return t1 and t2 and (t3 or t4)
+    return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
 
 
 driver = webdriver.Chrome()
@@ -280,8 +384,9 @@ sei.go_to_blocos()
 
 # sei.exibir_bloco(68049)
 
-bloco = sei.armazena_bloco(68757)
+# bloco = sei.armazena_bloco(69745)
 
+sei.expedir_bloco(69745)
 #sei.expedir_bloco(68757)
 
 # sei.expand_visual()

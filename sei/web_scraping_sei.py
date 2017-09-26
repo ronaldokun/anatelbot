@@ -25,7 +25,7 @@ from selenium.common.exceptions import \
     NoSuchElementException
 
 from locators import Login, Base, LatMenu, \
-    Main, ListaBlocos, Bloco, Processo
+    Main, ListaBlocos, Bloco, Processo, Envio
 
 
 from base import Page
@@ -178,51 +178,7 @@ class PagInicial(Page):
         return lista_processos
 
     
-    def navigate_elem_to_new_window(self, elem):
-        """ Receive an instance of Page, navigate the link to a new window
-
-            focus the driver in the new window
-
-            return the main window and the driver focused on new window
-
-            Assumes link is in page
-        """
-        # Guarda janela principal
-        main_window = self.driver.current_window_handle
-
-        # Abre link no elem em uma nova janela
-        elem.send_keys(Keys.SHIFT + Keys.RETURN)
-        
-        
-        # Guarda as janelas do navegador presentes
-        windows = self.driver.window_handles
-
-        # Troca o foco do navegador
-        self.driver.switch_to_window(windows[-1])
-
-        return (main_window, windows[-1])
-    
-    def navigate_link_to_new_window(self, link):
-        
-        # Guarda janela principal
-        main_window = self.driver.current_window_handle
-
-        # Abre link no elem em uma nova janela
-        #body = self.driver.find_element_by_tag_name('body')
-        
-        #body.send_keys(Keys.CONTROL + 'n')
-        
-        self.driver.execute_script("window.open()")
-        # Guarda as janelas do navegador presentes
-        windows = self.driver.window_handles
-
-        # Troca o foco do navegador
-        self.driver.switch_to_window(windows[-1])
-        
-        self.driver.get(link)
-        
-        return (main_window, windows[-1])
-    
+      
     
     def expedir_bloco(self, numero):
 
@@ -247,13 +203,15 @@ class PagInicial(Page):
                 
                 
                 
+                
+                
 
     def expedir_oficio(self, proc, num_doc, link):
         
         # Guarda o link para abrir o processo
         #elem = self.wait_for_element_to_click((By.LINK_TEXT, proc))
 
-        (main_window, proc_window) = self.navigate_link_to_new_window(link)
+        (main_window, proc_window) = navigate_link_to_new_window(self.driver, link)
         
         info = self.info_oficio(num_doc) 
         
@@ -263,7 +221,7 @@ class PagInicial(Page):
             
         self.atualiza_andamento(buttons, info)
         
-        #self.enviar_processo_sede(buttons)
+        self.enviar_processo_sede(buttons)
         
         self.driver.close()
         
@@ -271,16 +229,68 @@ class PagInicial(Page):
             
         
         
-    def enviar_processo_sede(self, buttons):
+    def enviar_processo_sede(self, buttons): 
         
-        assert self.driver.page_source.title == Processo.TITLE, \
-        "Erro ao navegar para o processo"
+        with self.wait_for_page_load():
         
-        enviar = buttons[3]
+            assert self.get_title() == Processo.TITLE, \
+            "Erro ao navegar para o processo"
         
-        link = Base.NAV_URL + enviar.attrs["href"]
+            enviar = buttons[3]
+            
+            link = Base.NAV_URL + enviar.attrs["href"]
+            
+            (proc_window, new_window) = navigate_link_to_new_window(self.driver, link)        
+            
+            self.driver.execute_script(Envio.LUPA)
+            
+        with self.wait_for_page_load():
+            
+            # Guarda as janelas do navegador presentes
+            windows = driver.window_handles
+    
+            # Troca o foco do navegador
+            self.driver.switch_to_window(windows[-1])
+            
+        assert self.get_title() == Envio.TITLE, \
+        "Erro ao navegar para as unidades de tramitação"
+                                
+        unidade = self.wait_for_element(Envio.IDSIGLA)
         
-        (proc_window, new_window) = self.navigate_link_to_new_window(link)        
+        unidade.clear()
+            
+        unidade.send_keys(Envio.SIGLASEDE + Keys.RETURN)
+        
+        sede = self.wait_for_element(Envio.IDSEDE)
+        
+        assert sede.get_attribute("title") == Envio.TXTSEDE, \
+        "Erro ao selecionar a Unidade Protocolo.Sede para envio"
+        
+        sede.click()
+        
+        self.wait_for_element_to_click(Envio.TRSP).click()
+        
+        self.driver.close()
+        
+        # Troca o foco do navegador
+        self.driver.switch_to_window(new_window)
+        
+        self.wait_for_element_to_click(Envio.MANTERABERTO).click()
+                
+        self.wait_for_element_to_click(Envio.RETDIAS).click()
+                
+        prazo = self.wait_for_element(Envio.NUMDIAS)
+        
+        prazo.clear()
+        
+        prazo.send_keys(Envio.PRAZO)
+        
+        self.wait_for_element_to_click(Envio.UTEIS).click()
+        
+        self.wait_for_element_to_click(Envio.ENVIAR).click()           
+        
+        
+        
         
         
     def acoes_oficio(self):
@@ -326,7 +336,7 @@ class PagInicial(Page):
             #return to parent frame
             self.driver.switch_to_default_content()
             
-        return info
+            return info
         
     def atualiza_andamento(self, buttons, info):
         
@@ -338,7 +348,7 @@ class PagInicial(Page):
         
         link = Base.NAV_URL + andamento.attrs['href']        
         
-        (proc_window, new_window) = self.navigate_link_to_new_window(link)
+        (proc_window, new_window) = navigate_link_to_new_window(self.driver, link)
         
         input_and = self.wait_for_element((By.ID, "txaDescricao"))
 
@@ -346,7 +356,7 @@ class PagInicial(Page):
         
         input_and.send_keys(text)
         
-        #self.wait_for_element_to_click((By.ID, "sbmSalvar")).click()
+        self.wait_for_element_to_click((By.ID, "sbmSalvar")).click()
         
         self.driver.close()
         
@@ -376,6 +386,52 @@ def podeExpedir(p):
     return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
 
 
+def navigate_elem_to_new_window(driver, elem):
+        """ Receive an instance of Page, navigate the link to a new window
+
+            focus the driver in the new window
+
+            return the main window and the driver focused on new window
+
+            Assumes link is in page
+        """
+        # Guarda janela principal
+        main_window = driver.current_window_handle
+
+        # Abre link no elem em uma nova janela
+        elem.send_keys(Keys.SHIFT + Keys.RETURN)
+        
+        
+        # Guarda as janelas do navegador presentes
+        windows = driver.window_handles
+
+        # Troca o foco do navegador
+        driver.switch_to_window(windows[-1])
+
+        return (main_window, windows[-1])
+    
+def navigate_link_to_new_window(driver, link):
+    
+    # Guarda janela principal
+    main_window = driver.current_window_handle
+
+    # Abre link no elem em uma nova janela
+    #body = self.driver.find_element_by_tag_name('body')
+    
+    #body.send_keys(Keys.CONTROL + 'n')
+    
+    driver.execute_script("window.open()")
+    # Guarda as janelas do navegador presentes
+    windows = driver.window_handles
+
+    # Troca o foco do navegador
+    driver.switch_to_window(windows[-1])
+    
+    driver.get(link)
+    
+    return (main_window, windows[-1])
+
+
 driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
@@ -387,6 +443,7 @@ sei.go_to_blocos()
 # bloco = sei.armazena_bloco(69745)
 
 sei.expedir_bloco(69745)
+
 #sei.expedir_bloco(68757)
 
 # sei.expand_visual()

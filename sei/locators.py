@@ -63,6 +63,37 @@ class Processo(object):
 
     TXT_AND_POS = "por meio de correspondência simples com aviso de recebimento."
     
-    PRAZO = "3"
+class Envio(object):
+    
+    TITLE =         "SEI - Selecionar Unidades"
+    
+    PRAZO =         "3"
+    
+    IDSIGLA =         (By.ID, "txtSiglaUnidade")
+    
+    SIGLASEDE =          "Protocolo.Sede"
+    
+    TXTSEDE =       "Protocolo.Sede - Protocolo da Sede"
+    
+    IDSEDE =        (By.ID, "chkInfraItem0")
+    
+    TRSP =          (By.ID, "btnTransportarSelecao")
+                
+    LUPA =          "objLupaUnidades.selecionar(700,500)"
+    
+    UNIDADE =       (By.ID, "txtUnidade")
+    
+    
+    MANTERABERTO =  (By.ID, "chkSinManterAberto")
+    
+    RETDATA =       (By.ID, "optDataCerta")
+    
+    RETDIAS =       (By.ID, "optDias")
+    
+    NUMDIAS =       (By.ID, "txtDias")
+    
+    UTEIS =         (By.ID, "chkSinDiasUteis")
+    
+    ENVIAR =        (By.ID, "sbmEnviar")
 
     

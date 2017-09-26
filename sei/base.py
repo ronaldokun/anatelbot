@@ -19,6 +19,9 @@ class Page(object):
     def __init__(self, driver):
         self.driver = driver
         self.timeout = 30
+        
+    def __enter__(self):
+        return self
 
     def close(self):
         self.driver.close()
@@ -30,6 +33,8 @@ class Page(object):
         yield
         WebDriverWait(self.driver, self.timeout).until(
             EC.staleness_of(old_page)
+            
+        
         )
 
     def find_element(self, *locator):

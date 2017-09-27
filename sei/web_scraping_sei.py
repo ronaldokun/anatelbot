@@ -37,7 +37,6 @@ class LoginPage(Page):
 
     def login(self, usr, pwd):
         """
-        with self.driver, navigate to url
         make login and return and instance of browser"""
 
         self.driver.get(Login.URL)
@@ -93,14 +92,10 @@ class PagInicial(Page):
         return self.get_title() == 'SEI - Controle de Processos'
 
     def go_to_initial_page(self):
-
         self.wait_for_element_to_click(
             Base.INITIALPAGE).click()
 
     def exibir_menu_lateral(self):
-
-        if not self.isPaginaInicial():
-            self.go_to_initial_page()
 
         menu = self.wait_for_element(Base.EXIBIRMENU)
 
@@ -195,15 +190,7 @@ class PagInicial(Page):
 
                 link = Base.NAV_URL + p['processo'].a.attrs['href'] 
 
-                #elem = self.wait_for_element_to_click(
-                 #   (By.LINK_TEXT, proc))
-
-                self.expedir_oficio(proc, num_doc, link)
-                
-                
-                
-                
-                
+                self.expedir_oficio(proc, num_doc, link)               
                 
 
     def expedir_oficio(self, proc, num_doc, link):
@@ -436,13 +423,13 @@ driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-sei.go_to_blocos()
+#sei.go_to_blocos()
 
 # sei.exibir_bloco(68049)
 
 # bloco = sei.armazena_bloco(69745)
 
-sei.expedir_bloco(69745)
+sei.expedir_bloco(70668)
 
 #sei.expedir_bloco(68757)
 

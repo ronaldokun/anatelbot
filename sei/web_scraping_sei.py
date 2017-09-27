@@ -23,6 +23,8 @@ from selenium.webdriver.common.by import By
 
 from locators import Login, Base, LatMenu, \
     Main, ListaBlocos, Bloco, Processo, Envio
+    
+
 
 
 from base import Page
@@ -131,7 +133,7 @@ class PagInicial(Page):
         try:
             self.wait_for_element((By.LINK_TEXT, str(numero))).click()
 
-        except NoSuchElementException:
+        except:
             print("O Bloco de Assinatura informado não existe ou está \
                   concluído!")
 
@@ -141,7 +143,7 @@ class PagInicial(Page):
 
             self.exibir_bloco(numero)
 
-        html_bloco = soup(driver.page_source, "lxml")
+        html_bloco = soup(self.driver.page_source, "lxml")
         linhas = html_bloco.find_all("tr", class_=['infraTrClara', 'infraTrEscura'])
 
         chaves = ['checkbox', 'seq', "processo", 'documento', 'data', 'tipo',
@@ -154,10 +156,6 @@ class PagInicial(Page):
             proc = {k: None for k in chaves}
 
             cols = [v for v in linha.contents if v != "\n"]
-            
-            #proc['checkbox'] = linha("a", class_="infraCheckbox")
-            
-            #proc['seq'] = linha.
             
             assert len(chaves) == len(cols), "Verifique as linhas do bloco!"
                         
@@ -252,26 +250,26 @@ class PagInicial(Page):
         
         sede.click()
         
-        self.wait_for_element_to_click(Envio.TRSP).click()
+        self.wait_for_element_to_click(Envio.IDBTNTRSP).click()
         
         self.driver.close()
         
         # Troca o foco do navegador
         self.driver.switch_to_window(new_window)
         
-        self.wait_for_element_to_click(Envio.MANTERABERTO).click()
+        self.wait_for_element_to_click(Envio.IDMANTERABERTO).click()
                 
-        self.wait_for_element_to_click(Envio.RETDIAS).click()
+        self.wait_for_element_to_click(Envio.IDRETDIAS).click()
                 
-        prazo = self.wait_for_element(Envio.NUMDIAS)
+        prazo = self.wait_for_element(Envio.IDNUMDIAS)
         
         prazo.clear()
         
         prazo.send_keys(Envio.PRAZO)
         
-        self.wait_for_element_to_click(Envio.UTEIS).click()
+        self.wait_for_element_to_click(Envio.IDUTEIS).click()
         
-        self.wait_for_element_to_click(Envio.ENVIAR).click()           
+        self.wait_for_element_to_click(Envio.IDENVIAR).click()           
         
         
         
@@ -289,7 +287,7 @@ class PagInicial(Page):
         
         buttons = html_frame.find(id="divArvoreAcoes").contents
                 
-        assert len(buttons) == 17, "Erro ao guardar os botões de ação do processo"
+        #assert len(buttons) == 17, "Erro ao guardar os botões de ação do processo"
         
         self.driver.switch_to_default_content()
 
@@ -344,9 +342,7 @@ class PagInicial(Page):
         
         self.driver.close()
         
-        self.driver.switch_to_window(proc_window)
-        
-        
+        self.driver.switch_to_window(proc_window)       
         
         
     
@@ -420,18 +416,3 @@ driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-#sei.go_to_blocos()
-
-# sei.exibir_bloco(68049)
-
-# bloco = sei.armazena_bloco(69745)
-
-sei.expedir_bloco(70668)
-
-#sei.expedir_bloco(68757)
-
-# sei.expand_visual()
-
-# processos = sei.lista_processos()
-
-# sei.exibir_menu_lateral()

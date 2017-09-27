@@ -77,23 +77,22 @@ class Envio(object):
     
     IDSEDE =        (By.ID, "chkInfraItem0")
     
-    TRSP =          (By.ID, "btnTransportarSelecao")
+    IDBTNTRSP =          (By.ID, "btnTransportarSelecao")
                 
     LUPA =          "objLupaUnidades.selecionar(700,500)"
     
-    UNIDADE =       (By.ID, "txtUnidade")
+    IDUNIDADE =       (By.ID, "txtUnidade")
+        
+    IDMANTERABERTO =  (By.ID, "chkSinManterAberto")
     
+    IDRETDATA =       (By.ID, "optDataCerta")
     
-    MANTERABERTO =  (By.ID, "chkSinManterAberto")
+    IDRETDIAS =       (By.ID, "optDias")
     
-    RETDATA =       (By.ID, "optDataCerta")
+    IDNUMDIAS =       (By.ID, "txtDias")
     
-    RETDIAS =       (By.ID, "optDias")
+    IDUTEIS =         (By.ID, "chkSinDiasUteis")
     
-    NUMDIAS =       (By.ID, "txtDias")
-    
-    UTEIS =         (By.ID, "chkSinDiasUteis")
-    
-    ENVIAR =        (By.ID, "sbmEnviar")
+    IDENVIAR =        (By.ID, "sbmEnviar")
 
     

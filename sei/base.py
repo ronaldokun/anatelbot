@@ -13,7 +13,6 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from contextlib import contextmanager
 
-
 class Page(object):
     # assumes self.driver is a selenium webdriver
     def __init__(self, driver):

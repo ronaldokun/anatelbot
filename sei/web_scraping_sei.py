@@ -20,9 +20,6 @@ from selenium.webdriver.support.ui import Select
 # METHODS
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-# EXCEPTIONS
-from selenium.common.exceptions import \
-    NoSuchElementException
 
 from locators import Login, Base, LatMenu, \
     Main, ListaBlocos, Bloco, Processo, Envio
@@ -117,7 +114,7 @@ class PagInicial(Page):
 
             contador = Select(self.wait_for_element(Main.CONTADOR))
             contador.select_by_visible_text(pag)
-            html_sei = soup(driver.page_source, "lxml")
+            html_sei = soup(self.driver.page_source, "lxml")
             processos += html_sei("tr", {"class": 'infraTrClara'})
 
         return processos

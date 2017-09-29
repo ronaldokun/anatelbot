@@ -29,87 +29,60 @@ from base import Page
 def podeExpedir(p):
 
     t1 = p['processo'].find_all('a', class_="protocoloAberto")
-        
+
     t2 = p['tipo'].find_all(string="Ofício")
 
     t3 = p['assinatura'].find_all(string=re.compile("Coordenador"))
-    
+
     t4 = p['assinatura'].find_all(string=re.compile("Gerente"))
-    
+
     return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
 
 
 def navigate_elem_to_new_window(driver, elem):
-        """ Receive an instance of Page, navigate the link to a new window
+    """ Receive an instance of Page, navigate the link to a new window
 
-            focus the driver in the new window
+        focus the driver in the new window
 
-            return the main window and the driver focused on new window
+        return the main window and the driver focused on new window
 
-            Assumes link is in page
-        """
-        # Guarda janela principal
-        main_window = driver.current_window_handle
-
-        # Abre link no elem em uma nova janela
-        elem.send_keys(Keys.SHIFT + Keys.RETURN)
-        
-        
-        # Guarda as janelas do navegador presentes
-        windows = driver.window_handles
-
-        # Troca o foco do navegador
-        driver.switch_to_window(windows[-1])
-
-        return (main_window, windows[-1])
-    
-def navigate_link_to_new_window(driver, link):
-    
+        Assumes link is in page
+    """
     # Guarda janela principal
     main_window = driver.current_window_handle
 
     # Abre link no elem em uma nova janela
-    #body = self.driver.find_element_by_tag_name('body')
-    
-    #body.send_keys(Keys.CONTROL + 'n')
-    
+    elem.send_keys(Keys.SHIFT + Keys.RETURN)
+
+    # Guarda as janelas do navegador presentes
+    windows = driver.window_handles
+
+    # Troca o foco do navegador
+    driver.switch_to_window(windows[-1])
+
+    return (main_window, windows[-1])
+
+
+def navigate_link_to_new_window(driver, link):
+
+    # Guarda janela principal
+    main_window = driver.current_window_handle
+
+    # Abre link no elem em uma nova janela
+    # body = self.driver.find_element_by_tag_name('body')
+
+    # body.send_keys(Keys.CONTROL + 'n')
+
     driver.execute_script("window.open()")
     # Guarda as janelas do navegador presentes
     windows = driver.window_handles
 
     # Troca o foco do navegador
     driver.switch_to_window(windows[-1])
-    
+
     driver.get(link)
-    
+
     return (main_window, windows[-1])
-
-
-
-class LoginPage(Page):
-
-    def login(self, usr, pwd):
-        """
-        with self.driver, navigate to url
-        make login and return and instance of browser"""
-
-        self.driver.get(Login.URL)
-        self.driver.maximize_window()
-
-        usuario = self.wait_for_element_to_click(Login.LOGIN)
-        senha = self.wait_for_element_to_click(Login.SENHA)
-
-        # Clear any clutter on the form
-        usuario.clear()
-        usuario.send_keys(usr)
-
-        senha.clear()
-        senha.send_keys(pwd)
-
-        # Hit Enter
-        senha.send_keys(Keys.RETURN)
-
-        return PagInicial(self.driver)
 
 
 class BasePage(Page):
@@ -126,19 +99,19 @@ class BasePage(Page):
         self.wait_for_element_to_click(Base.INITIALPAGE).click()
 
     def exibir_menu_lateral(self):
-        
+
         menu = self.find_element(Base.EXIBIRMENU)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
-            
+
     def go_to_blocos(self):
         self.exibir_menu_lateral()
         self.wait_for_element(LatMenu.BLOCOASS).click()
-        
 
-class Bloco
-        
+
+class Bloco(BasePage):
+
     def exibir_bloco(self, numero):
 
         if self.get_title() != ListaBlocos.TITLE:
@@ -150,7 +123,7 @@ class Bloco
         except:
             print("O Bloco de Assinatura informado não existe ou está \
                   concluído!")
-            
+
     def armazena_bloco(self, numero):
 
         if self.get_title() != Bloco.TITLE + " " + str(numero):
@@ -158,7 +131,8 @@ class Bloco
             self.exibir_bloco(numero)
 
         html_bloco = soup(self.driver.page_source, "lxml")
-        linhas = html_bloco.find_all("tr", class_=['infraTrClara', 'infraTrEscura'])
+        linhas = html_bloco.find_all(
+            "tr", class_=['infraTrClara', 'infraTrEscura'])
 
         chaves = ['checkbox', 'seq', "processo", 'documento', 'data', 'tipo',
                   'assinatura', 'anotacoes', 'acoes']
@@ -166,42 +140,47 @@ class Bloco
         lista_processos = []
 
         for linha in linhas:
-            
+
             proc = {k: None for k in chaves}
 
             cols = [v for v in linha.contents if v != "\n"]
-            
+
             assert len(chaves) == len(cols), "Verifique as linhas do bloco!"
-                        
+
             for k, v in zip(chaves, cols):
 
                 proc[k] = v
-                
+
             proc["expedido"] = False
 
             lista_processos.append(proc)
 
         return lista_processos
-    
+
     def expedir_bloco(self, numero):
-    
-    
+
         processos = self.armazena_bloco(numero)
-    
+
         for p in processos:
-            
-            if p['expedido']: next                
-    
+
+            if p['expedido']:
+
+                print("Processo %s já foi expedido!\n", p['processo'].a.string)
+                next
+
             if podeExpedir(p):
-    
+
                 proc = p['processo'].a.string
-                
+
                 num_doc = p['documento'].a.string
-    
-                link = Base.NAV_URL + p['processo'].a.attrs['href'] 
-    
+
+                link = Base.NAV_URL + p['processo'].a.attrs['href']
+
+                (bloco_window, proc_window) = navigate_link_to_new_window(
+                    self.driver, link)
+
                 self.expedir_oficio(proc, num_doc, link)
-           
+
 
 class PagInicial(BasePage):
 
@@ -231,7 +210,7 @@ class PagInicial(BasePage):
 
         if not self.isPaginaInicial():
             self.go_to_initial_page()
-            
+
         self.expand_visual()
 
         contador = Select(self.wait_for_element(Main.CONTADOR))
@@ -246,9 +225,8 @@ class PagInicial(BasePage):
             processos += html_sei("tr", {"class": 'infraTrClara'})
 
         return processos
-    
+
+
 class ProcPage(BasePage):
-    
-    
-    
-#TODO: Guardar processos em detalhes
+
+    # TODO: Guardar processos em detalhes

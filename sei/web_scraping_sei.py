@@ -199,8 +199,6 @@ class PagInicial(Page):
 
         self.enviar_processo_sede(buttons)
 
-        self.driver.close()
-
         self.driver.switch_to_window(main_window)
 
     def enviar_processo_sede(self, buttons):
@@ -262,6 +260,11 @@ class PagInicial(Page):
         self.wait_for_element_to_click(Envio.IDUTEIS).click()
 
         self.wait_for_element_to_click(Envio.IDENVIAR).click()
+        
+        self.driver.close()
+        
+        self.driver.switch_to_window(proc_window)
+
 
     def acoes_oficio(self):
 

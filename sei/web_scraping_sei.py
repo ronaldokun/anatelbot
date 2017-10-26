@@ -111,7 +111,8 @@ class PagInicial(Page):
         pages = [pag.text for pag in contador.options]
 
         for pag in pages:
-
+            
+            # One simple repetition to avoid more complex code
             contador = Select(self.wait_for_element(Main.CONTADOR))
             contador.select_by_visible_text(pag)
             html_sei = soup(self.driver.page_source, "lxml")
@@ -263,7 +264,11 @@ class PagInicial(Page):
         
         self.driver.close()
         
-        self.driver.switch_to_window(proc_window)
+        #self.driver.switch_to_window(proc_window)
+        
+        #self.driver.close()
+        
+        
 
 
     def acoes_oficio(self):
@@ -273,6 +278,8 @@ class PagInicial(Page):
 
         # Switch to central frame
         self.driver.switch_to_frame("ifrVisualizacao")
+        
+        self.wait_for_element((By.ID, "divArvoreAcoes"))
 
         html_frame = soup(self.driver.page_source, "lxml")
 
@@ -391,3 +398,6 @@ def navigate_link_to_new_window(driver, link):
 driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
+
+sei.expedir_bloco(73946)
+

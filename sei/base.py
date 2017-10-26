@@ -7,7 +7,7 @@ Created on Mon Aug 28 20:44:15 2017
 """
 
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -17,7 +17,7 @@ class Page(object):
     # assumes self.driver is a selenium webdriver
     def __init__(self, driver):
         self.driver = driver
-        self.timeout = 30
+        self.timeout = 10
         
     def __enter__(self):
         return self
@@ -35,6 +35,18 @@ class Page(object):
             
         
         )
+        
+    def elem_is_visible(self, *locator):
+        
+        try:
+            
+            WebDriverWait(self.driver, self.timeout).until(
+                    EC.visibility_of_element_located(*locator))
+        except TimeoutException:
+            return False
+        return True    
+    
+    
 
     def find_element(self, *locator):
         return self.find_element(*locator)
@@ -55,8 +67,8 @@ class Page(object):
 
     def check_element_exists(self, *locator):
         try:
-            self.find_element(*locator)
-        except NoSuchElementException:
+            self.wait_for_element(*locator)
+        except TimeoutException:
             return False
         return True
 

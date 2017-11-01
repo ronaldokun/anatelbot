@@ -213,7 +213,7 @@ class PagInicial(Page):
 
             link = Base.NAV_URL + enviar.attrs["href"]
 
-            (proc_window, new_window) = navigate_link_to_new_window(self.driver, link)
+            (janela_processo, janela_andamento) = navigate_link_to_new_window(self.driver, link)
 
             self.driver.execute_script(Envio.LUPA)
 
@@ -221,9 +221,11 @@ class PagInicial(Page):
 
             # Guarda as janelas do navegador presentes
             windows = driver.window_handles
+            
+            janela_envio = windows[-1]
 
             # Troca o foco do navegador
-            self.driver.switch_to_window(windows[-1])
+            self.driver.switch_to_window(janela_envio)
 
         assert self.get_title() == Envio.TITLE, \
             "Erro ao navegar para as unidades de tramitação"
@@ -243,10 +245,11 @@ class PagInicial(Page):
 
         self.wait_for_element_to_click(Envio.IDBTNTRSP).click()
 
+        # Fecha a janela_envio
         self.driver.close()
 
         # Troca o foco do navegador
-        self.driver.switch_to_window(new_window)
+        self.driver.switch_to_window(janela_andamento)
 
         self.wait_for_element_to_click(Envio.IDMANTERABERTO).click()
 
@@ -262,11 +265,13 @@ class PagInicial(Page):
 
         self.wait_for_element_to_click(Envio.IDENVIAR).click()
         
+        # fecha a janela_andamento
         self.driver.close()
         
-        #self.driver.switch_to_window(proc_window)
+        self.driver.switch_to_window(janela_processo)
         
-        #self.driver.close()
+        # fecha a janela processo
+        self.driver.close()
         
         
 
@@ -399,5 +404,5 @@ driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-sei.expedir_bloco(74084)
+sei.expedir_bloco(74446)
 

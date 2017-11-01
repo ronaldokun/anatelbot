@@ -44,7 +44,7 @@ class Page(object):
                     EC.visibility_of_element_located(*locator))
         except TimeoutException:
             return False
-        return True    
+        return True   
     
     
 

@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Sep  7 16:55:01 2017
 
-@author: rsilva
-"""
+import os
+
+import re
+
+import pandas as pd
+
+from datetime import date, time
 
 # HTML PARSER
 from bs4 import BeautifulSoup as soup
@@ -15,6 +18,10 @@ from selenium import webdriver
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
+# Exceptions
+from selenium.common.exceptions import TimeoutException
+
+
 # METHODS
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -25,92 +32,144 @@ from locators import Login, Base, LatMenu, \
 
 from base import Page
 
+import functions as ft
 
-def podeExpedir(p):
+def login_SEI(driver, usr, pwd):
+        """
+        Esta função recebe um objeto Webdrive e as credenciais  
+        do usuário, loga no SEI - ANATEL e retorna uma instância da classe  
+        SEI. 
+        """
 
-    t1 = p['processo'].find_all('a', class_="protocoloAberto")
+        page = Page(driver)
+        page.driver.get(Login.URL)
+        page.driver.maximize_window()
 
-    t2 = p['tipo'].find_all(string="Ofício")
+        usuario = page.wait_for_element_to_click(Login.LOGIN)
+        senha = page.wait_for_element_to_click(Login.SENHA)
 
-    t3 = p['assinatura'].find_all(string=re.compile("Coordenador"))
+        # Clear any clutter on the form
+        usuario.clear()
+        usuario.send_keys(usr)
 
-    t4 = p['assinatura'].find_all(string=re.compile("Gerente"))
+        senha.clear()
+        senha.send_keys(pwd)
 
-    return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
+        # Hit Enter
+        senha.send_keys(Keys.RETURN)
 
-
-def navigate_elem_to_new_window(driver, elem):
-    """ Receive an instance of Page, navigate the link to a new window
-
-        focus the driver in the new window
-
-        return the main window and the driver focused on new window
-
-        Assumes link is in page
-    """
-    # Guarda janela principal
-    main_window = driver.current_window_handle
-
-    # Abre link no elem em uma nova janela
-    elem.send_keys(Keys.SHIFT + Keys.RETURN)
-
-    # Guarda as janelas do navegador presentes
-    windows = driver.window_handles
-
-    # Troca o foco do navegador
-    driver.switch_to_window(windows[-1])
-
-    return (main_window, windows[-1])
+        return PagInicial(page.driver)
 
 
-def navigate_link_to_new_window(driver, link):
-
-    # Guarda janela principal
-    main_window = driver.current_window_handle
-
-    # Abre link no elem em uma nova janela
-    # body = self.driver.find_element_by_tag_name('body')
-
-    # body.send_keys(Keys.CONTROL + 'n')
-
-    driver.execute_script("window.open()")
-    # Guarda as janelas do navegador presentes
-    windows = driver.window_handles
-
-    # Troca o foco do navegador
-    driver.switch_to_window(windows[-1])
-
-    driver.get(link)
-
-    return (main_window, windows[-1])
-
-
-class BasePage(Page):
+class PagInicial(Page):
     """ This class is a Page class with additional methods to be executed 
         on elements present in the Header Frame and Menu Frame in SEI. 
-        Those Headers are present in all Pages inside SEI, e.g., since is 
-        logged in
+        Those Headers are present in all Pages inside SEI.
     """
 
+    # Atributo adicional da classe
+    processos = []
+    
+    def ver_proc_detalhado(self):
+        """
+        Expands the visualization from the main page in SEI
+        """
+        try:
+            ver_todos = self.wait_for_element_to_click(Main.FILTROATRIBUICAO)
+            
+            if ver_todos.text =="Ver todos os processos":
+                ver_todos.click()
+        
+        except TimeoutException:
+            
+            print("A página não carregou no tempo limite ou cheque o link\
+                  'ver todos os processos'")
+            
+        try:
+            
+            detalhado = self.wait_for_element_to_click(Main.TIPOVISUALIZACAO)
+        
+            if detalhado.text == "Visualização detalhada":
+                detalhado.click()
+                
+        except TimeoutException:
+            
+            print("A página não carregou no tempo limite ou cheque o link\
+            de visualização detalhada")
+            
     def isPaginaInicial(self):
+        """Retorna True se a página estiver na página inicial do SEI, False
+        caso contrário"""        
         return self.get_title() == 'SEI - Controle de Processos'
 
     def go_to_initial_page(self):
-        self.wait_for_element_to_click(Base.INITIALPAGE).click()
+        """
+        Navega até a página inicial do SEI caso já esteja nela 
+        a página é recarregada
+        Assume que o link está presente em qualquer subpágina do SEI
+        """
+        self.wait_for_element_to_click(
+            Base.INITIALPAGE).click()
 
     def exibir_menu_lateral(self):
-
-        menu = self.find_element(Base.EXIBIRMENU)
+        """
+        Exibe o Menu Lateral á Esquerda no SEI para acessos aos seus diversos
+        links
+        Assume que o link está presente em qualquer subpágina do SEI
+        """
+        menu = self.wait_for_element(Base.EXIBIRMENU)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
+            
+    def itera_processos(self):
+        """
+        Navega as páginas de processos abertos no SEI. Cada linha da página
+        inicial do SEI possui 6 tags principais. Esse método guarda
+        essas html tags como objetos soup 
+        """     
+        
+        #Apaga o conteúdo atual da lista de processos
+        lista_processos = []
+        
+        # assegura que está inicial
+        if not self.isPaginaInicial():
+            self.go_to_initial_page()
 
-    def go_to_blocos(self):
-        self.exibir_menu_lateral()
-        self.wait_for_element(LatMenu.BLOCOASS).click()
+        # Mostra página com informações detalhadas
+        self.ver_proc_detalhado()
+        
+        contador = Select(self.wait_for_element(Main.CONTADOR))
 
+        pages = [pag.text for pag in contador.options]
 
-class Bloco(BasePage):
+        for pag in pages:
+            
+            # One simple repetition to avoid more complex code
+            contador = Select(self.wait_for_element(Main.CONTADOR))
+            contador.select_by_visible_text(pag)
+            html_sei = soup(self.driver.page_source, "lxml")
+            lista_processos += html_sei("tr", {"class": 'infraTrClara'})
+            
+            
+            
+        # percorre a lista de processos
+        # cada linha corresponde a uma tag mãe 'tr'
+        # substituimos a tag mãe por uma lista das tags filhas 
+        # 'tag.contents', descartando os '\n'
+        # a função lista_to_dict_tags recebe essa lista
+        # e retorna um dicionário das tags
+        
+        for line in lista_processos:
+            
+            lista_tags = [tag for tag in line.contents if tag !='\n']
+            
+            self.processos.append(ft.lista_to_dict_tags(lista_tags))
+            
+        
+            
+
+class PagBlocos(Page):
 
     def exibir_bloco(self, numero):
 
@@ -168,7 +227,7 @@ class Bloco(BasePage):
                 print("Processo %s já foi expedido!\n", p['processo'].a.string)
                 next
 
-            if podeExpedir(p):
+            if ft.podeExpedir(p):
 
                 proc = p['processo'].a.string
 
@@ -176,57 +235,14 @@ class Bloco(BasePage):
 
                 link = Base.NAV_URL + p['processo'].a.attrs['href']
 
-                (bloco_window, proc_window) = navigate_link_to_new_window(
+                (bloco_window, proc_window) = ft.navigate_link_to_new_window(
                     self.driver, link)
 
                 self.expedir_oficio(proc, num_doc, link)
 
 
-class PagInicial(BasePage):
-
-    """
-    This class is a subclass of page, this class is a logged page
-    """
-
-    def expand_visual(self):
-
-        ver_todos_processos = self.wait_for_element_to_click(
-            Main.FILTROATRIBUICAO)
-        # Checa se a visualização está restrita aos processos atribuidos ao
-        # login
-        if ver_todos_processos.text == 'Ver todos os processos':
-            ver_todos_processos.click()
-
-        # Verifica se está na visualização detalhada senão muda para ela
-        visualizacao_detalhada = self.wait_for_element_to_click(
-            Main.TIPOVISUALIZACAO)
-
-        if visualizacao_detalhada.text == 'Visualização detalhada':
-            visualizacao_detalhada.click()
-
-    def guarda_todos_processos(self):
-
-        processos = []
-
-        if not self.isPaginaInicial():
-            self.go_to_initial_page()
-
-        self.expand_visual()
-
-        contador = Select(self.wait_for_element(Main.CONTADOR))
-
-        pages = [pag.text for pag in contador.options]
-
-        for pag in pages:
-
-            contador = Select(self.wait_for_element(Main.CONTADOR))
-            contador.select_by_visible_text(pag)
-            html_sei = soup(self.driver.page_source, "lxml")
-            processos += html_sei("tr", {"class": 'infraTrClara'})
-
-        return processos
 
 
-class ProcPage(BasePage):
+class ProcPage(Page):
 
-    # TODO: Guardar processos em detalhes
+    pass# TODO: Guardar processos em detalhes

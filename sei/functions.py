@@ -7,6 +7,10 @@ Created on Wed Nov  1 16:50:19 2017
 
 import re
 
+import os
+
+os.chdir('../')
+
 # Selenium Methods
 from selenium.webdriver.common.keys import Keys
 
@@ -73,114 +77,114 @@ def navigate_link_to_new_window(driver, link):
 
     return (main_window, windows[-1])
 
-def lista_to_dict_tags(lista_tags):
+
+def cria_dict_tags(lista_tags):
 
     dict_tags = {}
     
-    assert len(lista_tags) == 6, \
-    "Verifique o nº de tags de cada linha do processo, valor diferente de 10"
+    assert len(lista_tags) == 6, "Verifique o nº de tags de cada linha do processo, valor diferente de 10"
 
-    dict_tags['checkbox'] = lista_tags[0].find(class_='infraCheckbox')
+    #dict_tags['checkbox'] = lista_tags[0].find(class_='infraCheckbox')
     
-    # Existem no máximo 4 tags 'a' nos controles dos processos como
-    # tags filhas da 2ª tag
-    controles = lista_tags[1].find_all('a')    
+    controles = lista_tags[1].find_all('a')
     
-    # itera e classifica as tags filhas
+    dict_tags['AVISO'] = 'NÃO'
+    
     for tag_a in controles:
         
-        img = str(tag_a.img['src'])
+        img = str(tag_a.img['src'])       
         
-        # por default as anotações não estão como prioridade ( vermelhas )        
-        dict_tags['prioridade'] = False
         
-        # testa se a tag ép Post-It
         if 'imagens/sei_anotacao' in img:
-                        
-            txt = re.search('\((.*)\)', tag_a.attrs['onmouseover']).group()
             
-            txt = txt.split("'")[1:4:2]
+            #dict_tags['ANOTACAO'] = tag_a
             
-            dict_tags['post-it'] = txt
+            dict_tags['ANOTACAO'] = re.search('\((.*)\)', tag_a.attrs['onmouseover']).group().split("'")[1:4:2]
             
-            dict_tags['link_post-it'] =  Base.NAV_URL + tag_a['href']
-            
-            if 'prioridade' in img: 
+            if 'PRIORIDADE' in img: 
                 
-                dict_tags['prioridade'] = True
-        # testa se é Ponto de Controle
+                dict_tags['PRIORIDADE'] = 'SIM'
+                
+            else:                
+                
+                dict_tags['PRIORIDADE'] = 'NÃO'
+            
         elif 'imagens/sei_situacao' in  img:
             
-            txt = re.search('\((.*)\)', tag_a.attrs['onmouseover']).group()
+            dict_tags['SITUACAO'] = re.search('\((.*)\)', tag_a.attrs['onmouseover']).group().split("'")[1]
             
-            txt = txt.split("'")[1]
-            
-            dict_tags['situacao'] = txt
-            
-            dict_tags['link_situacao'] = Base.NAV_URL + tag_a['href']
-        
-        # testa se a tag é um marcador
         elif 'imagens/marcador' in img:
             
-            dict_tags['link_marcador'] = Base.NAV_URL + tag_a['href']
+            #dict_tags['MARCADOR'] = tag_a
             
-            txt = re.search('\((.*)\)', tag_a.attrs['onmouseover']).group()
+            marcador = re.search('\((.*)\)', tag_a.attrs['onmouseover']).group().split("'")[1:4:2]
             
-            txt = txt.split("'")[1:4:2]
+            dict_tags['MARCADOR'] = marcador[1]
             
-            dict_tags['marcador'] = txt[1] + ' : ' + txt[0]            
+            dict_tags['TEXTO-MARCADOR'] = marcador[0]
             
-        # testa se a tag é um aviso   
-        elif 'imagens/exclamacao' in img: 
-
-            txt = re.search('(\(\')(.*)(\'\))', tag_a.attrs['onmouseover']).group(2)                     
+            
+        elif 'imagens/exclamacao' in img:                        
            
-            dict_tags['aviso'] = txt
+            #dict_tags['AVISO'] = re.search('(\(\')(.*)(\'\))', tag_a.attrs['onmouseover']).group(2)
             
-        # o peticionamento não aparece como tag 'a' mas sim como tag 'img'   
-        pet = lista_tags[1].find(src = re.compile('peticionamento'))
+            dict_tags['AVISO'] = 'SIM'
+            
+            
+            
+        peticionamento = lista_tags[1].find(src = re.compile('peticionamento'))
         
-        if pet:
+        if peticionamento:
             
-            txt = re.search('\((.*)\)', pet.attrs['onmouseover']).group()
-            
-            txt = txt.split('"')[1]
-            
-            dict_tags['peticionamento'] = txt
+            dict_tags['PETICIONAMENTO'] = re.search('\((.*)\)', peticionamento.attrs['onmouseover']).group().split('"')[1]
             
             
     processo = lista_tags[2].find('a')
     
-    if processo['class'] == 'processoNaoVisualizado':
-        
-        dict_tags['visualizado'] = 'NÃO'
-        
-    else: dict_tags['visualizado'] = 'SIM'
+    dict_tags['PROCESSO'] = processo.string    
     
-    dict_tags['link_processo'] = Base.NAV_URL + processo['href']
+    #dict_tags['VISUALIZADO'] = processo.attrs['class'][0]
     
-    txt = re.search("(\)(.*)(\))", processo['onmouseover']).group(2)
-    
-    dict_tags['detalhes'] = txt.split(',')[0]
+    #dict_tags['link'] = Base.NAV_URL + processo.attrs['href']
     
     
     try:
-        dict_tags['atribuicao'] = lista_tags[3].find('a').string
+        dict_tags['ATRIBUICAO'] = lista_tags[3].find('a').string
     
     except:        
         
-        dict_tags['atribuicao'] = ''
-        
+        pass
                 
-    dict_tags['tipo'] = lista_tags[4].string
+    dict_tags['TIPO'] = lista_tags[4].string
     
     try:
-        dict_tags['interessado'] = lista_tags[5].find(class_='spanItemCelula').string
+        dict_tags['INTERESSADO'] = lista_tags[5].find(class_='spanItemCelula').string
         
     except: 
         
-        dict_tags['interessado'] = ''
+        pass
         
         
-    return {processo.string:dict_tags}    
+    return dict_tags     
+
+def dict_to_df(processos):
+
+    tags = ['PROCESSO','TIPO', 'ATRIBUICAO', 'MARCADOR', 'TEXTO-MARCADOR', 'ANOTACAO', 'PRIORIDADE',
+            'PETICIONAMENTO', 'AVISO', 'SITUACAO','INTERESSADO']
+
+    df = pd.DataFrame(columns=tags)
+
+    for p in processos:
+
+        df = df.append(pd.Series(p), ignore_index=True)
+        
+    #df['VISUALIZADO'] = df['VISUALIZADO'].astype("category")
+    df['ATRIBUICAO'] = df['ATRIBUICAO'].astype("category")
+    df['PRIORIDADE'] = df['PRIORIDADE'].astype("category")
+    df['TIPO'] = df['TIPO'].astype("category")
+    
+    #df['VISUALIZADO'].cat.categories = ['NÃO', 'SIM']
+    
+    
+    return df    
 

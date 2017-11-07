@@ -5,6 +5,7 @@ Created on Thu Aug 24 23:14:09 2017
 
 @author: ronaldo
 """
+import os
 
 # HTML PARSER
 from bs4 import BeautifulSoup as soup
@@ -20,6 +21,8 @@ from selenium.webdriver.support.ui import Select
 # METHODS
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+
+os.chdir('../')
 
 from locators import Login, Base, LatMenu, \
     Main, ListaBlocos, Bloco, Processo, Envio
@@ -400,9 +403,11 @@ def navigate_link_to_new_window(driver, link):
     return (main_window, windows[-1])
 
 
+    
 driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-sei.expedir_bloco(74446)
+    
+sei.expedir_bloco(74931)
 

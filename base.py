@@ -44,7 +44,7 @@ class Page(object):
                     EC.visibility_of_element_located(*locator))
         except TimeoutException:
             return False
-        return True    
+        return True   
     
     
 
@@ -71,6 +71,11 @@ class Page(object):
         except TimeoutException:
             return False
         return True
+    
+    def wait_for_element_to_be_visible(self, *locator):
+        return WebDriverWait(self.driver, self.timeout).until(
+            EC.visibility_of_element_located(*locator))
+
 
     def wait_for_element(self, *locator):
         return WebDriverWait(self.driver, self.timeout).until(

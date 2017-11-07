@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
+# python modules imports
 import os
 
 import re
 
 import pandas as pd
 
-from datetime import date, time
+from datetime import datetime as dt
+from datetime import time
 
 # HTML PARSER
 from bs4 import BeautifulSoup as soup
@@ -30,6 +32,7 @@ from locators import Login, Base, LatMenu, \
     Main, ListaBlocos, Bloco, Processo, Envio
 
 
+# Personal Files
 from base import Page
 
 import functions as ft
@@ -58,16 +61,15 @@ def login_SEI(driver, usr, pwd):
         # Hit Enter
         senha.send_keys(Keys.RETURN)
 
-        return PagInicial(page.driver)
+        return SEI(page.driver)
 
 
-class PagInicial(Page):
-    """ This class is a Page class with additional methods to be executed 
-        on elements present in the Header Frame and Menu Frame in SEI. 
-        Those Headers are present in all Pages inside SEI.
+class SEI(Page):
     """
-
-    # Atributo adicional da classe
+    Esta subclasse da classe Page define métodos de execução de ações na 
+    página principal do SEI e de resgate de informações
+    """
+    
     processos = []
     
     def ver_proc_detalhado(self):
@@ -87,10 +89,10 @@ class PagInicial(Page):
             
         try:
             
-            detalhado = self.wait_for_element_to_click(Main.TIPOVISUALIZACAO)
+            visual_detalhado = self.wait_for_element_to_click(Main.TIPOVISUALIZACAO)
         
-            if detalhado.text == "Visualização detalhada":
-                detalhado.click()
+            if visual_detalhado.text == "Visualização detalhada":
+                visual_detalhado.click()
                 
         except TimeoutException:
             
@@ -124,13 +126,12 @@ class PagInicial(Page):
             
     def itera_processos(self):
         """
-        Navega as páginas de processos abertos no SEI. Cada linha da página
-        inicial do SEI possui 6 tags principais. Esse método guarda
-        essas html tags como objetos soup 
+        Navega as páginas de processos abertos no SEI e guarda as tags
+        html dos processos como objeto soup no atributo processos_abertos
         """     
         
         #Apaga o conteúdo atual da lista de processos
-        lista_processos = []
+        self.processos = []
         
         # assegura que está inicial
         if not self.isPaginaInicial():
@@ -149,23 +150,15 @@ class PagInicial(Page):
             contador = Select(self.wait_for_element(Main.CONTADOR))
             contador.select_by_visible_text(pag)
             html_sei = soup(self.driver.page_source, "lxml")
-            lista_processos += html_sei("tr", {"class": 'infraTrClara'})
-            
+            self.processos += html_sei("tr", {"class": 'infraTrClara'})
             
             
         # percorre a lista de processos
         # cada linha corresponde a uma tag mãe 'tr'
-        # substituimos a tag mãe por uma lista das tags filhas 
-        # 'tag.contents', descartando os '\n'
-        # a função lista_to_dict_tags recebe essa lista
-        # e retorna um dicionário das tags
-        
-        for line in lista_processos:
-            
-            lista_tags = [tag for tag in line.contents if tag !='\n']
-            
-            self.processos.append(ft.lista_to_dict_tags(lista_tags))
-            
+        # substituimos a tag mãe por uma lista das tags filhas 'tag.contents', descartando os '\n'
+        # a função lista_to_dict_tags recebe essa lista e retorna um dicionário das tags
+        self.processos =  [ft.cria_tags_dict([tag for tag in line.contents \
+                           if tag !='\n']) for line in self.processos]                 
         
             
 
@@ -246,3 +239,5 @@ class PagBlocos(Page):
 class ProcPage(Page):
 
     pass# TODO: Guardar processos em detalhes
+
+

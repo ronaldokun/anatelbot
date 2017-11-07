@@ -84,22 +84,30 @@ def imprime_boleto(page, id, type='cpf'):
         
         page.wait_for_element_to_click(Boleto.MRK_TODOS).click()
         
-        page.wait_for_element_to_click(Boleto.PRINT).click()
+        page.wait_for_element_to_click(Boleto.PRINT).click()      
+        
         
     except:
         
         pass
-        
-    
-    
-    
-   
+
 
 driver = webdriver.Ie()
 
 ie = Page(driver)
+       
+    
+dtype_dic = { 'CPF' : str, 'FISTEL' : str}
+    
+df = pd.read_csv('ie/cassacao.csv', dtype=dtype_dic)
 
-imprime_boleto(ie, '22663041866')
+for i in range(21,22):
+    
+    cpf = df['CPF'].iloc[i]
+    
+    imprime_boleto(ie, cpf)
+    
+    
     
     
 

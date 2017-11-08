@@ -21,6 +21,7 @@ from selenium.webdriver.support.ui import Select
 # METHODS
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.alert import Alert
 
 os.chdir('../')
 
@@ -185,6 +186,12 @@ class PagInicial(Page):
                 link = Base.NAV_URL + p['processo'].a.attrs['href']
 
                 self.expedir_oficio(proc, num_doc, link)
+                
+                self.wait_for_element_to_click((By.ID, p['checkbox'].id)).click()
+                
+                self.wait_for_element_to_click(Bloco.RET_BLOCO).click()
+                
+                Alert(self.driver).accept()
 
     def expedir_oficio(self, proc, num_doc, link):
 
@@ -268,7 +275,7 @@ class PagInicial(Page):
 
         self.wait_for_element_to_click(Envio.IDENVIAR).click()
         
-        # fecha a janela_andamento
+        # fecha a janela_envio
         self.driver.close()
         
         self.driver.switch_to_window(janela_processo)
@@ -409,5 +416,5 @@ driver = webdriver.Chrome()
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
     
-sei.expedir_bloco(74931)
+sei.expedir_bloco(75129)
 

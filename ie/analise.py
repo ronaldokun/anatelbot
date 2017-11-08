@@ -89,7 +89,7 @@ def imprime_boleto(page, id, type='cpf'):
         
     except:
         
-        pass
+        print(" Entidade não devedora\n")
 
 
 driver = webdriver.Ie()

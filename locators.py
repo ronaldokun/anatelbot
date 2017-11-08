@@ -51,6 +51,8 @@ class ListaBlocos(object):
 class Bloco(object):
 
     TITLE = "SEI - Documentos do Bloco de Assinatura"
+    
+    RET_BLOCO = ((By.ID, 'btnExcluir'))
 
 
 class Processo(object):

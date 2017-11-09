@@ -7,20 +7,25 @@ Created on Wed Nov  1 16:50:19 2017
 
 import re
 
-import os
-
 import pandas as pd
 
-"os.chdir('../')"
+import datetime as dt
+
 
 # Selenium Methods
 from selenium.webdriver.common.keys import Keys
 
-from locators import Base
+from locators import Boleto
 
 
 
-def podeExpedir(p):    
+def podeExpedir(p): 
+    
+    """Recebe um tag referente à linha do bloco de assinatura e verifica
+    algumas condições necessárias para expedição do Ofício. Retorna True caso
+    todas as condições forem satisfeitas, False do do contrário.
+    Retorna: Boolean
+    """
 
     t1 = p['processo'].find_all('a', class_="protocoloAberto")
 
@@ -80,10 +85,14 @@ def navigate_link_to_new_window(driver, link):
 
 
 def cria_dict_tags(lista_tags):
+    """ Recebe uma lista de tags de cada linha do processo  da página inicial
+    do SEI, retorna um dicionário dessas tags
+    """
 
     dict_tags = {}
     
-    assert len(lista_tags) == 6, "Verifique o nº de tags de cada linha do processo, valor diferente de 10"
+    assert len(lista_tags) == 6, "Verifique o nº de tags de cada linha do \
+    processo, valor diferente de 10"
 
     #dict_tags['checkbox'] = lista_tags[0].find(class_='infraCheckbox')
     
@@ -100,7 +109,8 @@ def cria_dict_tags(lista_tags):
             
             #dict_tags['ANOTACAO'] = tag_a
             
-            dict_tags['ANOTACAO'] = re.search('\((.*)\)', tag_a.attrs['onmouseover']).group().split("'")[1:4:2]
+            dict_tags['ANOTACAO'] = re.search('\((.*)\)', \
+                     tag_a.attrs['onmouseover']).group().split("'")[1:4:2]
             
             if 'PRIORIDADE' in img: 
                 
@@ -112,13 +122,15 @@ def cria_dict_tags(lista_tags):
             
         elif 'imagens/sei_situacao' in  img:
             
-            dict_tags['SITUACAO'] = re.search('\((.*)\)', tag_a.attrs['onmouseover']).group().split("'")[1]
+            dict_tags['SITUACAO'] = re.search('\((.*)\)', \
+                     tag_a.attrs['onmouseover']).group().split("'")[1]
             
         elif 'imagens/marcador' in img:
             
             #dict_tags['MARCADOR'] = tag_a
             
-            marcador = re.search('\((.*)\)', tag_a.attrs['onmouseover']).group().split("'")[1:4:2]
+            marcador = re.search('\((.*)\)', \
+                                 tag_a.attrs['onmouseover']).group().split("'")[1:4:2]
             
             dict_tags['MARCADOR'] = marcador[1]
             
@@ -137,7 +149,8 @@ def cria_dict_tags(lista_tags):
         
         if peticionamento:
             
-            dict_tags['PETICIONAMENTO'] = re.search('\((.*)\)', peticionamento.attrs['onmouseover']).group().split('"')[1]
+            dict_tags['PETICIONAMENTO'] = re.search('\((.*)\)', \
+                     peticionamento.attrs['onmouseover']).group().split('"')[1]
             
             
     processo = lista_tags[2].find('a')
@@ -169,9 +182,15 @@ def cria_dict_tags(lista_tags):
     return dict_tags     
 
 def dict_to_df(processos):
+    """Recebe a lista processos contendo um dicionário das tags de cada
+    linha de processo aberto no SEI. Retorna um Data Frame cujos registros 
+    são cada linha de processos.
+    """
+    
 
-    tags = ['PROCESSO','TIPO', 'ATRIBUICAO', 'MARCADOR', 'TEXTO-MARCADOR', 'ANOTACAO', 'PRIORIDADE',
-            'PETICIONAMENTO', 'AVISO', 'SITUACAO','INTERESSADO']
+    tags = ['PROCESSO','TIPO', 'ATRIBUICAO', 'MARCADOR', 'TEXTO-MARCADOR', \
+            'ANOTACAO', 'PRIORIDADE', 'PETICIONAMENTO', 'AVISO', 'SITUACAO', \
+            'INTERESSADO']
 
     df = pd.DataFrame(columns=tags)
 
@@ -188,4 +207,76 @@ def dict_to_df(processos):
     
     
     return df    
+
+
+def last_day_of_month(): 
+    """ Retorna o último dia do mês atual no formato DD/MM/AA
+    como uma string"""
+    
+    any_day = dt.date.today()
+    
+    next_month = any_day.replace(day=28) + dt.timedelta(days=4)  # this will never fail
+    
+    date = next_month - dt.timedelta(days=next_month.day)
+    
+    date = date.strftime("%d%m%y")
+            
+    return date
+
+
+def imprime_boleto(page, ident, type='cpf'):
+    
+    # navigate
+    page.driver.get(Boleto.URL)
+    
+    if type == 'cpf':
+        
+        cpf = page.wait_for_element_to_click(Boleto.B_CPF)
+        
+        cpf.click()        
+               
+        elem = page.wait_for_element_to_click(Boleto.INPUT_CPF)
+        
+    else:
+        
+        fistel = page.wait_for_element_to_click(Boleto.B_FISTEL)
+        
+        fistel.click()
+        
+        elem = page.wait_for_element_to_click(Boleto.INPUT_FISTEL)
+        
+    #elem.clear()
+        
+    elem.send_keys(ident)
+    
+    date = page.wait_for_element_to_click(Boleto.INPUT_DATA)
+    
+    date.clear()
+    
+    date.send_keys(last_day_of_month())
+    
+    page.wait_for_element_to_click(Boleto.BUT_CONF).click()
+    
+    try:
+        
+        marcar = page.wait_for_element_to_click(Boleto.MRK_TODOS)
+        
+        marcar.click()
+        
+        imprimir = page.wait_for_element_to_click(Boleto.PRINT)
+        
+        imprimir.click()      
+        
+        
+    except:
+        
+        #print(" Entidade não devedora\n")
+        
+        return False
+    
+    return True
+
+
+
+
 

@@ -15,7 +15,7 @@ import datetime as dt
 # Selenium Methods
 from selenium.webdriver.common.keys import Keys
 
-from locators import Boleto
+from modules.locators import Boleto
 
 
 

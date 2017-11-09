@@ -9,14 +9,14 @@ import pandas as pd
 
 from selenium import webdriver 
 
-from base import Page
+from modules.base import Page
 
-from modules.functions import imprime_boleto, 
+from modules.functions import imprime_boleto
       
     
-dtype_dic = { 'CPF' : str, 'FISTEL' : str}
+#dtype_dic = { 'CPF' : str, 'FISTEL' : str}
     
-df = pd.read_csv('ie/cassacao.csv', dtype=dtype_dic)
+#df = pd.read_csv('ie/cassacao.csv', dtype=dtype_dic)
 
 driver = webdriver.Ie()
 
@@ -24,11 +24,7 @@ ie = Page(driver)
 
 
 
-for i in range(22,30):
-    
-    cpf = df['CPF'].iloc[i]
-    
-    imprime_boleto(ie, cpf)
+
     
     
     

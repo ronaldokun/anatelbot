@@ -23,13 +23,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.alert import Alert
 
-os.chdir('../')
-
-from locators import Login, Base, LatMenu, \
+from modules.locators import Login, Base, LatMenu, \
     Main, ListaBlocos, Bloco, Processo, Envio
 
 
-from base import Page
+from modules.base import Page
 
 import re
 
@@ -166,6 +164,10 @@ class PagInicial(Page):
             for k, v in zip(chaves, cols):
 
                 proc[k] = v
+                
+                
+            proc['checkbox'] = proc['checkbox'].find('input', class_='infraCheckbox')
+            
 
             lista_processos.append(proc)
 
@@ -187,11 +189,15 @@ class PagInicial(Page):
 
                 self.expedir_oficio(proc, num_doc, link)
                 
-                self.wait_for_element_to_click((By.ID, p['checkbox'].id)).click()
+                chk = self.wait_for_element_to_click((By.ID, p['checkbox'].attrs['id']))
                 
-                self.wait_for_element_to_click(Bloco.RET_BLOCO).click()
+                chk.click()
+
+        ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
                 
-                Alert(self.driver).accept()
+        ret.click()
+                
+        Alert(self.driver).accept()
 
     def expedir_oficio(self, proc, num_doc, link):
 
@@ -416,5 +422,5 @@ driver = webdriver.Chrome()
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
     
-sei.expedir_bloco(75267)
+sei.expedir_bloco(75202)
 

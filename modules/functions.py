@@ -9,7 +9,9 @@ import re
 
 import os
 
-os.chdir('../')
+import pandas as pd
+
+"os.chdir('../')"
 
 # Selenium Methods
 from selenium.webdriver.common.keys import Keys
@@ -18,8 +20,7 @@ from locators import Base
 
 
 
-
-def podeExpedir(p):
+def podeExpedir(p):    
 
     t1 = p['processo'].find_all('a', class_="protocoloAberto")
 

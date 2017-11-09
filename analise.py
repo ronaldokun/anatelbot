@@ -58,13 +58,17 @@ def imprime_boleto(page, id, type='cpf'):
     
     if type == 'cpf':
         
-        page.wait_for_element_to_click(Boleto.B_CPF).click()        
+        cpf = page.wait_for_element_to_click(Boleto.B_CPF)
+        
+        cpf.click()        
                
         elem = page.wait_for_element_to_click(Boleto.INPUT_CPF)
         
     else:
         
-        page.wait_for_element_to_click(Boleto.B_FISTEL)
+        fistel = page.wait_for_element_to_click(Boleto.B_FISTEL)
+        
+        fistel.click()
         
         elem = page.wait_for_element_to_click(Boleto.INPUT_FISTEL)
         
@@ -82,26 +86,32 @@ def imprime_boleto(page, id, type='cpf'):
     
     try:
         
-        page.wait_for_element_to_click(Boleto.MRK_TODOS).click()
+        marcar = page.wait_for_element_to_click(Boleto.MRK_TODOS)
         
-        page.wait_for_element_to_click(Boleto.PRINT).click()      
+        marcar.click()
+        
+        imprimir = page.wait_for_element_to_click(Boleto.PRINT)
+        
+        imprimir.click()      
         
         
     except:
         
         print(" Entidade não devedora\n")
 
-
-driver = webdriver.Ie()
-
-ie = Page(driver)
        
     
 dtype_dic = { 'CPF' : str, 'FISTEL' : str}
     
 df = pd.read_csv('ie/cassacao.csv', dtype=dtype_dic)
 
-for i in range(21,22):
+driver = webdriver.Ie()
+
+ie = Page(driver)
+
+
+
+for i in range(22,30):
     
     cpf = df['CPF'].iloc[i]
     

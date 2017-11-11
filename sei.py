@@ -37,31 +37,32 @@ from base import Page
 
 import functions as ft
 
+
 def login_SEI(driver, usr, pwd):
-        """
-        Esta função recebe um objeto Webdrive e as credenciais  
-        do usuário, loga no SEI - ANATEL e retorna uma instância da classe  
-        SEI. 
-        """
+    """
+    Esta função recebe um objeto Webdrive e as credenciais  
+    do usuário, loga no SEI - ANATEL e retorna uma instância da classe  
+    SEI. 
+    """
 
-        page = Page(driver)
-        page.driver.get(Login.URL)
-        page.driver.maximize_window()
+    page = Page(driver)
+    page.driver.get(Login.URL)
+    page.driver.maximize_window()
 
-        usuario = page.wait_for_element_to_click(Login.LOGIN)
-        senha = page.wait_for_element_to_click(Login.SENHA)
+    usuario = page.wait_for_element_to_click(Login.LOGIN)
+    senha = page.wait_for_element_to_click(Login.SENHA)
 
-        # Clear any clutter on the form
-        usuario.clear()
-        usuario.send_keys(usr)
+    # Clear any clutter on the form
+    usuario.clear()
+    usuario.send_keys(usr)
 
-        senha.clear()
-        senha.send_keys(pwd)
+    senha.clear()
+    senha.send_keys(pwd)
 
-        # Hit Enter
-        senha.send_keys(Keys.RETURN)
+    # Hit Enter
+    senha.send_keys(Keys.RETURN)
 
-        return SEI(page.driver)
+    return SEI(page.driver)
 
 
 class SEI(Page):
@@ -69,39 +70,40 @@ class SEI(Page):
     Esta subclasse da classe Page define métodos de execução de ações na 
     página principal do SEI e de resgate de informações
     """
-    
+
     processos = []
-    
+
     def ver_proc_detalhado(self):
         """
         Expands the visualization from the main page in SEI
         """
         try:
             ver_todos = self.wait_for_element_to_click(Main.FILTROATRIBUICAO)
-            
-            if ver_todos.text =="Ver todos os processos":
+
+            if ver_todos.text == "Ver todos os processos":
                 ver_todos.click()
-        
+
         except TimeoutException:
-            
+
             print("A página não carregou no tempo limite ou cheque o link\
                   'ver todos os processos'")
-            
+
         try:
-            
-            visual_detalhado = self.wait_for_element_to_click(Main.TIPOVISUALIZACAO)
-        
+
+            visual_detalhado = self.wait_for_element_to_click(
+                Main.TIPOVISUALIZACAO)
+
             if visual_detalhado.text == "Visualização detalhada":
                 visual_detalhado.click()
-                
+
         except TimeoutException:
-            
+
             print("A página não carregou no tempo limite ou cheque o link\
             de visualização detalhada")
-            
+
     def isPaginaInicial(self):
         """Retorna True se a página estiver na página inicial do SEI, False
-        caso contrário"""        
+        caso contrário"""
         return self.get_title() == 'SEI - Controle de Processos'
 
     def go_to_initial_page(self):
@@ -123,44 +125,42 @@ class SEI(Page):
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
-            
+
     def itera_processos(self):
         """
         Navega as páginas de processos abertos no SEI e guarda as tags
         html dos processos como objeto soup no atributo processos_abertos
-        """     
-        
-        #Apaga o conteúdo atual da lista de processos
+        """
+
+        # Apaga o conteúdo atual da lista de processos
         self.processos = []
-        
+
         # assegura que está inicial
         if not self.isPaginaInicial():
             self.go_to_initial_page()
 
         # Mostra página com informações detalhadas
         self.ver_proc_detalhado()
-        
+
         contador = Select(self.wait_for_element(Main.CONTADOR))
 
         pages = [pag.text for pag in contador.options]
 
         for pag in pages:
-            
+
             # One simple repetition to avoid more complex code
             contador = Select(self.wait_for_element(Main.CONTADOR))
             contador.select_by_visible_text(pag)
             html_sei = soup(self.driver.page_source, "lxml")
             self.processos += html_sei("tr", {"class": 'infraTrClara'})
-            
-            
+
         # percorre a lista de processos
         # cada linha corresponde a uma tag mãe 'tr'
         # substituimos a tag mãe por uma lista das tags filhas 'tag.contents', descartando os '\n'
         # a função lista_to_dict_tags recebe essa lista e retorna um dicionário das tags
-        self.processos =  [ft.cria_tags_dict([tag for tag in line.contents \
-                           if tag !='\n']) for line in self.processos]                 
-        
-            
+        self.processos = [ft.cria_tags_dict([tag for tag in line.contents
+                                             if tag != '\n']) for line in self.processos]
+
 
 class PagBlocos(Page):
 
@@ -234,10 +234,6 @@ class PagBlocos(Page):
                 self.expedir_oficio(proc, num_doc, link)
 
 
-
-
 class ProcPage(Page):
 
-    pass# TODO: Guardar processos em detalhes
-
-
+    pass  # TODO: Guardar processos em detalhes

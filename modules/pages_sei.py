@@ -35,7 +35,7 @@ from locators import Login, Base, LatMenu, \
 # Personal Files
 from base import Page
 
-import functions as ft
+import sei_functions as ft
 
 
 def login_SEI(driver, usr, pwd):
@@ -108,7 +108,7 @@ class SEI(Page):
 
     def go_to_initial_page(self):
         """
-        Navega até a página inicial do SEI caso já esteja nela 
+        Navega até a página inicial do SEI caso já esteja nela
         a página é recarregada
         Assume que o link está presente em qualquer subpágina do SEI
         """
@@ -162,7 +162,7 @@ class SEI(Page):
                                              if tag != '\n']) for line in self.processos]
 
 
-class PagBlocos(Page):
+class Blocos(Page):
 
     def exibir_bloco(self, numero):
 
@@ -234,6 +234,6 @@ class PagBlocos(Page):
                 self.expedir_oficio(proc, num_doc, link)
 
 
-class ProcPage(Page):
+class Processo(Page):
 
     pass  # TODO: Guardar processos em detalhes

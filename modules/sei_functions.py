@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Wed Nov  1 16:50:19 2017
@@ -18,32 +19,36 @@ from selenium.webdriver.common.keys import Keys
 from modules.locators import Boleto
 
 
-def podeExpedir(p):
-    """Recebe um tag referente à linha do bloco de assinatura e verifica
-    algumas condições necessárias para expedição do Ofício. Retorna True caso
-    todas as condições forem satisfeitas, False do do contrário.
-    Retorna: Boolean
+def podeExpedir(linha):
+    """Verifica algumas condições necessárias para expedição do Ofício no SEI
+    Args:
+        linha: Dicionário das html tags presentes nas linhas
+                   do bloco de assinatura.
+
+        Return: Boolean
     """
 
-    t1 = p['processo'].find_all('a', class_="protocoloAberto")
+    t1 = linha['processo'].find_all('a', class_="protocoloAberto")
 
-    t2 = p['tipo'].find_all(string="Ofício")
+    t2 = linha['tipo'].find_all(string="Ofício")
 
-    t3 = p['assinatura'].find_all(string=re.compile("Coordenador"))
+    t3 = linha['assinatura'].find_all(string=re.compile("Coordenador"))
 
-    t4 = p['assinatura'].find_all(string=re.compile("Gerente"))
+    t4 = linha['assinatura'].find_all(string=re.compile("Gerente"))
 
     return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
 
 
-def navigate_elem_to_new_window(driver, elem):
-    """ Receive an instance of Page, navigate the link to a new window
-
-        focus the driver in the new window
-
-        return the main window and the driver focused on new window
-
-        Assumes link is in page
+def navigate_elem_to_new_window(driver, elem): 
+    """ Navigate the link present in element to a new window
+        focus the page on the new window
+        Assumes the is a link present in the html element 'elem' 
+        Args:
+           driver: Selenium webdriver object 
+           elem: html element with navigable link
+        Return:
+            tuple with both webdriver windows objects
+            with the browser focused on the new one. 
     """
     # Guarda janela principal
     main_window = driver.current_window_handle
@@ -137,24 +142,24 @@ def cria_dict_tags(lista_tags):
         if peticionamento:
 
             pattern = re.search('\((.*)\)', peticionamento.attrs['onmouseover']
-            dict_tags['PETICIONAMENTO'] = pattern.group().split('"')[1]
+            dict_tags['PETICIONAMENTO']=pattern.group().split('"')[1]
 
-    processo = lista_tags[2].find('a')
+    processo=lista_tags[2].find('a')
 
-    dict_tags['PROCESSO'] = processo.string
+    dict_tags['PROCESSO']=processo.string
 
 
     try:
-        dict_tags['ATRIBUICAO'] = lista_tags[3].find('a').string
+        dict_tags['ATRIBUICAO']=lista_tags[3].find('a').string
 
     except:
 
         pass
 
-    dict_tags['TIPO'] = lista_tags[4].string
+    dict_tags['TIPO']=lista_tags[4].string
 
     try:
-        dict_tags['INTERESSADO'] = lista_tags[5].find(
+        dict_tags['INTERESSADO']=lista_tags[5].find(
             class_='spanItemCelula').string
 
     except:
@@ -166,23 +171,23 @@ def cria_dict_tags(lista_tags):
 
 def dict_to_df(processos):
     """Recebe a lista processos contendo um dicionário das tags de cada
-    linha de processo aberto no SEI. Retorna um Data Frame cujos registros 
+    linha de processo aberto no SEI. Retorna um Data Frame cujos registros
     são cada linha de processos.
     """
 
-    tags = ['PROCESSO', 'TIPO', 'ATRIBUICAO', 'MARCADOR', 'TEXTO-MARCADOR',
+    tags=['PROCESSO', 'TIPO', 'ATRIBUICAO', 'MARCADOR', 'TEXTO-MARCADOR',
             'ANOTACAO', 'PRIORIDADE', 'PETICIONAMENTO', 'AVISO', 'SITUACAO',
             'INTERESSADO']
 
-    df = pd.DataFrame(columns=tags)
+    df=pd.DataFrame(columns=tags)
 
     for p in processos:
 
-        df = df.append(pd.Series(p), ignore_index=True)
+        df=df.append(pd.Series(p), ignore_index=True)
 
-    df['ATRIBUICAO'] = df['ATRIBUICAO'].astype("category")
-    df['PRIORIDADE'] = df['PRIORIDADE'].astype("category")
-    df['TIPO'] = df['TIPO'].astype("category")
+    df['ATRIBUICAO']=df['ATRIBUICAO'].astype("category")
+    df['PRIORIDADE']=df['PRIORIDADE'].astype("category")
+    df['TIPO']=df['TIPO'].astype("category")
 
 
     return df
@@ -192,14 +197,14 @@ def last_day_of_month():
     """ Retorna o último dia do mês atual no formato DD/MM/AA
     como uma string"""
 
-    any_day = dt.date.today()
+    any_day=dt.date.today()
 
-    next_month = any_day.replace(
+    next_month=any_day.replace(
         day=28) + dt.timedelta(days=4)  # this will never fail
 
-    date = next_month - dt.timedelta(days=next_month.day)
+    date=next_month - dt.timedelta(days=next_month.day)
 
-    date = date.strftime("%d%m%y")
+    date=date.strftime("%d%m%y")
 
     return date
 
@@ -211,25 +216,25 @@ def imprime_boleto(page, ident, type='cpf'):
 
     if type == 'cpf':
 
-        cpf = page.wait_for_element_to_click(Boleto.B_CPF)
+        cpf=page.wait_for_element_to_click(Boleto.B_CPF)
 
         cpf.click()
 
-        elem = page.wait_for_element_to_click(Boleto.INPUT_CPF)
+        elem=page.wait_for_element_to_click(Boleto.INPUT_CPF)
 
     else:
 
-        fistel = page.wait_for_element_to_click(Boleto.B_FISTEL)
+        fistel=page.wait_for_element_to_click(Boleto.B_FISTEL)
 
         fistel.click()
 
-        elem = page.wait_for_element_to_click(Boleto.INPUT_FISTEL)
+        elem=page.wait_for_element_to_click(Boleto.INPUT_FISTEL)
 
     elem.clear()
 
     elem.send_keys(ident)
 
-    date = page.wait_for_element_to_click(Boleto.INPUT_DATA)
+    date=page.wait_for_element_to_click(Boleto.INPUT_DATA)
 
     date.clear()
 
@@ -239,11 +244,11 @@ def imprime_boleto(page, ident, type='cpf'):
 
     try:
 
-        marcar = page.wait_for_element_to_click(Boleto.MRK_TODOS)
+        marcar=page.wait_for_element_to_click(Boleto.MRK_TODOS)
 
         marcar.click()
 
-        imprimir = page.wait_for_element_to_click(Boleto.PRINT)
+        imprimir=page.wait_for_element_to_click(Boleto.PRINT)
 
         imprimir.click()
 

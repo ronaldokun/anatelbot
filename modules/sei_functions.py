@@ -39,7 +39,7 @@ def podeExpedir(linha):
     return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
 
 
-def navigate_elem_to_new_window(driver, elem): 
+def navigate_elem_to_new_window(driver, elem):
     """ Navigate the link present in element to a new window
         focus the page on the new window
         Assumes the is a link present in the html element 'elem' 
@@ -141,25 +141,26 @@ def cria_dict_tags(lista_tags):
 
         if peticionamento:
 
-            pattern = re.search('\((.*)\)', peticionamento.attrs['onmouseover']
-            dict_tags['PETICIONAMENTO']=pattern.group().split('"')[1]
+            pattern = re.search(
+                '\((.*)\)', peticionamento.attrs['onmouseover'])
+            dict_tags['PETICIONAMENTO'] = pattern.group().split('"')[1]
 
-    processo=lista_tags[2].find('a')
+    processo = lista_tags[2].find('a')
 
-    dict_tags['PROCESSO']=processo.string
-
+    dict_tags['PROCESSO'] = processo.string
 
     try:
-        dict_tags['ATRIBUICAO']=lista_tags[3].find('a').string
+
+        dict_tags['ATRIBUICAO'] = lista_tags[3].find('a').string
 
     except:
 
         pass
 
-    dict_tags['TIPO']=lista_tags[4].string
+    dict_tags['TIPO'] = lista_tags[4].string
 
     try:
-        dict_tags['INTERESSADO']=lista_tags[5].find(
+        dict_tags['INTERESSADO'] = lista_tags[5].find(
             class_='spanItemCelula').string
 
     except:
@@ -175,85 +176,20 @@ def dict_to_df(processos):
     são cada linha de processos.
     """
 
-    tags=['PROCESSO', 'TIPO', 'ATRIBUICAO', 'MARCADOR', 'TEXTO-MARCADOR',
+    tags = ['PROCESSO', 'TIPO', 'ATRIBUICAO', 'MARCADOR', 'TEXTO-MARCADOR',
             'ANOTACAO', 'PRIORIDADE', 'PETICIONAMENTO', 'AVISO', 'SITUACAO',
             'INTERESSADO']
 
-    df=pd.DataFrame(columns=tags)
+    df = pd.DataFrame(columns=tags)
 
     for p in processos:
 
-        df=df.append(pd.Series(p), ignore_index=True)
+        df = df.append(pd.Series(p), ignore_index=True)
 
-    df['ATRIBUICAO']=df['ATRIBUICAO'].astype("category")
-    df['PRIORIDADE']=df['PRIORIDADE'].astype("category")
-    df['TIPO']=df['TIPO'].astype("category")
-
+    df['ATRIBUICAO'] = df['ATRIBUICAO'].astype("category")
+    df['PRIORIDADE'] = df['PRIORIDADE'].astype("category")
+    df['TIPO'] = df['TIPO'].astype("category")
 
     return df
 
 
-def last_day_of_month():
-    """ Retorna o último dia do mês atual no formato DD/MM/AA
-    como uma string"""
-
-    any_day=dt.date.today()
-
-    next_month=any_day.replace(
-        day=28) + dt.timedelta(days=4)  # this will never fail
-
-    date=next_month - dt.timedelta(days=next_month.day)
-
-    date=date.strftime("%d%m%y")
-
-    return date
-
-
-def imprime_boleto(page, ident, type='cpf'):
-
-    # navigate
-    page.driver.get(Boleto.URL)
-
-    if type == 'cpf':
-
-        cpf=page.wait_for_element_to_click(Boleto.B_CPF)
-
-        cpf.click()
-
-        elem=page.wait_for_element_to_click(Boleto.INPUT_CPF)
-
-    else:
-
-        fistel=page.wait_for_element_to_click(Boleto.B_FISTEL)
-
-        fistel.click()
-
-        elem=page.wait_for_element_to_click(Boleto.INPUT_FISTEL)
-
-    elem.clear()
-
-    elem.send_keys(ident)
-
-    date=page.wait_for_element_to_click(Boleto.INPUT_DATA)
-
-    date.clear()
-
-    date.send_keys(last_day_of_month())
-
-    page.wait_for_element_to_click(Boleto.BUT_CONF).click()
-
-    try:
-
-        marcar=page.wait_for_element_to_click(Boleto.MRK_TODOS)
-
-        marcar.click()
-
-        imprimir=page.wait_for_element_to_click(Boleto.PRINT)
-
-        imprimir.click()
-
-    except:
-
-        return False
-
-    return True

@@ -84,3 +84,9 @@ class Page(object):
     def wait_for_element_to_click(self, *locator):
         return WebDriverWait(self.driver, self.timeout).until(
             EC.element_to_be_clickable(*locator))
+        
+    def wait_for_new_window(self):
+        return WebDriverWait(self.driver, self.timeout).until(
+                EC.number_of_windows_to_be(2))
+        
+              

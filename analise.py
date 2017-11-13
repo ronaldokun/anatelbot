@@ -15,6 +15,27 @@ from modules.locators import Boleto
 
 from selenium.webdriver.common.keys import Keys
 
+from selenium.webdriver.common.alert import Alert
+
+
+import pandas as pd
+
+import os
+
+os.chdir(r'C:\Users\rsilva\Gdrive\projects\programming\automation')
+
+
+def save_page(driver, filename):
+    
+    with open(filename, 'w') as file:
+        
+        # write image
+        file.write(driver.page_source)
+        
+    #driver.close()
+    
+        
+        
 
 def last_day_of_month():
     """ Use datetime module and manipulation to return the last day
@@ -28,7 +49,7 @@ def last_day_of_month():
     # this will always result in the last day of the month
     date = next_month - dt.timedelta(days=next_month.day)
 
-    date = dt.datetime.strftime("%d%m%y")
+    date = date.strftime("%d%m%y")
 
     return date
 
@@ -74,19 +95,81 @@ def imprime_boleto(page, ident, id_type='cpf'):
         marcar = page.wait_for_element_to_click(Boleto.MRK_TODOS)
 
         marcar.click()
+        
+    except:
+        
+        return False
+    
+    try:
 
         imprimir = page.wait_for_element_to_click(Boleto.PRINT)
 
         imprimir.click()
-
+        
     except:
-
+        
         return False
-
+    
+    try:
+    
+        page.wait_for_new_window()
+        
+    except:
+        
+        return False        
+    
     return True
 
-# dtype_dic = { 'CPF' : str, 'FISTEL' : str}
 
-# df = pd.read_csv('ie/cassacao.csv', dtype=dtype_dic)
+
+driver = webdriver.Ie()
+
+ie = Page(driver)
+
+dtype_dic = { 'CPF' : str, 'FISTEL' : str}
+
+df = pd.read_csv('files/cassacao.csv', dtype=dtype_dic)
+
+devedores = []
+
+for i in range(52,53):
+    
+    cpf = df.iloc[i]['CPF']
+    
+    name = df.iloc[i]['Nome']
+    
+    if(imprime_boleto(ie, cpf)):
+        
+        devedores.append(name)
+        
+        # input("Digite Enter: ")
+        
+windows = ie.driver.window_handles
+
+main = windows[0]       
+
+        
+for name, window in zip(devedores, windows[1:]):
+    
+    ie.driver.switch_to_window(windows[-1])
+
+    save_page(ie.driver, r'files/boletos/' + name + '.html')
+
+    ie.driver.close()
+                
+    ie.driver.switch_to_window(main)
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 

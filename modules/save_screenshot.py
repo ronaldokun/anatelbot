@@ -14,13 +14,13 @@ js = 'return Math.max( document.body.scrollHeight, document.body.offsetHeight,  
 scrollheight = browser.execute_script(js)
 
 if verbose > 0: 
-    print scrollheight
+    print(scrollheight)
 
 slices = []
 offset = 0
 while offset < scrollheight:
     if verbose > 0: 
-        print offset
+        print(offset)
 
     browser.execute_script("window.scrollTo(0, %s);" % offset)
     img = Image.open(StringIO(browser.get_screenshot_as_png()))
@@ -29,7 +29,7 @@ while offset < scrollheight:
 
     if verbose > 0:
         browser.get_screenshot_as_file('%s/screen_%s.png' % ('/tmp', offset))
-        print scrollheight
+        print(scrollheight)
 
 
 screenshot = Image.new('RGB', (slices[0].size[0], scrollheight))
@@ -38,4 +38,4 @@ for img in slices:
     screenshot.paste(img, (0, offset))
     offset += img.size[1]
 
-screenshot.save('/tmp/test.png')
+screenshot.save(r'/files/boleto/test.png')

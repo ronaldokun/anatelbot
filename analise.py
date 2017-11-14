@@ -98,6 +98,8 @@ def imprime_boleto(page, ident, id_type='cpf'):
         
     except:
         
+        print("Não foi possível marcar todos os boletos")
+        
         return False
     
     try:
@@ -108,6 +110,8 @@ def imprime_boleto(page, ident, id_type='cpf'):
         
     except:
         
+        print("Não foi possível imprimir todos os boletos")
+        
         return False
     
     try:
@@ -115,6 +119,8 @@ def imprime_boleto(page, ident, id_type='cpf'):
         page.wait_for_new_window()
         
     except:
+        
+        print("A espera pela nova janela não funcionou!")
         
         return False        
     
@@ -130,9 +136,12 @@ dtype_dic = { 'CPF' : str, 'FISTEL' : str}
 
 df = pd.read_csv('files/cassacao.csv', dtype=dtype_dic)
 
+# retira falecidos
+df = df[df['Ano do Óbito'].isnull()]
+
 devedores = []
 
-for i in range(52,53):
+for i in range(58,61):
     
     cpf = df.iloc[i]['CPF']
     
@@ -140,24 +149,35 @@ for i in range(52,53):
     
     if(imprime_boleto(ie, cpf)):
         
-        devedores.append(name)
-        
-        # input("Digite Enter: ")
-        
-windows = ie.driver.window_handles
+        # devedores.append(name)
+        windows = ie.driver.window_handles
 
-main = windows[0]       
-
+        main = windows[0]  
         
-for name, window in zip(devedores, windows[1:]):
+        ie.driver.switch_to_window(windows[-1])
     
-    ie.driver.switch_to_window(windows[-1])
-
-    save_page(ie.driver, r'files/boletos/' + name + '.html')
-
-    ie.driver.close()
+        save_page(ie.driver, r'files/boletos/' + name + '.html')
+    
+        ie.driver.close()
                 
-    ie.driver.switch_to_window(main)
+        ie.driver.switch_to_window(main)
+        
+    else: next
+        
+#windows = ie.driver.window_handles
+#
+#main = windows[0]       
+#
+#        
+#for name, window in zip(devedores, windows[1:]):
+#    
+#    ie.driver.switch_to_window(windows[-1])
+#    
+#    save_page(ie.driver, r'files/boletos/' + name + '.html')
+#    
+#    ie.driver.close()
+#                
+#    ie.driver.switch_to_window(main)
 
 
 

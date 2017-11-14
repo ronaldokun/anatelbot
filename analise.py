@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#!usr/bin/env python3
 """
 Created on Tue Nov  7 14:05:59 2017
 
@@ -14,7 +15,6 @@ from modules.base import Page
 from modules.locators import Boleto
 
 from selenium.webdriver.common.keys import Keys
-
 from selenium.webdriver.common.alert import Alert
 
 
@@ -26,16 +26,14 @@ os.chdir(r'C:\Users\rsilva\Gdrive\projects\programming\automation')
 
 
 def save_page(driver, filename):
-    
+
     with open(filename, 'w') as file:
-        
+
         # write image
         file.write(driver.page_source)
-        
-    #driver.close()
-    
-        
-        
+
+    # driver.close()
+
 
 def last_day_of_month():
     """ Use datetime module and manipulation to return the last day
@@ -95,44 +93,43 @@ def imprime_boleto(page, ident, id_type='cpf'):
         marcar = page.wait_for_element_to_click(Boleto.MRK_TODOS)
 
         marcar.click()
-        
+
     except:
-        
+
         print("Não foi possível marcar todos os boletos")
-        
+
         return False
-    
+
     try:
 
         imprimir = page.wait_for_element_to_click(Boleto.PRINT)
 
         imprimir.click()
-        
-    except:
-        
-        print("Não foi possível imprimir todos os boletos")
-        
-        return False
-    
-    try:
-    
-        page.wait_for_new_window()
-        
-    except:
-        
-        print("A espera pela nova janela não funcionou!")
-        
-        return False        
-    
-    return True
 
+    except:
+
+        print("Não foi possível imprimir todos os boletos")
+
+        return False
+
+    try:
+
+        page.wait_for_new_window()
+
+    except:
+
+        print("A espera pela nova janela não funcionou!")
+
+        return False
+
+    return True
 
 
 driver = webdriver.Ie()
 
 ie = Page(driver)
 
-dtype_dic = { 'CPF' : str, 'FISTEL' : str}
+dtype_dic = {'CPF': str, 'FISTEL': str}
 
 df = pd.read_csv('files/cassacao.csv', dtype=dtype_dic)
 
@@ -141,55 +138,23 @@ df = df[df['Ano do Óbito'].isnull()]
 
 devedores = []
 
-for i in range(58,61):
-    
+for i in range(58, 61):
+
     cpf = df.iloc[i]['CPF']
-    
+
     name = df.iloc[i]['Nome']
-    
-    if(imprime_boleto(ie, cpf)):
-        
+
+    if imprime_boleto(ie, cpf):
+
         # devedores.append(name)
         windows = ie.driver.window_handles
 
-        main = windows[0]  
-        
+        main = windows[0]
+
         ie.driver.switch_to_window(windows[-1])
-    
+
         save_page(ie.driver, r'files/boletos/' + name + '.html')
-    
+
         ie.driver.close()
-                
+
         ie.driver.switch_to_window(main)
-        
-    else: next
-        
-#windows = ie.driver.window_handles
-#
-#main = windows[0]       
-#
-#        
-#for name, window in zip(devedores, windows[1:]):
-#    
-#    ie.driver.switch_to_window(windows[-1])
-#    
-#    save_page(ie.driver, r'files/boletos/' + name + '.html')
-#    
-#    ie.driver.close()
-#                
-#    ie.driver.switch_to_window(main)
-
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-

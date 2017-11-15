@@ -6,6 +6,8 @@ import re
 from datetime import datetime as dt
 from datetime import time
 
+from getpass import getuser, getpass
+
 import pandas as pd
 from bs4 import BeautifulSoup as soup
 # INITIALIZE DRIVER
@@ -401,6 +403,22 @@ class Processo(Page):
         # self.driver.switch_to_window(main_window)
         
         
+def main(login, senha):
+    
+    driver = webdriver.Chrome()
+    
+    sei = login_SEI(driver, login, senha)
+    
+    return sei
+
+
+if __name__ == "__main__":
+    
+    login = getuser()
+    
+    senha = getpass(prompt="Senha: ")
+    
+    main(login, senha)        
 
     
 

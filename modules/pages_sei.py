@@ -2,40 +2,28 @@
 
 # python modules imports
 import os
-
 import re
-
-import pandas as pd
-
 from datetime import datetime as dt
 from datetime import time
 
-# HTML PARSER
+import pandas as pd
 from bs4 import BeautifulSoup as soup
-
 # INITIALIZE DRIVER
 from selenium import webdriver
-
+# Exceptions
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+# METHODS
+from selenium.webdriver.common.keys import Keys
 # WAIT AND CONDITIONS METHODS
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
-# Exceptions
-from selenium.common.exceptions import TimeoutException
-
-
-# METHODS
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-
-from locators import Login, Base, LatMenu, \
-    Main, ListaBlocos, Bloco, Processo, Envio
-
-
+import sei_functions as ft
 # Personal Files
 from base import Page
-
-import sei_functions as ft
+from locators import (Base, Bloco, Envio, LatMenu, ListaBlocos, Login, Main,
+                      Processo)
 
 
 def login_SEI(driver, usr, pwd):

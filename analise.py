@@ -7,20 +7,15 @@ Created on Tue Nov  7 14:05:59 2017
 """
 
 import datetime as dt
-
-from selenium import webdriver
-
-from modules.base import Page
-
-from modules.locators import Boleto
-
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.alert import Alert
-
+import os
 
 import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.common.keys import Keys
 
-import os
+from modules.base import Page
+from modules.locators import Boleto
 
 os.chdir(r'C:\Users\rsilva\Gdrive\projects\programming\automation')
 

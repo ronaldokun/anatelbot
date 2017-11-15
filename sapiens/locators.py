@@ -33,8 +33,3 @@ class Rf(object):
     NAME = (By.ID, "textfield-1015-inputE1")
     
     QUADRO1 = (By.CLASS_NAME, "x-grid-cell-inner")
-
-
-
-
-      

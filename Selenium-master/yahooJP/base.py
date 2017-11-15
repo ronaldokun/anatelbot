@@ -1,6 +1,7 @@
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 class Page(object):
     def __init__(self, driver, base_url='http://yahoo.co.jp/'):

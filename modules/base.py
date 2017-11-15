@@ -6,12 +6,13 @@ Created on Mon Aug 28 20:44:15 2017
 @author: ronaldo
 """
 
-from selenium.webdriver.support.ui import WebDriverWait
+from contextlib import contextmanager
+
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
-from contextlib import contextmanager
 
 class Page(object):
     # assumes self.driver is a selenium webdriver
@@ -88,5 +89,3 @@ class Page(object):
     def wait_for_new_window(self):
         return WebDriverWait(self.driver, self.timeout).until(
                 EC.number_of_windows_to_be(2))
-        
-              

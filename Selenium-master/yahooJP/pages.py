@@ -1,8 +1,9 @@
-from yahooJP.base import Page
-from yahooJP.locators import *
 from time import sleep
-from yahooJP.users import get_password, get_email
+
+from yahooJP.base import Page
 from yahooJP.excel_users import excel_get_email, excel_get_password
+from yahooJP.locators import *
+from yahooJP.users import get_email, get_password
 
 
 class MainPage(Page):

@@ -6,13 +6,10 @@ Created on Wed Nov  1 16:50:19 2017
 @author: rsilva
 """
 
+import datetime as dt
 import re
 
 import pandas as pd
-
-import datetime as dt
-
-
 # Selenium Methods
 from selenium.webdriver.common.keys import Keys
 
@@ -191,5 +188,3 @@ def dict_to_df(processos):
     df['TIPO'] = df['TIPO'].astype("category")
 
     return df
-
-

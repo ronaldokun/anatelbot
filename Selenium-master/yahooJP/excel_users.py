@@ -1,6 +1,5 @@
 import xlrd
 
-
 file_location = "./users.xlsx"
 workbook = xlrd.open_workbook(file_location)
 sheet = workbook.sheet_by_index(0)

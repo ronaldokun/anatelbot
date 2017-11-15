@@ -1,6 +1,8 @@
 import unittest
-from yahooJP.pages import *
+
 from selenium import webdriver
+
+from yahooJP.pages import *
 
 
 class TestPages(unittest.TestCase):

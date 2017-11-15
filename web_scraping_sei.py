@@ -6,30 +6,22 @@ Created on Thu Aug 24 23:14:09 2017
 @author: ronaldo
 """
 import os
+import re
 
-# HTML PARSER
 from bs4 import BeautifulSoup as soup
-
 # INITIALIZE DRIVER
 from selenium import webdriver
-
-
+from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.common.by import By
+# METHODS
+from selenium.webdriver.common.keys import Keys
 # WAIT AND CONDITIONS METHODS
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
-# METHODS
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.alert import Alert
-
-from modules.locators import Login, Base, LatMenu, \
-    Main, ListaBlocos, Bloco, Processo, Envio
-
-
 from modules.base import Page
-
-import re
+from modules.locators import (Base, Bloco, Envio, LatMenu, ListaBlocos, Login,
+                              Main, Processo)
 
 
 class LoginPage(Page):

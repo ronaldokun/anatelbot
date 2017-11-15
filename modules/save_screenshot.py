@@ -1,7 +1,8 @@
 #!/usr/bin/python
-from selenium import webdriver
-from PIL import Image
 from cStringIO import StringIO
+
+from PIL import Image
+from selenium import webdriver
 
 verbose = 1
 

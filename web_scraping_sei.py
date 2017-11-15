@@ -113,7 +113,7 @@ class PagInicial(Page):
         pages = [pag.text for pag in contador.options]
 
         for pag in pages:
-            
+
             # One simple repetition to avoid more complex code
             contador = Select(self.wait_for_element(Main.CONTADOR))
             contador.select_by_visible_text(pag)
@@ -164,10 +164,9 @@ class PagInicial(Page):
             for k, v in zip(chaves, cols):
 
                 proc[k] = v
-                
-                
-            proc['checkbox'] = proc['checkbox'].find('input', class_='infraCheckbox')
-            
+
+            proc['checkbox'] = proc['checkbox'].find(
+                'input', class_='infraCheckbox')
 
             lista_processos.append(proc)
 
@@ -188,15 +187,16 @@ class PagInicial(Page):
                 link = Base.NAV_URL + p['processo'].a.attrs['href']
 
                 self.expedir_oficio(proc, num_doc, link)
-                
-                chk = self.wait_for_element_to_click((By.ID, p['checkbox'].attrs['id']))
-                
+
+                chk = self.wait_for_element_to_click(
+                    (By.ID, p['checkbox'].attrs['id']))
+
                 chk.click()
 
         ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
-                
+
         ret.click()
-                
+
         Alert(self.driver).accept()
 
     def expedir_oficio(self, proc, num_doc, link):
@@ -229,7 +229,8 @@ class PagInicial(Page):
 
             link = Base.NAV_URL + enviar.attrs["href"]
 
-            (janela_processo, janela_andamento) = navigate_link_to_new_window(self.driver, link)
+            (janela_processo, janela_andamento) = navigate_link_to_new_window(
+                self.driver, link)
 
             self.driver.execute_script(Envio.LUPA)
 
@@ -237,7 +238,7 @@ class PagInicial(Page):
 
             # Guarda as janelas do navegador presentes
             windows = driver.window_handles
-            
+
             janela_envio = windows[-1]
 
             # Troca o foco do navegador
@@ -280,17 +281,14 @@ class PagInicial(Page):
         self.wait_for_element_to_click(Envio.IDUTEIS).click()
 
         self.wait_for_element_to_click(Envio.IDENVIAR).click()
-        
+
         # fecha a janela_envio
         self.driver.close()
-        
+
         self.driver.switch_to_window(janela_processo)
-        
+
         # fecha a janela processo
         self.driver.close()
-        
-        
-
 
     def acoes_oficio(self):
 
@@ -299,7 +297,7 @@ class PagInicial(Page):
 
         # Switch to central frame
         self.driver.switch_to_frame("ifrVisualizacao")
-        
+
         self.wait_for_element((By.ID, "divArvoreAcoes"))
 
         html_frame = soup(self.driver.page_source, "lxml")
@@ -416,11 +414,9 @@ def navigate_link_to_new_window(driver, link):
     return (main_window, windows[-1])
 
 
-    
 driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-    
-sei.expedir_bloco(75796)
 
+sei.expedir_bloco(75796)

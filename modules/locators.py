@@ -15,35 +15,37 @@ class Login(object):
 
     TITLE = "SEI / ANATEL"
 
-    LOGIN = (By.ID, "txtUsuario")
+    LOG = (By.ID, "txtUsuario")
 
-    SENHA = (By.ID, "pwdSenha")
+    PWD = (By.ID, "pwdSenha")
 
 
 class Base(object):
 
-    INITIALPAGE = (By.ID, "lnkControleProcessos")
+    INIT = (By.ID, "lnkControleProcessos")
 
-    EXIBIRMENU = (By.ID, "lnkInfraMenuSistema")
+    MENU = (By.ID, "lnkInfraMenuSistema")
 
-    NAV_URL = Login.URL + "/sei/"
+    URL = Login.URL + "/sei/"
 
 
 class LatMenu(object):
 
-    BLOCOASS = (By.LINK_TEXT, "Blocos de Assinatura")
+    BL_ASS = (By.LINK_TEXT, "Blocos de Assinatura")
 
 
 class Main(object):
+    
+    TITLE = 'SEI - Controle de Processos'
 
-    FILTROATRIBUICAO = (By.ID, "ancVisualizacao1")
+    ATR = (By.ID, "ancVisualizacao1")
 
-    TIPOVISUALIZACAO = (By.ID, "ancTipoVisualizacao")
+    VISUAL = (By.ID, "ancTipoVisualizacao")
 
-    CONTADOR = (By.ID, "selInfraPaginacaoSuperior")
+    CONT = (By.ID, "selInfraPaginacaoSuperior")
 
 
-class ListaBlocos(object):
+class Blocos(object):
 
     TITLE = "SEI - Blocos de Assinatura"
 
@@ -55,48 +57,57 @@ class Bloco(object):
     RET_BLOCO = ((By.ID, 'btnExcluir'))
 
 
-class Processo(object):
+class Tree(object):
 
     TITLE = "SEI - Processo"
+       
+class Central(object):
+    
+    ACOES = (By.ID, "divArvoreAcoes")
+    
+    IN_AND = (By.ID, "txaDescricao")
+    
+    SV_AND = (By.ID, "sbmSalvar")
+    
+    AND_PRE = "Solicita-se ao protocolo a expedição do "
 
-    TXT_AND_PRE = "Solicita-se ao protocolo a expedição do "
+    AND_MID = " ( SEI nº "
 
-    TXT_AND_MID = " ( SEI nº "
-
-    TXT_AND_POS = "por meio de correspondência simples com aviso de recebimento."
-
+    AND_POS = "por meio de correspondência simples com aviso de recebimento."
 
 class Envio(object):
+    
+    TITLE = "SEI - Enviar Processo"
 
-    TITLE = "SEI - Selecionar Unidades"
+    UNIDS = "SEI - Selecionar Unidades"
 
     PRAZO = "3"
 
-    IDSIGLA = (By.ID, "txtSiglaUnidade")
+    IN_SIGLA = (By.ID, "txtSiglaUnidade")
 
-    SIGLASEDE = "Protocolo.Sede"
+    SIGLA = "Protocolo.Sede"
 
-    TXTSEDE = "Protocolo.Sede - Protocolo da Sede"
+    SEDE = "Protocolo.Sede - Protocolo da Sede"
 
-    IDSEDE = (By.ID, "chkInfraItem0")
+    ID_SEDE = (By.ID, "chkInfraItem0")
 
-    IDBTNTRSP = (By.ID, "btnTransportarSelecao")
+    B_TRSP = (By.ID, "btnTransportarSelecao")
 
     LUPA = "objLupaUnidades.selecionar(700,500)"
 
     IDUNIDADE = (By.ID, "txtUnidade")
 
-    IDMANTERABERTO = (By.ID, "chkSinManterAberto")
+    OPEN = (By.ID, "chkSinManterAberto")
 
     IDRETDATA = (By.ID, "optDataCerta")
 
-    IDRETDIAS = (By.ID, "optDias")
+    RET_DIAS = (By.ID, "optDias")
 
-    IDNUMDIAS = (By.ID, "txtDias")
+    NUM_DIAS = (By.ID, "txtDias")
 
-    IDUTEIS = (By.ID, "chkSinDiasUteis")
+    UTEIS = (By.ID, "chkSinDiasUteis")
 
-    IDENVIAR = (By.ID, "sbmEnviar")
+    ENVIAR = (By.ID, "sbmEnviar")
 
 
 class Boleto(object):

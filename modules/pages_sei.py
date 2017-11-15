@@ -22,9 +22,7 @@ from selenium.webdriver.support.ui import Select
 import sei_functions as ft
 # Personal Files
 from base import Page
-from locators import (Base, Bloco, Envio, LatMenu, ListaBlocos, Login, Main,
-                      Processo)
-
+import locators  as loc
 
 def login_SEI(driver, usr, pwd):
     """
@@ -34,11 +32,11 @@ def login_SEI(driver, usr, pwd):
     """
 
     page = Page(driver)
-    page.driver.get(Login.URL)
+    page.driver.get(loc.Login.URL)
     page.driver.maximize_window()
 
-    usuario = page.wait_for_element_to_click(Login.LOGIN)
-    senha = page.wait_for_element_to_click(Login.SENHA)
+    usuario = page.wait_for_element_to_click(loc.Login.LOG)
+    senha = page.wait_for_element_to_click(loc.Login.PWD)
 
     # Clear any clutter on the form
     usuario.clear()
@@ -66,7 +64,7 @@ class SEI(Page):
         Expands the visualization from the main page in SEI
         """
         try:
-            ver_todos = self.wait_for_element_to_click(Main.FILTROATRIBUICAO)
+            ver_todos = self.wait_for_element_to_click(loc.Main.ATR)
 
             if ver_todos.text == "Ver todos os processos":
                 ver_todos.click()
@@ -79,7 +77,7 @@ class SEI(Page):
         try:
 
             visual_detalhado = self.wait_for_element_to_click(
-                Main.TIPOVISUALIZACAO)
+                loc.Main.VISUAL)
 
             if visual_detalhado.text == "Visualização detalhada":
                 visual_detalhado.click()
@@ -92,7 +90,7 @@ class SEI(Page):
     def isPaginaInicial(self):
         """Retorna True se a página estiver na página inicial do SEI, False
         caso contrário"""
-        return self.get_title() == 'SEI - Controle de Processos'
+        return self.get_title() == loc.Main.TITLE
 
     def go_to_initial_page(self):
         """
@@ -101,7 +99,7 @@ class SEI(Page):
         Assume que o link está presente em qualquer subpágina do SEI
         """
         self.wait_for_element_to_click(
-            Base.INITIALPAGE).click()
+            loc.Base.INIT).click()
 
     def exibir_menu_lateral(self):
         """
@@ -109,7 +107,7 @@ class SEI(Page):
         links
         Assume que o link está presente em qualquer subpágina do SEI
         """
-        menu = self.wait_for_element(Base.EXIBIRMENU)
+        menu = self.wait_for_element(loc.Base.MENU)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -130,31 +128,36 @@ class SEI(Page):
         # Mostra página com informações detalhadas
         self.ver_proc_detalhado()
 
-        contador = Select(self.wait_for_element(Main.CONTADOR))
+        contador = Select(self.wait_for_element(loc.Main.CONT))
 
         pages = [pag.text for pag in contador.options]
 
         for pag in pages:
 
             # One simple repetition to avoid more complex code
-            contador = Select(self.wait_for_element(Main.CONTADOR))
+            contador = Select(self.wait_for_element(loc.Main.CONT))
             contador.select_by_visible_text(pag)
             html_sei = soup(self.driver.page_source, "lxml")
             self.processos += html_sei("tr", {"class": 'infraTrClara'})
 
         # percorre a lista de processos
         # cada linha corresponde a uma tag mãe 'tr'
-        # substituimos a tag mãe por uma lista das tags filhas 'tag.contents', descartando os '\n'
-        # a função lista_to_dict_tags recebe essa lista e retorna um dicionário das tags
-        self.processos = [ft.cria_tags_dict([tag for tag in line.contents
-                                             if tag != '\n']) for line in self.processos]
+        # substituimos a tag mãe por uma lista das tags filhas 
+        # 'tag.contents', descartando os '\n'
+        # a função lista_to_dict_tags recebe essa lista e 
+        # retorna um dicionário das tags
+        self.processos = [ft.armazena_tags(
+                         [tag for tag in line.contents if tag != '\n']) 
+                         for line in self.processos]
+        
+        
 
 
 class Blocos(Page):
 
     def exibir_bloco(self, numero):
 
-        if self.get_title() != ListaBlocos.TITLE:
+        if self.get_title() != loc.Blocos.TITLE:
             self.go_to_blocos()
 
         try:
@@ -166,7 +169,7 @@ class Blocos(Page):
 
     def armazena_bloco(self, numero):
 
-        if self.get_title() != Bloco.TITLE + " " + str(numero):
+        if self.get_title() != loc.Bloco.TITLE + " " + str(numero):
 
             self.exibir_bloco(numero)
 
@@ -191,7 +194,7 @@ class Blocos(Page):
 
                 proc[k] = v
 
-            proc["expedido"] = False
+            # proc["expedido"] = False
 
             lista_processos.append(proc)
 
@@ -203,10 +206,10 @@ class Blocos(Page):
 
         for p in processos:
 
-            if p['expedido']:
-
-                print("Processo %s já foi expedido!\n", p['processo'].a.string)
-                next
+#            if p['expedido']:
+#
+#                print("Processo %s já foi expedido!\n", p['processo'].a.string)
+#                next
 
             if ft.podeExpedir(p):
 
@@ -214,14 +217,190 @@ class Blocos(Page):
 
                 num_doc = p['documento'].a.string
 
-                link = Base.NAV_URL + p['processo'].a.attrs['href']
+                link = loc.Base.URL + p['processo'].a.attrs['href']
 
-                (bloco_window, proc_window) = ft.navigate_link_to_new_window(
+                (bloco_window, proc_window) = ft.nav_link_to_new_win(
                     self.driver, link)
+                
+                processo = Processo(self.driver, proc_window)
 
-                self.expedir_oficio(proc, num_doc, link)
+                processo.expedir_oficio(proc, num_doc, link)
 
 
 class Processo(Page):
+    
+    tree = {}
+    
+    def __init__(self, driver, window):        
+        super().__init__(driver)
+        self.window = window
+        
+    def fecha_processo(self):
+        
+        self.driver.switch_to_window(self.window)
+        
+        self.driver.close()
+        
+    def info_oficio(self, num_doc):
 
-    pass  # TODO: Guardar processos em detalhes
+        assert self.get_title() == Processo.TITLE, \
+            "Erro ao navegar para o processo"
+
+        # Switch to tree frame
+        self.driver.switch_to_frame("ifrArvore")
+
+        with self.wait_for_page_load():
+
+            html_tree = soup(self.driver.page_source, "lxml")
+
+            info = html_tree.find(title=re.compile(num_doc)).string
+
+            assert info != '', "Falha ao retornar Info do Ofício da Árvore"
+
+            # return to parent frame
+            self.driver.switch_to_default_content()
+
+            return info
+        
+    def acoes_oficio(self):
+
+        assert self.get_title() == loc.Tree.TITLE, \
+            "Erro ao navegar para o processo"
+
+        # Switch to central frame
+        self.driver.switch_to_frame("ifrVisualizacao")
+
+        self.wait_for_element(loc.Central.ACOES)
+
+        html_frame = soup(self.driver.page_source, "lxml")
+
+        buttons = html_frame.find(id="divArvoreAcoes").contents
+
+        self.driver.switch_to_default_content()
+
+        return buttons
+    
+    def atualiza_andamento(self, buttons, info):
+
+        assert self.get_title() == loc.Tree.TITLE, \
+            "Erro ao navegar para o processo"
+            
+        andamento = buttons[4]
+
+        link = loc.Base.URL + andamento.attrs['href']
+
+        (proc_window, and_window) = ft.nav_link_to_new_win(self.driver, link)
+
+        input_and = self.wait_for_element(ft.Central.IN_AND)
+
+        text = ft.Central.TXT_AND_PRE + info + ft.Central.TXT_AND_POS
+
+        input_and.send_keys(text)
+
+        self.wait_for_element_to_click(ft.Central.SV_AND).click()
+
+        self.driver.close()
+
+        self.driver.switch_to_window(proc_window)
+        
+        
+        
+    def enviar_processo_sede(self, buttons):
+
+        with self.wait_for_page_load():
+
+            assert self.get_title() == loc.Tree.TITLE, \
+                "Erro na função 'enviar_processo_sede"
+
+            enviar = buttons[3]
+
+            link = loc.Base.URL + enviar.attrs["href"]
+            
+            
+            (janela_processo, janela_enviar) = ft.nav_link_to_new_win(
+                self.driver, link)
+        
+        with self.wait_for_page_load():
+            
+            assert self.get_title() == loc.Envio.TITLE, \
+                "Erro ao clicar no botão 'Enviar Processo'"                    
+
+            self.driver.execute_script(loc.Envio.LUPA)
+
+        with self.wait_for_page_load():
+            
+            # Guarda as janelas do navegador presentes
+            windows = driver.window_handles
+
+            janela_unidades = windows[-1]
+
+            # Troca o foco do navegador
+            self.driver.switch_to_window(janela_unidades)
+
+            assert self.get_title() == loc.Envio.UNIDS, \
+             "Erro ao clicar na lupa 'Selecionar Unidades'" 
+
+        unidade = self.wait_for_element(loc.Envio.IN_SIGLA)
+
+        unidade.clear()
+
+        unidade.send_keys(loc.Envio.SIGLA + Keys.RETURN)
+
+        sede = self.wait_for_element(loc.Envio.ID_SEDE)
+
+        assert sede.get_attribute("title") == loc.Envio.SEDE, \
+            "Erro ao selecionar a Unidade Protocolo.Sede para envio"
+
+        sede.click()
+
+        self.wait_for_element_to_click(loc.Envio.B_TRSP).click()
+
+        # Fecha a janela_unidades
+        self.driver.close()
+
+        # Troca o foco do navegador
+        self.driver.switch_to_window(janela_enviar)
+
+        self.wait_for_element_to_click(loc.Envio.OPEN).click()
+
+        self.wait_for_element_to_click(loc.Envio.RET_DIAS).click()
+
+        prazo = self.wait_for_element(loc.Envio.NUM_DIAS)
+
+        prazo.clear()
+
+        prazo.send_keys(loc.Envio.PRAZO)
+
+        self.wait_for_element_to_click(loc.Envio.UTEIS).click()
+
+        self.wait_for_element_to_click(loc.Envio.ENVIAR).click()
+
+        # fecha a janela_enviar
+        self.driver.close()
+
+        self.driver.switch_to_window(janela_processo)
+
+        # fecha a janela processo
+        # self.driver.close()
+
+
+
+        
+    def expedir_oficio(self, num_doc):
+
+        info = self.info_oficio(num_doc)
+
+        # self.driver.switch_to_window(self.window)
+
+        buttons = self.acoes_oficio()
+
+        self.atualiza_andamento(buttons, info)
+
+        self.enviar_processo_sede(buttons)
+
+        # self.driver.switch_to_window(main_window)
+        
+        
+
+    
+

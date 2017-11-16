@@ -152,6 +152,8 @@ class SEI(Page):
                          [tag for tag in line.contents if tag != '\n']) 
                          for line in self.processos]
         
+        self.processos = {p['processo'].string : p for p in self.processos}
+        
         
 
 
@@ -233,16 +235,48 @@ class Processo(Page):
     
     tree = {}
     
-    def __init__(self, driver, window):        
+    def __init__(self, driver, tags):        
         super().__init__(driver)
-        self.window = window
+        self.tags = tags
         
-    def fecha_processo(self):
-        
-        self.driver.switch_to_window(self.window)
+    def fecha_processo_atual(self):        
         
         self.driver.close()
         
+    def cria_processo(self, tipo, desc='', inter='', nivel = 'público'):
+        
+        tipo = str(tipo)
+        
+        assert tipo in loc.Tipos.PROCS,\
+        print("O tipo de processo digitado {0}, não é válido".format(str(tipo)))
+        
+        select = Select(self.wait_for_element(loc.Tipos.SL_TIP_PROC))
+        
+        select.select_by_visible_text(tipo)
+        
+        if desc:
+            
+            espec = self.wait_for_element(loc.Processo.ESPEC)
+            
+            espec.send_keys(desc)
+            
+        if inter:
+            
+            self.cadastrar_interessado(inter)
+            
+        
+    def consultar_contato(self, nome):
+        
+        pass
+    
+    def cadastrar_interessado(self, nome, tipo='pf', dados):
+    
+        pass
+
+            
+            
+        
+    
     def info_oficio(self, num_doc):
 
         assert self.get_title() == Processo.TITLE, \
@@ -266,7 +300,7 @@ class Processo(Page):
         
     def acoes_oficio(self):
 
-        assert self.get_title() == loc.Tree.TITLE, \
+        assert self.get_title() == loc.Processo.TITLE, \
             "Erro ao navegar para o processo"
 
         # Switch to central frame
@@ -284,7 +318,7 @@ class Processo(Page):
     
     def atualiza_andamento(self, buttons, info):
 
-        assert self.get_title() == loc.Tree.TITLE, \
+        assert self.get_title() == loc.Processo.TITLE, \
             "Erro ao navegar para o processo"
             
         andamento = buttons[4]
@@ -311,7 +345,7 @@ class Processo(Page):
 
         with self.wait_for_page_load():
 
-            assert self.get_title() == loc.Tree.TITLE, \
+            assert self.get_title() == loc.Processo.TITLE, \
                 "Erro na função 'enviar_processo_sede"
 
             enviar = buttons[3]
@@ -332,7 +366,7 @@ class Processo(Page):
         with self.wait_for_page_load():
             
             # Guarda as janelas do navegador presentes
-            windows = driver.window_handles
+            windows = self.driver.window_handles
 
             janela_unidades = windows[-1]
 
@@ -403,22 +437,20 @@ class Processo(Page):
         # self.driver.switch_to_window(main_window)
         
         
-def main(login, senha):
+def main():
     
+    login = getuser()
+    
+    senha = getpass(prompt="Senha: ")
+        
     driver = webdriver.Chrome()
     
     sei = login_SEI(driver, login, senha)
     
     return sei
 
-
-if __name__ == "__main__":
+#if __name__ == "__main__":
     
-    login = getuser()
+ #   main()
     
-    senha = getpass(prompt="Senha: ")
-    
-    main(login, senha)        
-
-    
-
+sei = main()         

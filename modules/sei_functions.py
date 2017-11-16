@@ -14,7 +14,7 @@ import pandas as pd
 # Selenium Methods
 from selenium.webdriver.common.keys import Keys
 
-from locators import Boleto
+import locators as loc
 
 
 def podeExpedir(linha):
@@ -285,3 +285,4 @@ def dict_to_df(processos):
     df['tipo'] = df['tipo'].astype("category")
 
     return df
+

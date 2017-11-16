@@ -20,8 +20,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
 from modules.base import Page
-from modules.locators import (Base, Bloco, Envio, LatMenu, ListaBlocos, Login,
-                              Main, Processo)
+from modules.locators import (Base, Bloco, Envio, LatMenu, Blocos, Login,
+                              Main, Processo, Central)
 
 
 class LoginPage(Page):
@@ -33,8 +33,8 @@ class LoginPage(Page):
         self.driver.get(Login.URL)
         self.driver.maximize_window()
 
-        usuario = self.wait_for_element_to_click(Login.LOGIN)
-        senha = self.wait_for_element_to_click(Login.SENHA)
+        usuario = self.wait_for_element_to_click(Login.LOG)
+        senha = self.wait_for_element_to_click(Login.PWD)
 
         # Clear any clutter on the form
         usuario.clear()
@@ -60,7 +60,7 @@ class PagInicial(Page):
 
         try:
             ver_todos_processos = self.wait_for_element_to_click(
-                Main.FILTROATRIBUICAO)
+                Main.ATR)
 
             if ver_todos_processos.text == 'Ver todos os processos':
                 ver_todos_processos.click()
@@ -71,7 +71,7 @@ class PagInicial(Page):
         # Verifica se está na visualização detalhada senão muda para ela
         try:
             visualizacao_detalhada = self.wait_for_element_to_click(
-                Main.TIPOVISUALIZACAO)
+                Main.VISUAL)
 
             if visualizacao_detalhada.text == 'Visualização detalhada':
                 visualizacao_detalhada.click()
@@ -84,11 +84,11 @@ class PagInicial(Page):
 
     def go_to_initial_page(self):
         self.wait_for_element_to_click(
-            Base.INITIALPAGE).click()
+            Base.INIT).click()
 
     def exibir_menu_lateral(self):
 
-        menu = self.wait_for_element(Base.EXIBIRMENU)
+        menu = self.wait_for_element(Base.MENU)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -100,14 +100,14 @@ class PagInicial(Page):
         if not self.isPaginaInicial():
             self.go_to_initial_page()
 
-        contador = Select(self.wait_for_element(Main.CONTADOR))
+        contador = Select(self.wait_for_element(Main.CONT))
 
         pages = [pag.text for pag in contador.options]
 
         for pag in pages:
 
             # One simple repetition to avoid more complex code
-            contador = Select(self.wait_for_element(Main.CONTADOR))
+            contador = Select(self.wait_for_element(Main.CONT))
             contador.select_by_visible_text(pag)
             html_sei = soup(self.driver.page_source, "lxml")
             processos += html_sei("tr", {"class": 'infraTrClara'})
@@ -116,11 +116,11 @@ class PagInicial(Page):
 
     def go_to_blocos(self):
         self.exibir_menu_lateral()
-        self.wait_for_element(LatMenu.BLOCOASS).click()
+        self.wait_for_element(LatMenu.BL_ASS).click()
 
     def exibir_bloco(self, numero):
 
-        if self.get_title() != ListaBlocos.TITLE:
+        if self.get_title() != Blocos.TITLE:
             self.go_to_blocos()
 
         try:
@@ -176,7 +176,7 @@ class PagInicial(Page):
 
                 num_doc = p['documento'].a.string
 
-                link = Base.NAV_URL + p['processo'].a.attrs['href']
+                link = Base.URL + p['processo'].a.attrs['href']
 
                 self.expedir_oficio(proc, num_doc, link)
 
@@ -219,7 +219,7 @@ class PagInicial(Page):
 
             enviar = buttons[3]
 
-            link = Base.NAV_URL + enviar.attrs["href"]
+            link = Base.URL + enviar.attrs["href"]
 
             (janela_processo, janela_andamento) = navigate_link_to_new_window(
                 self.driver, link)
@@ -236,23 +236,23 @@ class PagInicial(Page):
             # Troca o foco do navegador
             self.driver.switch_to_window(janela_envio)
 
-        assert self.get_title() == Envio.TITLE, \
+        assert self.get_title() == Envio.UNIDS, \
             "Erro ao navegar para as unidades de tramitação"
 
-        unidade = self.wait_for_element(Envio.IDSIGLA)
+        unidade = self.wait_for_element(Envio.IN_SIGLA)
 
         unidade.clear()
 
-        unidade.send_keys(Envio.SIGLASEDE + Keys.RETURN)
+        unidade.send_keys(Envio.SIGLA + Keys.RETURN)
 
-        sede = self.wait_for_element(Envio.IDSEDE)
+        sede = self.wait_for_element(Envio.ID_SEDE)
 
-        assert sede.get_attribute("title") == Envio.TXTSEDE, \
+        assert sede.get_attribute("title") == Envio.SEDE, \
             "Erro ao selecionar a Unidade Protocolo.Sede para envio"
 
         sede.click()
 
-        self.wait_for_element_to_click(Envio.IDBTNTRSP).click()
+        self.wait_for_element_to_click(Envio.B_TRSP).click()
 
         # Fecha a janela_envio
         self.driver.close()
@@ -260,19 +260,19 @@ class PagInicial(Page):
         # Troca o foco do navegador
         self.driver.switch_to_window(janela_andamento)
 
-        self.wait_for_element_to_click(Envio.IDMANTERABERTO).click()
+        self.wait_for_element_to_click(Envio.OPEN).click()
 
-        self.wait_for_element_to_click(Envio.IDRETDIAS).click()
+        self.wait_for_element_to_click(Envio.RET_DIAS).click()
 
-        prazo = self.wait_for_element(Envio.IDNUMDIAS)
+        prazo = self.wait_for_element(Envio.NUM_DIAS)
 
         prazo.clear()
 
         prazo.send_keys(Envio.PRAZO)
 
-        self.wait_for_element_to_click(Envio.IDUTEIS).click()
+        self.wait_for_element_to_click(Envio.UTEIS).click()
 
-        self.wait_for_element_to_click(Envio.IDENVIAR).click()
+        self.wait_for_element_to_click(Envio.ENVIAR).click()
 
         # fecha a janela_envio
         self.driver.close()
@@ -330,13 +330,13 @@ class PagInicial(Page):
 
         andamento = buttons[4]
 
-        link = Base.NAV_URL + andamento.attrs['href']
+        link = Base.URL + andamento.attrs['href']
 
         (proc_window, new_window) = navigate_link_to_new_window(self.driver, link)
 
         input_and = self.wait_for_element((By.ID, "txaDescricao"))
 
-        text = Processo.TXT_AND_PRE + info + Processo.TXT_AND_POS
+        text = Central.AND_PRE + info + Central.AND_POS
 
         input_and.send_keys(text)
 

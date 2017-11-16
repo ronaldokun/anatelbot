@@ -13,6 +13,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+NAV_URL = "https://sei.anatel.gov.br/sei"
+
+
 
 class Page(object):
     # assumes self.driver is a selenium webdriver
@@ -22,6 +25,12 @@ class Page(object):
         
     def __enter__(self):
         return self
+    
+    def go(self, link):
+        
+        link = NAV_URL + link
+        
+        self.driver.get(link)
 
     def close(self):
         self.driver.close()

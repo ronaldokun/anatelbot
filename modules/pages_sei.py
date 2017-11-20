@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 # python modules imports
 import os
@@ -17,14 +16,17 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 # METHODS
 from selenium.webdriver.common.keys import Keys
+
 # WAIT AND CONDITIONS METHODS
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
 import sei_functions as ft
+
 # Personal Files
 from base import Page
-import locators  as loc
+import locators as loc
+
 
 def login_SEI(driver, usr, pwd):
     """
@@ -35,7 +37,7 @@ def login_SEI(driver, usr, pwd):
 
     page = Page(driver)
     page.driver.get(loc.Login.URL)
-    page.driver.maximize_window()
+    # page.driver.maximize_window()
 
     usuario = page.wait_for_element_to_click(loc.Login.LOG)
     senha = page.wait_for_element_to_click(loc.Login.PWD)
@@ -55,12 +57,12 @@ def login_SEI(driver, usr, pwd):
 
 class SEI(Page):
     """
-    Esta subclasse da classe Page define métodos de execução de ações na 
+    Esta subclasse da classe Page define métodos de execução de ações na
     página principal do SEI e de resgate de informações
     """
 
     processos = []
-
+    
     def ver_proc_detalhado(self):
         """
         Expands the visualization from the main page in SEI
@@ -144,20 +146,81 @@ class SEI(Page):
 
         # percorre a lista de processos
         # cada linha corresponde a uma tag mãe 'tr'
-        # substituimos a tag mãe por uma lista das tags filhas 
+        # substituimos a tag mãe por uma lista das tags filhas
         # 'tag.contents', descartando os '\n'
-        # a função lista_to_dict_tags recebe essa lista e 
+        # a função lista_to_dict_tags recebe essa lista e
         # retorna um dicionário das tags
         self.processos = [ft.armazena_tags(
-                         [tag for tag in line.contents if tag != '\n']) 
-                         for line in self.processos]
+                         [tag for tag in line.contents if tag != '\n'])
+            for line in self.processos]
+
+        self.processos = {p['processo'].string: p for p in self.processos}
         
-        self.processos = {p['processo'].string : p for p in self.processos}
+    def consultar_contato(self, nome):
+
+        pass
+
+    def cadastrar_interessado(self, nome, dados, tipo='pf', ):
+
+        pass
+    
+    def cria_processo(self, tipo, desc='', inter='', nivel='público'):
+
+        tipo = str(tipo)
+
+        assert tipo in loc.Tipos.PROCS,\
+            print("O tipo de processo digitado {0}, não é válido".format(str(tipo)))
+
         
+        self.exibir_menu_lateral()
         
+        init_proc = self.wait_for_element_to_click(loc.LatMenu.INIT_PROC)
+        
+        init_proc.click()
+        
+        filtro = self.wait_for_element_to_click(loc.Tipos.FILTRO)
+        
+        filtro.send_keys(tipo)
+        
+        # exibe_todos = self.wait_for_element_to_click(loc.Tipos.EXIBE_ALL)
+        
+        # exibe_todos.click()
+    
+    
+        # select = Select(self.wait_for_element(loc.Tipos.SL_TIP_PROC))
+    
+        tipo = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
+        
+        tipo.click()
+    
+        if desc:
+    
+            espec = self.wait_for_element(loc.Processo.ESPEC)
+    
+            espec.send_keys(desc)
+    
+        if inter:
+    
+            self.cadastrar_interessado(inter)
+            self.consultar_contato(inter)
+    
+        if nivel == 'público':
+    
+            nivel = self.wait_for_element(loc.Processo.PUBL)
+    
+        elif nivel == 'restrito':
+    
+            nivel = self.wait_for_element(loc.Processo.REST)
+    
+        else:
+    
+            nivel = self.wait_for_element(loc.Processo.SIG)
+    
+        nivel.click()
 
 
-class Blocos(Page):
+
+class Blocos(SEI):
 
     def exibir_bloco(self, numero):
 
@@ -210,10 +273,10 @@ class Blocos(Page):
 
         for p in processos:
 
-#            if p['expedido']:
-#
-#                print("Processo %s já foi expedido!\n", p['processo'].a.string)
-#                next
+            #            if p['expedido']:
+            #
+            #                print("Processo %s já foi expedido!\n", p['processo'].a.string)
+            #                next
 
             if ft.podeExpedir(p):
 
@@ -225,57 +288,60 @@ class Blocos(Page):
 
                 (bloco_window, proc_window) = ft.nav_link_to_new_win(
                     self.driver, link)
-                
+
                 processo = Processo(self.driver, proc_window)
 
                 processo.expedir_oficio(proc, num_doc, link)
 
 
-class Processo(Page):
-    
+class Processo(SEI):
+
     tree = {}
-    
-    def __init__(self, driver, tags):        
+
+    def __init__(self, driver, tags):
         super().__init__(driver)
         self.tags = tags
-        
-    def fecha_processo_atual(self):        
-        
-        self.driver.close()
-        
-    def cria_processo(self, tipo, desc='', inter='', nivel = 'público'):
-        
-        tipo = str(tipo)
-        
-        assert tipo in loc.Tipos.PROCS,\
-        print("O tipo de processo digitado {0}, não é válido".format(str(tipo)))
-        
-        select = Select(self.wait_for_element(loc.Tipos.SL_TIP_PROC))
-        
-        select.select_by_visible_text(tipo)
-        
-        if desc:
-            
-            espec = self.wait_for_element(loc.Processo.ESPEC)
-            
-            espec.send_keys(desc)
-            
-        if inter:
-            
-            self.cadastrar_interessado(inter)
-            
-        
-    def consultar_contato(self, nome):
-        
-        pass
-    
-    def cadastrar_interessado(self, nome, tipo='pf', dados):
-    
-        pass
 
-            
-            
-        
+    def fecha_processo_atual(self):
+        self.driver.close()
+
+    def cria_processo(self, tipo, desc='', inter='', nivel='público'):
+
+        tipo = str(tipo)
+
+        assert tipo in loc.Tipos.PROCS,\
+            print(
+                "O tipo de processo digitado {0}, não é válido".format(str(tipo)))
+
+        select = Select(self.wait_for_element(loc.Tipos.SL_TIP_PROC))
+
+        select.select_by_visible_text(tipo)
+
+        if desc:
+
+            espec = self.wait_for_element(loc.Processo.ESPEC)
+
+            espec.send_keys(desc)
+
+        if inter:
+
+            self.cadastrar_interessado(inter)
+            self.consultar_contato(inter)
+
+        if nivel == 'público':
+
+            nivel = self.wait_for_element(loc.Processo.PUBL)
+
+        elif nivel == 'restrito':
+
+            nivel = self.wait_for_element(loc.Processo.REST)
+
+        else:
+
+            nivel = self.wait_for_element(loc.Processo.SIG)
+
+        nivel.click()
+
     
     def info_oficio(self, num_doc):
 
@@ -297,7 +363,7 @@ class Processo(Page):
             self.driver.switch_to_default_content()
 
             return info
-        
+
     def acoes_oficio(self):
 
         assert self.get_title() == loc.Processo.TITLE, \
@@ -315,12 +381,12 @@ class Processo(Page):
         self.driver.switch_to_default_content()
 
         return buttons
-    
+
     def atualiza_andamento(self, buttons, info):
 
         assert self.get_title() == loc.Processo.TITLE, \
             "Erro ao navegar para o processo"
-            
+
         andamento = buttons[4]
 
         link = loc.Base.URL + andamento.attrs['href']
@@ -338,9 +404,7 @@ class Processo(Page):
         self.driver.close()
 
         self.driver.switch_to_window(proc_window)
-        
-        
-        
+
     def enviar_processo_sede(self, buttons):
 
         with self.wait_for_page_load():
@@ -351,20 +415,19 @@ class Processo(Page):
             enviar = buttons[3]
 
             link = loc.Base.URL + enviar.attrs["href"]
-            
-            
+
             (janela_processo, janela_enviar) = ft.nav_link_to_new_win(
                 self.driver, link)
-        
+
         with self.wait_for_page_load():
-            
+
             assert self.get_title() == loc.Envio.TITLE, \
-                "Erro ao clicar no botão 'Enviar Processo'"                    
+                "Erro ao clicar no botão 'Enviar Processo'"
 
             self.driver.execute_script(loc.Envio.LUPA)
 
         with self.wait_for_page_load():
-            
+
             # Guarda as janelas do navegador presentes
             windows = self.driver.window_handles
 
@@ -374,7 +437,7 @@ class Processo(Page):
             self.driver.switch_to_window(janela_unidades)
 
             assert self.get_title() == loc.Envio.UNIDS, \
-             "Erro ao clicar na lupa 'Selecionar Unidades'" 
+                "Erro ao clicar na lupa 'Selecionar Unidades'"
 
         unidade = self.wait_for_element(loc.Envio.IN_SIGLA)
 
@@ -419,9 +482,6 @@ class Processo(Page):
         # fecha a janela processo
         # self.driver.close()
 
-
-
-        
     def expedir_oficio(self, num_doc):
 
         info = self.info_oficio(num_doc)
@@ -435,22 +495,25 @@ class Processo(Page):
         self.enviar_processo_sede(buttons)
 
         # self.driver.switch_to_window(main_window)
-        
-        
+
+
 def main():
-    
+
     login = getuser()
-    
+
     senha = getpass(prompt="Senha: ")
-        
+
     driver = webdriver.Chrome()
-    
+
     sei = login_SEI(driver, login, senha)
-    
+
     return sei
 
-#if __name__ == "__main__":
-    
- #   main()
-    
-sei = main()         
+# login = 'rsilva'
+# senha = 'Savorthemom3nts'
+
+#driver = webdriver.Chrome()
+
+#sei = login_SEI(driver, login, senha)
+
+sei = SEI(sei.driver)

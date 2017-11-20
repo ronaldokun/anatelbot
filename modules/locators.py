@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup as soup
 
 class Login(object):
 
-    URL = "https://sei.anatel.gov.br"
+    URL = "https://seihm.anatel.gov.br"
 
     TITLE = "SEI / ANATEL"
 
@@ -193,6 +193,10 @@ class Envio(object):
     ENVIAR = (By.ID, "sbmEnviar")
     
 class Tipos(object):
+    
+    EXIBE_ALL = (By.ID, 'imgExibirTiposProcedimento')
+    
+    FILTRO = (By.ID, 'txtFiltro')
     
     SL_TIP_PROC = (By.ID, "selTipoProcedimento")
     

@@ -63,8 +63,6 @@ class LatMenu(object):
     
     PT_CTRL = (By.LINK_TEXT, "Pontos de Controle")  
     
-    
-
 
 class Main(object):
     
@@ -130,20 +128,8 @@ class Processo(object):
             'Sigilo do Inquérito Policial (Art. 20 do Código de Processo Penal)',
             'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)'
             ]
+
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-       
 class Central(object):
     
     ACOES = (By.ID, "divArvoreAcoes")
@@ -200,6 +186,7 @@ class Tipos(object):
     
     SL_TIP_PROC = (By.ID, "selTipoProcedimento")
     
+        
     PROCS = ['',
  'Acesso à Informação: Demanda do e-SIC',
  'Acompanhamento Competição: Monitoramento Mercados',

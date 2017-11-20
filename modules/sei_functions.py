@@ -5,16 +5,20 @@ Created on Wed Nov  1 16:50:19 2017
 
 @author: rsilva
 """
-from bs4 import BeautifulSoup as soup
 
-import datetime as dt
 import re
 
 import pandas as pd
+
+from bs4 import BeautifulSoup as soup
+
 # Selenium Methods
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 
 import locators as loc
+
+import sei_functions as ft
 
 
 def podeExpedir(linha):
@@ -86,7 +90,7 @@ def nav_link_to_new_win(driver, link):
 
 def armazena_tags(lista_tags):
     """ Recebe uma lista de tags de cada linha do processo  da página inicial
-    do SEI, retorna um dicionário dessas tags
+    do Sei, retorna um dicionário dessas tags
     """
     
     dict_tags = {}
@@ -285,4 +289,138 @@ def dict_to_df(processos):
     df['tipo'] = df['tipo'].astype("category")
 
     return df
+
+
+def consultar_contato(Sei, nome):
+
+    pass
+
+
+def cadastrar_interessado(Sei, nome, dados, tipo='pf', ):
+
+    pass
+
+
+def cria_processo(Sei, tipo, desc='', inter='', nivel='público'):
+
+    tipo = str(tipo)
+
+    assert tipo in loc.Tipos.PROCS,\
+        print("O tipo de processo digitado {0}, não é válido".format(str(tipo)))
+
+    
+    Sei.exibir_menu_lateral()
+    
+    init_proc = Sei.wait_for_element_to_click(loc.LatMenu.INIT_PROC)
+    
+    init_proc.click()
+    
+    filtro = Sei.wait_for_element_to_click(loc.Tipos.FILTRO)
+    
+    filtro.send_keys(tipo)
+    
+    # exibe_todos = Sei.wait_for_element_to_click(loc.Tipos.EXIBE_ALL)
+    
+    # exibe_todos.click()
+
+
+    # select = Select(Sei.wait_for_element(loc.Tipos.SL_TIP_PROC))
+
+    tipo = Sei.wait_for_element_to_click((By.LINK_TEXT, tipo))
+    
+    tipo.click()
+
+    if desc:
+
+        espec = Sei.wait_for_element(loc.Processo.ESPEC)
+
+        espec.send_keys(desc)
+
+    if inter:
+
+        Sei.cadastrar_interessado(inter)
+        Sei.consultar_contato(inter)
+
+    if nivel == 'público':
+
+        nivel = Sei.wait_for_element(loc.Processo.PUBL)
+
+    elif nivel == 'restrito':
+
+        nivel = Sei.wait_for_element(loc.Processo.REST)
+
+    else:
+
+        nivel = Sei.wait_for_element(loc.Processo.SIG)
+
+    nivel.click()
+    
+
+def exibir_bloco(Sei, numero):
+
+    if Sei.get_title() != loc.Blocos.TITLE:
+        Sei.go_to_blocos()
+
+    try:
+        Sei.wait_for_element((By.LINK_TEXT, str(numero))).click()
+
+    except:
+        print("O Bloco de Assinatura informado não existe ou está \
+              concluído!")
+
+def armazena_bloco(Sei, numero):
+
+    if Sei.get_title() != loc.Bloco.TITLE + " " + str(numero):
+
+        Sei.exibir_bloco(numero)
+
+    html_bloco = soup(Sei.driver.page_source, "lxml")
+    linhas = html_bloco.find_all(
+        "tr", class_=['infraTrClara', 'infraTrEscura'])
+
+    chaves = ['checkbox', 'seq', "processo", 'documento', 'data', 'tipo',
+              'assinatura', 'anotacoes', 'acoes']
+
+    lista_processos = []
+
+    for linha in linhas:
+
+        proc = {k: None for k in chaves}
+
+        cols = [v for v in linha.contents if v != "\n"]
+
+        assert len(chaves) == len(cols), "Verifique as linhas do bloco!"
+
+        for k, v in zip(chaves, cols):
+
+            proc[k] = v
+
+        # proc["expedido"] = False
+
+        lista_processos.append(proc)
+
+    return lista_processos
+
+def expedir_bloco(Sei, numero):
+
+    processos = Sei.armazena_bloco(numero)
+
+    for p in processos:
+       
+        if ft.podeExpedir(p):
+
+            proc = p['processo'].a.string
+
+            num_doc = p['documento'].a.string
+
+            link = loc.Base.URL + p['processo'].a.attrs['href']
+
+            (bloco_window, proc_window) = ft.nav_link_to_new_win(
+                Sei.driver, link)
+
+            processo = Processo(Sei.driver, proc_window)
+
+            processo.expedir_oficio(proc, num_doc, link)
+
+
 

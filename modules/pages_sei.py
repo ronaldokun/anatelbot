@@ -52,16 +52,21 @@ def login_SEI(driver, usr, pwd):
     # Hit Enter
     senha.send_keys(Keys.RETURN)
 
-    return SEI(page.driver)
+    return Sei(page.driver)
 
 
-class SEI(Page):
+class Sei(Page):
     """
     Esta subclasse da classe Page define métodos de execução de ações na
     página principal do SEI e de resgate de informações
     """
+    
+    def processos(self):
+        return self._processos
+        
 
-    processos = []
+    def set_processos(self, processos):
+        self._processos = processos
     
     def ver_proc_detalhado(self):
         """
@@ -123,7 +128,7 @@ class SEI(Page):
         """
 
         # Apaga o conteúdo atual da lista de processos
-        self.processos = []
+        processos = []
 
         # assegura que está inicial
         if not self.isPaginaInicial():
@@ -142,7 +147,7 @@ class SEI(Page):
             contador = Select(self.wait_for_element(loc.Main.CONT))
             contador.select_by_visible_text(pag)
             html_sei = soup(self.driver.page_source, "lxml")
-            self.processos += html_sei("tr", {"class": 'infraTrClara'})
+            processos += html_sei("tr", {"class": 'infraTrClara'})
 
         # percorre a lista de processos
         # cada linha corresponde a uma tag mãe 'tr'
@@ -150,199 +155,28 @@ class SEI(Page):
         # 'tag.contents', descartando os '\n'
         # a função lista_to_dict_tags recebe essa lista e
         # retorna um dicionário das tags
-        self.processos = [ft.armazena_tags(
+        processos = [ft.armazena_tags(
                          [tag for tag in line.contents if tag != '\n'])
-            for line in self.processos]
+                              for line in processos]
 
-        self.processos = {p['processo'].string: p for p in self.processos}
+        processos = {p['processo'].string: p for p in processos}
         
-    def consultar_contato(self, nome):
-
-        pass
-
-    def cadastrar_interessado(self, nome, dados, tipo='pf', ):
-
-        pass
+        self.set_processos(processos)
     
-    def cria_processo(self, tipo, desc='', inter='', nivel='público'):
-
-        tipo = str(tipo)
-
-        assert tipo in loc.Tipos.PROCS,\
-            print("O tipo de processo digitado {0}, não é válido".format(str(tipo)))
-
-        
-        self.exibir_menu_lateral()
-        
-        init_proc = self.wait_for_element_to_click(loc.LatMenu.INIT_PROC)
-        
-        init_proc.click()
-        
-        filtro = self.wait_for_element_to_click(loc.Tipos.FILTRO)
-        
-        filtro.send_keys(tipo)
-        
-        # exibe_todos = self.wait_for_element_to_click(loc.Tipos.EXIBE_ALL)
-        
-        # exibe_todos.click()
-    
-    
-        # select = Select(self.wait_for_element(loc.Tipos.SL_TIP_PROC))
-    
-        tipo = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
-        
-        tipo.click()
-    
-        if desc:
-    
-            espec = self.wait_for_element(loc.Processo.ESPEC)
-    
-            espec.send_keys(desc)
-    
-        if inter:
-    
-            self.cadastrar_interessado(inter)
-            self.consultar_contato(inter)
-    
-        if nivel == 'público':
-    
-            nivel = self.wait_for_element(loc.Processo.PUBL)
-    
-        elif nivel == 'restrito':
-    
-            nivel = self.wait_for_element(loc.Processo.REST)
-    
-        else:
-    
-            nivel = self.wait_for_element(loc.Processo.SIG)
-    
-        nivel.click()
-
-
-
-class Blocos(SEI):
-
-    def exibir_bloco(self, numero):
-
-        if self.get_title() != loc.Blocos.TITLE:
-            self.go_to_blocos()
-
-        try:
-            self.wait_for_element((By.LINK_TEXT, str(numero))).click()
-
-        except:
-            print("O Bloco de Assinatura informado não existe ou está \
-                  concluído!")
-
-    def armazena_bloco(self, numero):
-
-        if self.get_title() != loc.Bloco.TITLE + " " + str(numero):
-
-            self.exibir_bloco(numero)
-
-        html_bloco = soup(self.driver.page_source, "lxml")
-        linhas = html_bloco.find_all(
-            "tr", class_=['infraTrClara', 'infraTrEscura'])
-
-        chaves = ['checkbox', 'seq', "processo", 'documento', 'data', 'tipo',
-                  'assinatura', 'anotacoes', 'acoes']
-
-        lista_processos = []
-
-        for linha in linhas:
-
-            proc = {k: None for k in chaves}
-
-            cols = [v for v in linha.contents if v != "\n"]
-
-            assert len(chaves) == len(cols), "Verifique as linhas do bloco!"
-
-            for k, v in zip(chaves, cols):
-
-                proc[k] = v
-
-            # proc["expedido"] = False
-
-            lista_processos.append(proc)
-
-        return lista_processos
-
-    def expedir_bloco(self, numero):
-
-        processos = self.armazena_bloco(numero)
-
-        for p in processos:
-
-            #            if p['expedido']:
-            #
-            #                print("Processo %s já foi expedido!\n", p['processo'].a.string)
-            #                next
-
-            if ft.podeExpedir(p):
-
-                proc = p['processo'].a.string
-
-                num_doc = p['documento'].a.string
-
-                link = loc.Base.URL + p['processo'].a.attrs['href']
-
-                (bloco_window, proc_window) = ft.nav_link_to_new_win(
-                    self.driver, link)
-
-                processo = Processo(self.driver, proc_window)
-
-                processo.expedir_oficio(proc, num_doc, link)
-
 
 class Processo(SEI):
 
     tree = {}
 
-    def __init__(self, driver, tags):
+    def __init__(self, driver):
         super().__init__(driver)
-        self.tags = tags
+        
+        
 
     def fecha_processo_atual(self):
         self.driver.close()
 
-    def cria_processo(self, tipo, desc='', inter='', nivel='público'):
-
-        tipo = str(tipo)
-
-        assert tipo in loc.Tipos.PROCS,\
-            print(
-                "O tipo de processo digitado {0}, não é válido".format(str(tipo)))
-
-        select = Select(self.wait_for_element(loc.Tipos.SL_TIP_PROC))
-
-        select.select_by_visible_text(tipo)
-
-        if desc:
-
-            espec = self.wait_for_element(loc.Processo.ESPEC)
-
-            espec.send_keys(desc)
-
-        if inter:
-
-            self.cadastrar_interessado(inter)
-            self.consultar_contato(inter)
-
-        if nivel == 'público':
-
-            nivel = self.wait_for_element(loc.Processo.PUBL)
-
-        elif nivel == 'restrito':
-
-            nivel = self.wait_for_element(loc.Processo.REST)
-
-        else:
-
-            nivel = self.wait_for_element(loc.Processo.SIG)
-
-        nivel.click()
-
-    
+        
     def info_oficio(self, num_doc):
 
         assert self.get_title() == Processo.TITLE, \

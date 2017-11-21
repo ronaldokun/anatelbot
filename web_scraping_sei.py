@@ -31,7 +31,7 @@ class LoginPage(Page):
         make login and return and instance of browser"""
 
         self.driver.get(Login.URL)
-        self.driver.maximize_window()
+        # self.driver.maximize_window()
 
         usuario = self.wait_for_element_to_click(Login.LOG)
         senha = self.wait_for_element_to_click(Login.PWD)
@@ -411,4 +411,4 @@ driver = webdriver.Chrome()
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
 
-sei.expedir_bloco(75796)
+sei.expedir_bloco(76428)

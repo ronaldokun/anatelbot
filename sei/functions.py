@@ -8,7 +8,7 @@ Created on Wed Nov  1 16:50:19 2017
 
 from sei import re, pd, soup, Keys, By
 
-from sei import loc
+from sei import locators as loc
 
 def podeExpedir(linha):
     """Verifica algumas condições necessárias para expedição do Ofício no SEI
@@ -99,8 +99,6 @@ def armazena_tags(lista_tags):
 
         if 'imagens/sei_anotacao' in img:
 
-            # Separa o texto interno retornado pelo js onmouseover delimitado
-            # pelas aspas simples. Salvo somente o primeiro e terceiro items
             dict_tags['anotacao'] = tag_a
 
         elif 'imagens/sei_situacao' in img:
@@ -166,7 +164,7 @@ def cria_dict_tags(lista_tags):
 
     controles = lista_tags[1].find_all('a')
 
-    dict_tags['AVISO'] = 'NÃO'
+    dict_tags['aviso'] = 'NÃO'
 
     for tag_a in controles:
 
@@ -182,27 +180,27 @@ def cria_dict_tags(lista_tags):
 
             if 'prioridade' in img:
 
-                dict_tags['PRIORIDADE'] = 'SIM'
+                dict_tags['prioridade'] = 'SIM'
 
             else:
 
-                dict_tags['PRIORIDADE'] = 'NÃO'
+                dict_tags['prioridade'] = 'NÃO'
 
         elif 'imagens/sei_situacao' in img:
 
-            dict_tags['SITUACAO'] = pattern.group().split("'")[1]
+            dict_tags['situacao'] = pattern.group().split("'")[1]
 
         elif 'imagens/marcador' in img:
 
             marcador = pattern.group().split("'")[1:4:2]
 
-            dict_tags['MARCADOR'] = marcador[1]
+            dict_tags['marcador'] = marcador[1]
 
             dict_tags['TEXTO-MARCADOR'] = marcador[0]
 
         elif 'imagens/exclamacao' in img:
 
-            dict_tags['AVISO'] = 'SIM'
+            dict_tags['aviso'] = 'SIM'
 
         peticionamento = lista_tags[1].find(src=re.compile('peticionamento'))
 
@@ -210,24 +208,24 @@ def cria_dict_tags(lista_tags):
 
             pattern = re.search(
                 '\((.*)\)', peticionamento.attrs['onmouseover'])
-            dict_tags['PETICIONAMENTO'] = pattern.group().split('"')[1]
+            dict_tags['peticionamento'] = pattern.group().split('"')[1]
 
     processo = lista_tags[2].find('a')
 
-    dict_tags['PROCESSO'] = processo.string
+    dict_tags['processo'] = processo.string
 
     try:
 
-        dict_tags['ATRIBUICAO'] = lista_tags[3].find('a').string
+        dict_tags['atribuicao'] = lista_tags[3].find('a').string
 
     except:
 
         pass
 
-    dict_tags['TIPO'] = lista_tags[4].string
+    dict_tags['tipo'] = lista_tags[4].string
 
     try:
-        dict_tags['INTERESSADO'] = lista_tags[5].find(
+        dict_tags['interessado'] = lista_tags[5].find(
             class_='spanItemCelula').string
 
     except:

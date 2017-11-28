@@ -1,31 +1,23 @@
 
 # python modules imports
-import os
 import re
-from datetime import datetime as dt
-from datetime import time
 
-from getpass import getuser, getpass
-
-import pandas as pd
-from bs4 import BeautifulSoup as soup
+from sei import soup
 # INITIALIZE DRIVER
-from selenium import webdriver
 # Exceptions
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.by import By
+from sei import TimeoutException
+
 # METHODS
-from selenium.webdriver.common.keys import Keys
+from sei import Keys
 
 # WAIT AND CONDITIONS METHODS
 # available since 2.26.0
-from selenium.webdriver.support.ui import Select
-
-import sei_functions as ft
+from sei import Select
 
 # Personal Files
-from base import Page
-import locators as loc
+from sei.base import Page
+
+from sei import *
 
 
 def login_SEI(driver, usr, pwd):
@@ -60,14 +52,21 @@ class Sei(Page):
     Esta subclasse da classe Page define métodos de execução de ações na
     página principal do SEI e de resgate de informações
     """
-    
-    def processos(self):
-        return self._processos
-        
+    def __init__(self, driver):
+        super().__init__(driver)
+        self._processos = {}
 
+    def processos(self):
+        return self._processos.items()
+        
     def set_processos(self, processos):
-        self._processos = processos
-    
+        self._processos = {p['processo'].string : p for p in processos}
+
+    def cria_objeto(self, num, tags):
+
+        return Processo(self.driver, num, tags)
+
+
     def ver_proc_detalhado(self):
         """
         Expands the visualization from the main page in SEI
@@ -159,19 +158,19 @@ class Sei(Page):
                          [tag for tag in line.contents if tag != '\n'])
                               for line in processos]
 
-        processos = {p['processo'].string: p for p in processos}
+        # processos = {p['processo'].string: p for p in processos}
         
         self.set_processos(processos)
     
 
-class Processo(SEI):
+class Processo(Sei):
 
-    tree = {}
-
-    def __init__(self, driver):
+    def __init__(self, driver, numero, tags={}):
         super().__init__(driver)
-        
-        
+        self.numero = numero
+        self.tags = tags
+        self.tree = {}
+
 
     def fecha_processo_atual(self):
         self.driver.close()
@@ -260,8 +259,6 @@ class Processo(SEI):
 
             self.driver.execute_script(loc.Envio.LUPA)
 
-        with self.wait_for_page_load():
-
             # Guarda as janelas do navegador presentes
             windows = self.driver.window_handles
 
@@ -270,8 +267,8 @@ class Processo(SEI):
             # Troca o foco do navegador
             self.driver.switch_to_window(janela_unidades)
 
-            assert self.get_title() == loc.Envio.UNIDS, \
-                "Erro ao clicar na lupa 'Selecionar Unidades'"
+        assert self.get_title() == loc.Envio.UNIDS, \
+            "Erro ao clicar na lupa 'Selecionar Unidades'"
 
         unidade = self.wait_for_element(loc.Envio.IN_SIGLA)
 
@@ -313,8 +310,6 @@ class Processo(SEI):
 
         self.driver.switch_to_window(janela_processo)
 
-        # fecha a janela processo
-        # self.driver.close()
 
     def expedir_oficio(self, num_doc):
 
@@ -331,23 +326,3 @@ class Processo(SEI):
         # self.driver.switch_to_window(main_window)
 
 
-def main():
-
-    login = getuser()
-
-    senha = getpass(prompt="Senha: ")
-
-    driver = webdriver.Chrome()
-
-    sei = login_SEI(driver, login, senha)
-
-    return sei
-
-# login = 'rsilva'
-# senha = 'Savorthemom3nts'
-
-#driver = webdriver.Chrome()
-
-#sei = login_SEI(driver, login, senha)
-
-sei = SEI(sei.driver)

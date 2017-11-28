@@ -32,8 +32,9 @@ from selenium.common.exceptions import TimeoutException
 from getpass import getuser, getpass
 
 # Personal Files
-from sei.base import Page
-import sei.locators as loc
-import sei.functions as ft
+import sei.locators as locators
+import sei.functions as functions
+import sei.pages as pages
 
-__all__ = ['Page', 'loc', 'ft']
+# __all__ = ['loc', 'func', 'pages']
+

@@ -8,8 +8,6 @@ Created on Mon Aug 28 20:19:59 2017
 
 from sei import By
 
-NAV_URL = "https://sei.anatel.gov.br/sei"
-
 
 class Login(object):
 
@@ -28,7 +26,7 @@ class Base(object):
 
     MENU = (By.ID, "lnkInfraMenuSistema")
 
-    URL = Login.URL + "/sei/"
+    URL = "https://sei.anatel.gov.br/sei"
 
 
 class LatMenu(object):

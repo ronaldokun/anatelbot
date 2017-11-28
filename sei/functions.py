@@ -6,20 +6,9 @@ Created on Wed Nov  1 16:50:19 2017
 @author: rsilva
 """
 
-import re
+from sei import re, pd, soup, Keys, By
 
-import pandas as pd
-
-from bs4 import BeautifulSoup as soup
-
-# Selenium Methods
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-
-import locators as loc
-
-import sei_functions as ft
-
+from sei import loc
 
 def podeExpedir(linha):
     """Verifica algumas condições necessárias para expedição do Ofício no SEI

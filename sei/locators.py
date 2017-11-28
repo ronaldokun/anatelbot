@@ -6,9 +6,9 @@ Created on Mon Aug 28 20:19:59 2017
 @author: ronaldo
 """
 
-from selenium.webdriver.common.by import By
+from sei import By
 
-from bs4 import BeautifulSoup as soup
+NAV_URL = "https://sei.anatel.gov.br/sei"
 
 
 class Login(object):

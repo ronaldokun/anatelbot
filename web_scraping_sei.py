@@ -19,8 +19,8 @@ from selenium.webdriver.common.keys import Keys
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
-from modules.base import Page
-from modules.locators import (Base, Bloco, Envio, LatMenu, Blocos, Login,
+from sei.base import Page
+from sei.locators import (Base, Bloco, Envio, LatMenu, Blocos, Login,
                               Main, Processo, Central)
 
 
@@ -187,9 +187,9 @@ class PagInicial(Page):
 
         ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
 
-        ret.click()
+        # ret.click()
 
-        Alert(self.driver).accept()
+        # Alert(self.driver).accept()
 
     def expedir_oficio(self, proc, num_doc, link):
 
@@ -411,4 +411,4 @@ driver = webdriver.Chrome()
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
 
-sei.expedir_bloco(76428)
+sei.expedir_bloco(77198)

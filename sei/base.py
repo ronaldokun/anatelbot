@@ -10,6 +10,8 @@ from contextlib import contextmanager
 
 from sei import webdriver, WebDriverWait, EC, TimeoutException, ActionChains
 
+from sei.locators import Base
+
 
 class Page(object):
     """Page Class Object with common navigation functions"""
@@ -30,7 +32,7 @@ class Page(object):
         """ Simplifies the navigation of href pages on sei.anatel.gov.br
         by pre-appending the required prefix NAV_URL
        """
-        link = NAV_URL + link
+        link = Base.URL + link
 
         self.driver.get(link)
 

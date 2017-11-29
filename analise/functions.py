@@ -8,18 +8,17 @@ Created on Tue Nov  7 14:05:59 2017
 
 import datetime as dt
 import os
-
 from time import sleep
-
+import re
 import pandas as pd
-from selenium import webdriver
-from selenium.webdriver.common.alert import Alert
-from selenium.webdriver.common.keys import Keys
 
-from modules.base import Page
-import modules.locators as loc
+from sei import Keys
 
-os.chdir(r'C:\Users\rsilva\Gdrive\projects\programming\automation')
+from analise.locators import Boleto, Sec, Entidade, Scpx
+from sei.base import Page
+from sei import webdriver
+
+os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
 
 
 def save_page(driver, filename):
@@ -55,29 +54,29 @@ def imprime_boleto(page, ident, id_type='cpf'):
     field and commands the print of the boleto
     """
     # navigate to page
-    page.driver.get(loc.Boleto.URL)
+    page.driver.get(Boleto.URL)
 
     if id_type == 'cpf':
 
-        cpf = page.wait_for_element_to_click(loc.Boleto.B_CPF)
+        cpf = page.wait_for_element_to_click(Boleto.B_CPF)
 
         cpf.click()
 
-        elem = page.wait_for_element_to_click(loc.Boleto.INPUT_CPF)
+        elem = page.wait_for_element_to_click(Boleto.INPUT_CPF)
 
     else:
 
-        fistel = page.wait_for_element_to_click(loc.Boleto.B_FISTEL)
+        fistel = page.wait_for_element_to_click(Boleto.B_FISTEL)
 
         fistel.click()
 
-        elem = page.wait_for_element_to_click(loc.Boleto.INPUT_FISTEL)
+        elem = page.wait_for_element_to_click(Boleto.INPUT_FISTEL)
 
     elem.clear()
 
     elem.send_keys(ident)
 
-    date = page.wait_for_element_to_click(loc.Boleto.INPUT_DATA)
+    date = page.wait_for_element_to_click(Boleto.INPUT_DATA)
 
     date.clear()
 
@@ -87,7 +86,7 @@ def imprime_boleto(page, ident, id_type='cpf'):
 
     try:
 
-        marcar = page.wait_for_element_to_click(loc.Boleto.MRK_TODOS)
+        marcar = page.wait_for_element_to_click(Boleto.MRK_TODOS)
 
         marcar.click()
 
@@ -99,7 +98,7 @@ def imprime_boleto(page, ident, id_type='cpf'):
 
     try:
 
-        imprimir = page.wait_for_element_to_click(loc.Boleto.PRINT)
+        imprimir = page.wait_for_element_to_click(Boleto.PRINT)
 
         imprimir.click()
 
@@ -122,7 +121,7 @@ def imprime_boleto(page, ident, id_type='cpf'):
     return True
 
 
-def atualiza_cadastro(page,dados):
+def atualiza_cadastro(page, dados):
     
     if 'CPF' not in dados:
         
@@ -143,28 +142,28 @@ def atualiza_cadastro(page,dados):
         elem.send_keys(data)
                 
     # Navigate to page
-    page.driver.get(loc.Sec.Ent_Alt)
+    page.driver.get(Sec.Ent_Alt)
     
-    cpf = page.wait_for_element_to_click(loc.Entidade.cpf)
+    cpf = page.wait_for_element_to_click(Entidade.cpf)
     
     cpf.send_keys(str(dados['CPF']) + Keys.RETURN)
        
         
     if 'Email' in dados:
         
-        atualiza_campo(dados['Email'], loc.Entidade.email)
+        atualiza_campo(dados['Email'], Entidade.email)
         
-    btn = page.wait_for_element_to_click(loc.Entidade.bt_dados)
+    btn = page.wait_for_element_to_click(Entidade.bt_dados)
     
     btn.click()
             
     if 'RG' in dados:
         
-        atualiza_campo(dados['RG'], loc.Entidade.rg)
+        atualiza_campo(dados['RG'], Entidade.rg)
         
     if 'Orgexp' in dados:
         
-        atualiza_campo(dados['Orgexp'], loc.Entidade.orgexp)
+        atualiza_campo(dados['Orgexp'], Entidade.orgexp)
         
     if 'Data de Nascimento' in dados:
         
@@ -172,36 +171,36 @@ def atualiza_cadastro(page,dados):
         
         data = data.replace('-', '')
         
-        atualiza_campo(data, loc.Entidade.nasc)
+        atualiza_campo(data, Entidade.nasc)
         
-    btn = page.wait_for_element_to_click(loc.Entidade.bt_fone)
+    btn = page.wait_for_element_to_click(Entidade.bt_fone)
     
     btn.click()
     
         
     if 'ddd' in dados:
         
-        atualiza_campo(dados['ddd'], loc.Entidade.ddd)
+        atualiza_campo(dados['ddd'], Entidade.ddd)
         
     else:
         
         ddd = '11'
         
-        atualiza_campo(ddd, loc.Entidade.ddd)
+        atualiza_campo(ddd, Entidade.ddd)
 
         
     if 'Fone' in dados:
         
-        atualiza_campo(dados['Fone'], loc.Entidade.fone)
+        atualiza_campo(dados['Fone'], Entidade.fone)
         
     else:
         
         fone = '123456789'
         
-        atualiza_campo(fone, loc.Entidade.fone)        
+        atualiza_campo(fone, Entidade.fone)        
         
         
-    btn = page.wait_for_element_to_click(loc.Entidade.bt_end)
+    btn = page.wait_for_element_to_click(Entidade.bt_end)
     
     btn.click()
        
@@ -212,16 +211,16 @@ def atualiza_cadastro(page,dados):
         
         cep = cep.replace('-', '')
         
-        atualiza_campo(cep, loc.Entidade.cep)
+        atualiza_campo(cep, Entidade.cep)
         
-        cep = page.wait_for_element_to_click(loc.Entidade.bt_cep)
+        cep = page.wait_for_element_to_click(Entidade.bt_cep)
 
         cep.click()
         
         
         for i in range(30):
             
-            logr = page.wait_for_element(loc.Entidade.logr)
+            logr = page.wait_for_element(Entidade.logr)
                     
             if logr.get_attribute('value'):
                 break
@@ -233,7 +232,7 @@ def atualiza_cadastro(page,dados):
             if 'Logradouro' not in dados:
                 
                 raise ValueError("É Obrigatório informar o logradouro")
-            atualiza_campo(dados['Logradouro'], loc.Entidade.logr)
+            atualiza_campo(dados['Logradouro'], Entidade.logr)
             
         if 'Número' not in dados:
             
@@ -242,13 +241,13 @@ def atualiza_cadastro(page,dados):
             
         else:
             
-            atualiza_campo(dados['Número'], loc.Entidade.num)
+            atualiza_campo(dados['Número'], Entidade.num)
             
         if 'Complemento' in dados:
             
-            atualiza_campo(dados['Complemento'], loc.Entidade.comp)
+            atualiza_campo(dados['Complemento'], Entidade.comp)
             
-        bairro = page.wait_for_element(loc.Entidade.bairro)
+        bairro = page.wait_for_element(Entidade.bairro)
         
         if not bairro.get_attribute('value'):
                 
@@ -260,29 +259,42 @@ def atualiza_cadastro(page,dados):
                 
             else:
                 
-                atualiza_campo(dados['Bairro'], loc.Entidade.bairro)
+                atualiza_campo(dados['Bairro'], Entidade.bairro)
                 
             
-    #confirmar = page.wait_for_element(loc.Entidade.confirmar)
+    #confirmar = page.wait_for_element(Entidade.confirmar)
     
     #confirmar.click()
     
-    page.driver.execute_script(loc.Entidade.submit)
+    page.driver.execute_script(Entidade.submit)
     
-        
+def consultaScpx(page, ident, tipo='cpf'):
 
-#driver = webdriver.Ie()
-#
-#ie = Page(driver)
-#
+    if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
+
+        raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
+
+    elif tipo == 'indicativo':
+
+        pattern = '^(P|p)(X|x)(\d){1}([C-Z,c-z]){1}(\d){4}$'
+
+        if not re.match(pattern, ident):
+
+            raise ValueError("Indicativo Digitado Inválido")
+
+    page.driver.get(Scpx.Consulta)
+
+
+
+#driver = webdriver.Firefox()
+
+#browser = Page(driver)
+
 #dtype_dic = {'CPF': str, 'FISTEL': str}
-#
-#df = pd.read_csv('files/cassacao.csv', dtype=dtype_dic)
-#
-#ddd = pd.read_table('files/ddd.tsv')
 
-# retira falecidos
-#df = df[df['Ano do Óbito'].isnull()]
+#df = pd.read_table('files/falecidos.tsv', dtype=dtype_dic)
+
+
 
 
 

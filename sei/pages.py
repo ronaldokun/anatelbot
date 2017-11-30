@@ -17,7 +17,8 @@ from sei import Select
 # Personal Files
 from sei.base import Page
 
-from sei import *
+from sei import locators as loc
+
 
 
 def login_SEI(driver, usr, pwd):

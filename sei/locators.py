@@ -183,7 +183,8 @@ class Tipos(object):
     FILTRO = (By.ID, 'txtFiltro')
     
     SL_TIP_PROC = (By.ID, "selTipoProcedimento")
-    
+
+    CONTATO = (By.ID, "txtPalavrasPesquisaContatos")
         
     PROCS = {'',
              'Acesso à Informação: Demanda do e-SIC',

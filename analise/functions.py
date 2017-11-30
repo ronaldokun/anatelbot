@@ -290,39 +290,11 @@ def consultaScpx(page, ident, tipo='cpf'):
 
         elem.send_keys(ident + Keys.RETURN)
 
-    if tipo == 'fistel':
+    elif tipo == 'fistel':
 
         elem = page.wait_for_element_to_click(Entidade.fistel)
 
         elem.send_keys(ident + Keys.RETURN)
 
     # TODO: implement other elements
-
-dtype_dic = {'CPF': str, 'Fistel': str}
-
-df = pd.read_table('files/cassacao.tsv', dtype=dtype_dic)
-
-driver = webdriver.Ie()
-
-ie = Page(driver)
-
-
-for i in range(57,58):
-
-    ident = df.iloc[i]['Fistel']
-
-    consultaScpx(ie, ident, tipo='fistel')
-
-    # devedores.append(name)
-    windows = ie.driver.window_handles
-
-    main = windows[0]
-
-    ie.driver.switch_to_window(windows[-1])
-
-    save_page(ie.driver, r'files/pages/' + ident + '.html')
-
-    #ie.driver.close()
-
-    #ie.driver.switch_to_window(main)
 

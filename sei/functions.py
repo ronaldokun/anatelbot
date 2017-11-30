@@ -9,6 +9,7 @@ Created on Wed Nov  1 16:50:19 2017
 from sei import re, pd, soup, Keys, By
 
 from sei import locators as loc
+from sei.pages import Sei
 
 def podeExpedir(linha):
     """Verifica algumas condições necessárias para expedição do Ofício no SEI
@@ -253,9 +254,6 @@ def string_of_tags(tags):
         
     return tags
 
-
-
-
 def dict_to_df(processos):
     """Recebe a lista processos contendo um dicionário das tags de cada
     processo aberto no SEI. Retorna um Data Frame cujos registros
@@ -278,9 +276,51 @@ def dict_to_df(processos):
     return df
 
 
-def consultar_contato(Sei, nome):
+def ir_pagina_contato(page):
 
-    pass
+    if not isinstance(page, Sei):
+        raise TypeError("Object {0} must be of instance {1}".format(page, Sei))
+
+    html = soup(page.driver.page_source, 'lxml')
+
+    tag = html.find('li', string='Listar')
+
+    if not tag:
+        raise LookupError("The tag of type {0} and string {1} is not present in the page".format('<li>', 'Listar'))
+
+    link = tag.a.attrs['href']
+
+    page.go(link)
+
+def consulta_contato(page, nome):
+
+    if page.get_title() != 'Sei - Contatos':
+        ir_pagina_contato(page)
+
+    contato = page.wait_for_element_to_click(loc.Tipos.CONTATO)
+
+    contato.clear()
+
+    contato.send_keys(nome + Keys.RETURN)
+
+    if not page.elem_is_visible(By.LINK_TEXT, "Nenhum Registro Encontrado"):
+
+        page.wait_for_element_to_be_visible(By.CLASS_NAME, 'infraTrClara')
+
+        html = soup(page.driver.page_source, 'lxml')
+
+        tags = html.find_all('tr', class_='infraTrClara')
+
+        return (len(tags), tags)
+
+    return (0,'')
+
+
+
+
+
+
+
 
 
 def cadastrar_interessado(Sei, nome, dados, tipo='pf', ):

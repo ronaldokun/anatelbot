@@ -189,15 +189,15 @@ def atualiza_cadastro(page, dados):
         atualiza_campo(ddd, Entidade.ddd)
 
         
-    if 'Fone' in dados:
+    #if 'Fone' in dados:
         
-        atualiza_campo(dados['Fone'], Entidade.fone)
+     #   atualiza_campo(dados['Fone'], Entidade.fone)
         
-    else:
+    #else:
         
-        fone = '123456789'
+     #   fone = '123456789'
         
-        atualiza_campo(fone, Entidade.fone)        
+      #  atualiza_campo(fone, Entidade.fone)
         
         
     btn = page.wait_for_element_to_click(Entidade.bt_end)
@@ -284,35 +284,45 @@ def consultaScpx(page, ident, tipo='cpf'):
 
     page.driver.get(Scpx.Consulta)
 
+    if tipo == 'cpf':
+
+        elem = page.wait_for_element_to_click(Entidade.cpf)
+
+        elem.send_keys(ident + Keys.RETURN)
+
+    if tipo == 'fistel':
+
+        elem = page.wait_for_element_to_click(Entidade.fistel)
+
+        elem.send_keys(ident + Keys.RETURN)
+
+    # TODO: implement other elements
+
+dtype_dic = {'CPF': str, 'Fistel': str}
+
+df = pd.read_table('files/cassacao.tsv', dtype=dtype_dic)
+
+driver = webdriver.Ie()
+
+ie = Page(driver)
 
 
-#driver = webdriver.Firefox()
+for i in range(57,58):
 
-#browser = Page(driver)
+    ident = df.iloc[i]['Fistel']
 
-#dtype_dic = {'CPF': str, 'FISTEL': str}
+    consultaScpx(ie, ident, tipo='fistel')
 
-#df = pd.read_table('files/falecidos.tsv', dtype=dtype_dic)
+    # devedores.append(name)
+    windows = ie.driver.window_handles
 
+    main = windows[0]
 
+    ie.driver.switch_to_window(windows[-1])
 
+    save_page(ie.driver, r'files/pages/' + ident + '.html')
 
+    #ie.driver.close()
 
-#for i in range(58, 61):
-#
-#    cpf = df.iloc[i]['CPF']
-#
-#    if imprime_boleto(ie, cpf):
-#
-#        # devedores.append(name)
-#        windows = ie.driver.window_handles
-#
-#        main = windows[0]
-#
-#        ie.driver.switch_to_window(windows[-1])
-#
-#        save_page(ie.driver, r'files/boletos/' + name + '.html')
-#
-#        ie.driver.close()
-#
-#        ie.driver.switch_to_window(main)
+    #ie.driver.switch_to_window(main)
+

@@ -6,17 +6,16 @@ Created on Tue Nov  7 14:05:59 2017
 @author: rsilva
 """
 
+from sei import *
+
 import datetime as dt
 import os
 from time import sleep
 import re
-import pandas as pd
 
 from sei import Keys
 
-from analise.locators import Boleto, Sec, Entidade, Scpx
-from sei.base import Page
-from sei import webdriver
+from analise.locators import Boleto, Sec, Entidade, Scpx, Sigec
 
 os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
 
@@ -24,6 +23,8 @@ os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
 def save_page(driver, filename):
 
     with open(filename, 'w') as file:
+
+        #html = soup(driver.page_source).prettify()
 
         # write image
         file.write(driver.page_source)
@@ -295,6 +296,32 @@ def consultaScpx(page, ident, tipo='cpf'):
         elem = page.wait_for_element_to_click(Entidade.fistel)
 
         elem.send_keys(ident + Keys.RETURN)
+
+    # TODO: implement other elements
+
+def consultaSigec(page, ident, tipo='cpf'):
+
+
+    if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
+
+        raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
+
+    page.driver.get(Sigec.consulta)
+
+    if tipo == 'cpf':
+
+        elem = page.wait_for_element_to_click(Sigec.cpf)
+
+        elem.send_keys(ident + Keys.RETURN)
+
+    elif tipo == 'fistel':
+
+        elem = page.wait_for_element_to_click(Sigec.fistel)
+
+        elem.send_keys(ident + Keys.RETURN)
+
+    page.wait_for_page_load()
+
 
     # TODO: implement other elements
 

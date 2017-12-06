@@ -6,7 +6,7 @@ Created on Mon Aug 28 20:19:59 2017
 @author: ronaldo
 """
 
-from sei import By
+from selenium.webdriver.common.by import By
 
 
 class Login(object):

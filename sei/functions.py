@@ -6,10 +6,15 @@ Created on Wed Nov  1 16:50:19 2017
 @author: rsilva
 """
 
-from sei import re, pd, soup, Keys, By
+import re
 
-from sei import locators as loc
-from sei.pages import Sei
+import pandas as pd
+
+from bs4 import BeautifulSoup as soup
+
+from selenium.webdriver.common.keys import Keys
+
+
 
 def podeExpedir(linha):
     """Verifica algumas condições necessárias para expedição do Ofício no SEI
@@ -276,23 +281,7 @@ def dict_to_df(processos):
     return df
 
 
-def ir_pagina_contato(page):
-
-    if not isinstance(page, Sei):
-        raise TypeError("Object {0} must be of instance {1}".format(page, Sei))
-
-    html = soup(page.driver.page_source, 'lxml')
-
-    tag = html.find('li', string='Listar')
-
-    if not tag:
-        raise LookupError("The tag of type {0} and string {1} is not present in the page".format('<li>', 'Listar'))
-
-    link = tag.a.attrs['href']
-
-    page.go(link)
-
-def consulta_contato(page, nome):
+def contatos_cadastrados(page, nome):
 
     if page.get_title() != 'Sei - Contatos':
         ir_pagina_contato(page)
@@ -314,14 +303,6 @@ def consulta_contato(page, nome):
         return (len(tags), tags)
 
     return (0,'')
-
-
-
-
-
-
-
-
 
 def cadastrar_interessado(Sei, nome, dados, tipo='pf', ):
 

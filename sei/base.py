@@ -8,7 +8,14 @@ Created on Mon Aug 28 20:44:15 2017
 
 from contextlib import contextmanager
 
-from sei import webdriver, WebDriverWait, EC, TimeoutException, ActionChains
+# WAIT AND CONDITIONS METHODS
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+# Exceptions
+from selenium.common.exceptions import TimeoutException
+
+from selenium.webdriver.common.action_chains import ActionChains
 
 from sei.locators import Base
 

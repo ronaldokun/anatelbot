@@ -131,4 +131,17 @@ class Scpx(object):
     Consulta = 'http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714'
 
 
+class Sigec(object):
+
+    consulta = "http://sistemasnet/sigec/ConsultasGerais/SituacaoCadastral/tela.asp?SISQSmodulo=3748"
+
+    cpf = (By.ID, "NumCNPJCPF")
+
+    fistel = (By.ID, 'NumFistel')
+
+
+
+
+
+
 

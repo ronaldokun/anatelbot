@@ -49,13 +49,13 @@ class Sei(Page):
         super().__init__(driver)
         self._processos = {}
 
-    def processos(self):
+    def get_processos(self):
         return self._processos
         
-    def set_processos(self, processos):
+    def _set_processos(self, processos):
         self._processos = {p['processo'].string: p for p in processos}
 
-    def cria_processo(self, num, tags):
+    def cria_processo(self, num, tags=None):
         return Processo(self.driver, num, tags)
 
     def ver_proc_detalhado(self):
@@ -90,7 +90,7 @@ class Sei(Page):
         """Retorna True se a página estiver na página inicial do SEI, False
         caso contrário"""
         return self.get_title() == locators.Main.TITLE
-
+s
     def go_to_initial_page(self):
         """
         Navega até a página inicial do SEI caso já esteja nela
@@ -143,7 +143,28 @@ class Sei(Page):
                     [tag for tag in line.contents if tag != '\n'])
                      for line in processos]
 
-        self.set_processos(processos)
+        self._set_processos(processos)
+
+    def contatos_cadastrados(self, nome):
+        if self.get_title() != 'Sei - Contatos':
+            self.ir_pagina_contato
+
+        contato = self.wait_for_element_to_click(loc.Tipos.CONTATO)
+
+        contato.clear()
+
+        contato.send_keys(nome + Keys.RETURN)
+
+        if not self.elem_is_visible(By.LINK_TEXT, "Nenhum Registro Encontrado"):
+            self.wait_for_element_to_be_visible(By.CLASS_NAME, 'infraTrClara')
+
+            html = Soup(self.driver.page_source, 'lxml')
+
+            tags = html.find_all('tr', class_='infraTrClara')
+
+            return (len(tags), tags)
+
+        return (0, '')
 
     def ir_pagina_contato(self):
 

@@ -5,18 +5,14 @@ Created on Wed Nov  1 16:50:19 2017
 
 @author: rsilva
 """
-
 import re
 
 import pandas as pd
-
-from bs4 import BeautifulSoup as soup
-
+from bs4 import BeautifulSoup as Soup
 from selenium.webdriver.common.keys import Keys
 
 
-
-def podeExpedir(linha):
+def pode_expedir(linha):
     """Verifica algumas condições necessárias para expedição do Ofício no SEI
     Args:
         linha: Dicionário das html tags presentes nas linhas
@@ -63,7 +59,6 @@ def nav_elem_to_new_win(driver, elem):
 
 
 def nav_link_to_new_win(driver, link):
-
     # Guarda janela principal
     main_window = driver.current_window_handle
 
@@ -83,21 +78,23 @@ def nav_link_to_new_win(driver, link):
 
     return (main_window, windows[-1])
 
+
 def armazena_tags(lista_tags):
     """ Recebe uma lista de tags de cada linha do processo  da página inicial
     do Sei, retorna um dicionário dessas tags
     """
-    
+
     dict_tags = {}
-    
-    assert len(lista_tags) == 6, "Verifique o nº de tags de cada linha do \
-    processo, valor diferente de 10"
-    
-    dict_tags['checkbox'] = lista_tags[0].find('input', class_ = 'infraCheckbox')
+
+    if len(lista_tags) != 6:
+        raise ValueError("Verifique o nº de tags de cada linha do \
+        processo: {}. O valor diferente de 6".format(len(lista_tags)))
+
+    dict_tags['checkbox'] = lista_tags[0].find('input', class_='infraCheckbox')
 
     controles = lista_tags[1].find_all('a')
 
-    dict_tags['aviso'] = False
+    dict_tags['aviso'] = ''
 
     for tag_a in controles:
 
@@ -105,15 +102,21 @@ def armazena_tags(lista_tags):
 
         if 'imagens/sei_anotacao' in img:
 
-            dict_tags['anotacao'] = tag_a
+            dict_tags['anotacao'] = tag_mouseover(tag_a, 'anotacao')
+
+            dict_tags['anotacao_link'] = tag_a.attrs['href']
 
         elif 'imagens/sei_situacao' in img:
 
-            dict_tags['situacao'] = tag_a
+            dict_tags['situacao'] = tag_mouseover(tag_a, 'situacao')
+
+            dict_tags['situacao_link'] = tag_a.attrs['href']
 
         elif 'imagens/marcador' in img:
 
-            dict_tags['marcador'] = tag_a
+            dict_tags['marcador'] = tag_mouseover(tag_a, 'marcador')
+
+            dict_tags['marcador_link'] = tag_a.attrs['href']
 
         elif 'imagens/exclamacao' in img:
 
@@ -126,9 +129,9 @@ def armazena_tags(lista_tags):
             pattern = re.search(
                 '\((.*)\)', peticionamento.attrs['onmouseover'])
             dict_tags['peticionamento'] = pattern.group().split('"')[1]
-            
+
         else:
-            
+
             dict_tags['peticionamento'] = ''
 
     processo = lista_tags[2].find('a')
@@ -137,7 +140,7 @@ def armazena_tags(lista_tags):
 
     try:
 
-        dict_tags['atribuicao'] = lista_tags[3].find('a')
+        dict_tags['atribuicao'] = lista_tags[3].find('a').string
 
     except:
 
@@ -146,7 +149,7 @@ def armazena_tags(lista_tags):
     dict_tags['tipo'] = lista_tags[4].string
 
     try:
-        
+
         dict_tags['interessado'] = lista_tags[5].find(
             class_='spanItemCelula').string
 
@@ -155,7 +158,6 @@ def armazena_tags(lista_tags):
         dict_tags['interessado'] = ''
 
     return dict_tags
-    
 
 
 def cria_dict_tags(lista_tags):
@@ -211,7 +213,6 @@ def cria_dict_tags(lista_tags):
         peticionamento = lista_tags[1].find(src=re.compile('peticionamento'))
 
         if peticionamento:
-
             pattern = re.search(
                 '\((.*)\)', peticionamento.attrs['onmouseover'])
             dict_tags['peticionamento'] = pattern.group().split('"')[1]
@@ -241,111 +242,81 @@ def cria_dict_tags(lista_tags):
     return dict_tags
 
 
-def string_of_tags(tags):
-    
-    func = lambda x: x.attrs['onmouseover'].split("'")
-    
-    if 'anotacao' in tags:
-        
-        tags['anotacao'] = ' '.join(func(tags['anotacao'])[1:4:2])
-        
-    if 'situacao' in tags:
-        
-        tags['situacao'] = func(tags['situacao'])[1]
-        
-    if 'marcador' in tags:
-        
-        tags['marcador'] = ' '.join(func(tags['marcador'])[1:4:2])
-        
-    return tags
+def tag_mouseover(tag, tipo):
+    tag_split = tag.attrs['onmouseover'].split("'")
+
+    if tipo == 'anotacao':
+
+        return ' '.join(tag_split[1:4:2])
+
+    elif tipo == 'situacao':
+
+        return tag_split[1]
+
+    elif tipo == 'marcador':
+
+        return ' '.join(tag_split[1:4:2])
+    else:
+
+        raise ValueError("O tipo de tag repassado não é válido: {}".format(tipo))
+
 
 def dict_to_df(processos):
     """Recebe a lista processos contendo um dicionário das tags de cada
     processo aberto no SEI. Retorna um Data Frame cujos registros
     são as string das tags.
     """
-    
-    cols = ['processo', 'tipo', 'atribuicao', 'marcador', 'anotacao','prioridade',
+
+    cols = ['processo', 'tipo', 'atribuicao', 'marcador', 'anotacao', 'prioridade',
             'peticionamento', 'aviso', 'situacao', 'interessado']
 
     df = pd.DataFrame(columns=cols)
-    
+
     for p in processos:
-        
-        df = df.append(pd.Series(string_of_tags(p)), ignore_index=True)
-    
+        df = df.append(pd.Series(p), ignore_index=True)
+
     df['atribuicao'] = df['atribuicao'].astype("category")
     df['prioridade'] = df['prioridade'].astype("category")
     df['tipo'] = df['tipo'].astype("category")
 
     return df
 
-
-def contatos_cadastrados(page, nome):
-
-    if page.get_title() != 'Sei - Contatos':
-        ir_pagina_contato(page)
-
-    contato = page.wait_for_element_to_click(loc.Tipos.CONTATO)
-
-    contato.clear()
-
-    contato.send_keys(nome + Keys.RETURN)
-
-    if not page.elem_is_visible(By.LINK_TEXT, "Nenhum Registro Encontrado"):
-
-        page.wait_for_element_to_be_visible(By.CLASS_NAME, 'infraTrClara')
-
-        html = soup(page.driver.page_source, 'lxml')
-
-        tags = html.find_all('tr', class_='infraTrClara')
-
-        return (len(tags), tags)
-
-    return (0,'')
-
 def cadastrar_interessado(Sei, nome, dados, tipo='pf', ):
-
     pass
 
 
 def cria_processo(Sei, tipo, desc='', inter='', nivel='público'):
-
     tipo = str(tipo)
 
-    assert tipo in loc.Tipos.PROCS,\
+    assert tipo in loc.Tipos.PROCS, \
         print("O tipo de processo digitado {0}, não é válido".format(str(tipo)))
 
-    
     Sei.exibir_menu_lateral()
-    
-    init_proc = Sei.wait_for_element_to_click(loc.LatMenu.INIT_PROC)
-    
-    init_proc.click()
-    
-    filtro = Sei.wait_for_element_to_click(loc.Tipos.FILTRO)
-    
-    filtro.send_keys(tipo)
-    
-    # exibe_todos = Sei.wait_for_element_to_click(loc.Tipos.EXIBE_ALL)
-    
-    # exibe_todos.click()
 
+    init_proc = Sei.wait_for_element_to_click(loc.LatMenu.INIT_PROC)
+
+    init_proc.click()
+
+    filtro = Sei.wait_for_element_to_click(loc.Tipos.FILTRO)
+
+    filtro.send_keys(tipo)
+
+    # exibe_todos = Sei.wait_for_element_to_click(loc.Tipos.EXIBE_ALL)
+
+    # exibe_todos.click()
 
     # select = Select(Sei.wait_for_element(loc.Tipos.SL_TIP_PROC))
 
     tipo = Sei.wait_for_element_to_click((By.LINK_TEXT, tipo))
-    
+
     tipo.click()
 
     if desc:
-
         espec = Sei.wait_for_element(loc.Processo.ESPEC)
 
         espec.send_keys(desc)
 
     if inter:
-
         Sei.cadastrar_interessado(inter)
         Sei.consultar_contato(inter)
 
@@ -362,10 +333,9 @@ def cria_processo(Sei, tipo, desc='', inter='', nivel='público'):
         nivel = Sei.wait_for_element(loc.Processo.SIG)
 
     nivel.click()
-    
+
 
 def exibir_bloco(Sei, numero):
-
     if Sei.get_title() != loc.Blocos.TITLE:
         Sei.go_to_blocos()
 
@@ -376,13 +346,12 @@ def exibir_bloco(Sei, numero):
         print("O Bloco de Assinatura informado não existe ou está \
               concluído!")
 
+
 def armazena_bloco(Sei, numero):
-
     if Sei.get_title() != loc.Bloco.TITLE + " " + str(numero):
-
         Sei.exibir_bloco(numero)
 
-    html_bloco = soup(Sei.driver.page_source, "lxml")
+    html_bloco = Soup(Sei.driver.page_source, "lxml")
     linhas = html_bloco.find_all(
         "tr", class_=['infraTrClara', 'infraTrEscura'])
 
@@ -400,7 +369,6 @@ def armazena_bloco(Sei, numero):
         assert len(chaves) == len(cols), "Verifique as linhas do bloco!"
 
         for k, v in zip(chaves, cols):
-
             proc[k] = v
 
         # proc["expedido"] = False
@@ -409,26 +377,22 @@ def armazena_bloco(Sei, numero):
 
     return lista_processos
 
-def expedir_bloco(Sei, numero):
 
+def expedir_bloco(Sei, numero):
     processos = Sei.armazena_bloco(numero)
 
     for p in processos:
-       
-        if ft.podeExpedir(p):
 
+        if pode_expedir(p):
             proc = p['processo'].a.string
 
             num_doc = p['documento'].a.string
 
-            link = loc.Base.URL + p['processo'].a.attrs['href']
+            link = Sei.go(p['processo'].a.attrs['href'])
 
-            (bloco_window, proc_window) = ft.nav_link_to_new_win(
+            (bloco_window, proc_window) = nav_link_to_new_win(
                 Sei.driver, link)
 
             processo = Processo(Sei.driver, proc_window)
 
             processo.expedir_oficio(proc, num_doc, link)
-
-
-

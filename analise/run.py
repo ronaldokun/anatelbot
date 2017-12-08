@@ -1,12 +1,11 @@
 
 
-from analise.functions import *
-
-from sei import By
+from os.path import exists
 
 from bs4 import BeautifulSoup as soup
+from selenium.webdriver.common.by import By
 
-from os.path import exists
+from analise.functions import *
 
 
 def save_source(browser, df, path, start, end):

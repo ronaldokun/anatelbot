@@ -8,14 +8,12 @@ Created on Mon Aug 28 20:44:15 2017
 
 from contextlib import contextmanager
 
+# Exceptions
+from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
 # WAIT AND CONDITIONS METHODS
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-# Exceptions
-from selenium.common.exceptions import TimeoutException
-
-from selenium.webdriver.common.action_chains import ActionChains
 
 from sei.locators import Base
 
@@ -54,6 +52,19 @@ class Page(object):
         yield
         WebDriverWait(self.driver, self.timeout).until(
             EC.staleness_of(old_page))
+
+    def alert_is_present(self):
+
+        try:
+
+            alert = WebDriverWait(self.driver, self.timeout).until(
+                EC.alert_is_present())
+
+        except (TimeoutException, WebDriverException):
+
+            return False
+
+        return alert
 
     def elem_is_visible(self, *locator):
         '''

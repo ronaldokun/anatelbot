@@ -5,13 +5,11 @@ Created on Thu Aug 24 23:14:09 2017
 
 @author: ronaldo
 """
-import os
 import re
 
 from bs4 import BeautifulSoup as soup
 # INITIALIZE DRIVER
 from selenium import webdriver
-from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 # METHODS
 from selenium.webdriver.common.keys import Keys
@@ -21,7 +19,7 @@ from selenium.webdriver.support.ui import Select
 
 from sei.base import Page
 from sei.locators import (Base, Bloco, Envio, LatMenu, Blocos, Login,
-                              Main, Processo, Central)
+                          Main, Processo, Central)
 
 
 class LoginPage(Page):
@@ -410,5 +408,4 @@ driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-
-sei.expedir_bloco(78138)
+sei.expedir_bloco(78440)

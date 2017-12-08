@@ -1,16 +1,13 @@
-from sei import locators
-from sei.base import Page
+import re
 
+from bs4 import BeautifulSoup as soup
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
-from selenium.common.exceptions import TimeoutException
-
-from bs4 import BeautifulSoup as soup
-
 from sei import functions as func
-
-import re
+from sei import locators
+from sei.base import Page
 
 
 def login_sei(driver, usr, pwd):
@@ -90,7 +87,7 @@ class Sei(Page):
         """Retorna True se a página estiver na página inicial do SEI, False
         caso contrário"""
         return self.get_title() == locators.Main.TITLE
-s
+
     def go_to_initial_page(self):
         """
         Navega até a página inicial do SEI caso já esteja nela

@@ -6,19 +6,36 @@ Created on Tue Nov  7 14:05:59 2017
 @author: rsilva
 """
 
-from sei import *
-
 import datetime as dt
 import os
-from time import sleep
 import re
+from time import sleep
 
-from sei import Keys
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 from analise.locators import Boleto, Sec, Entidade, Scpx, Sigec
+from sei.base import Page
 
 os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
 
+USER = 'rsilva'
+PASS = 'Savorthemom3nts'
+
+
+def init_browser(login, senha, webdriver=webdriver.Firefox()):
+    page = Page(webdriver)
+
+    page.driver.get('http://sistemasnet')
+
+    alert = page.alert_is_present()
+
+    if alert:
+        alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
+
+        alert.accept()
+
+    return page
 
 def save_page(driver, filename):
 

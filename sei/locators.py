@@ -52,6 +52,8 @@ class LatMenu(object):
     BL_INT = (By.LINK_TEXT, "Blocos Internos")
     
     CONTS = (By.LINK_TEXT, "Contatos")
+
+    CONTS_LISTAR = (By.LINK_TEXT, 'Listar')
     
     SOBRS = (By.LINK_TEXT, "Processos Sobrestados")
     
@@ -926,31 +928,45 @@ class Tipos(object):
              }
 
 
-    
-    
-    
+class Contato(object):
+    TIPO = (By.ID, 'selTipocontato')
 
+    SIGLA = (By.ID, 'txtSigla')
 
+    PF = (By.ID, 'lblPessoaFisica')
 
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    NOME = (By.ID, 'txtNome')
+
+    END = (By.ID, 'txtEndereco')
+
+    COMP = (By.ID, 'txtComplemento')
+
+    BAIRRO = (By.ID, 'txtBairro')
+
+    UF = (By.ID, 'selUF')
+
+    CIDADE = (By.ID, 'selCidade')
+
+    CEP = (By.ID, 'txtCep')
+
+    MASCULINO = (By.ID, 'optFeminino')
+
+    FEMININO = (By.ID, 'optMasculino')
+
+    CPF = (By.ID, 'txtCpf')
+
+    RG = (By.ID, 'txtRg')
+
+    ORG = (By.ID, 'txtOrgaoExpedidor')
+
+    NASC = (By.ID, 'txtNascimento')
+
+    FONE = (By.ID, 'txtTelefoneFixoPF')
+
+    CEL = (By.ID, 'txtTelefoneCelularPF')
+
+    EMAIL = (By.ID, 'txtEmail')
+
+    SALVAR = (By.NAME, 'sbmAlterarContato')
+
+    OBS = (By.ID, 'txtaObservacao')

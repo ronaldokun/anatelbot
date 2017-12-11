@@ -1,7 +1,8 @@
 import re
 
-from bs4 import BeautifulSoup as soup
+from bs4 import BeautifulSoup as Soup
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
@@ -133,7 +134,7 @@ class Sei(Page):
             # One simple repetition to avoid more complex code
             contador = Select(self.wait_for_element(locators.Main.CONT))
             contador.select_by_visible_text(pag)
-            html_sei = soup(self.driver.page_source, "lxml")
+            html_sei = Soup(self.driver.page_source, "lxml")
             processos += html_sei("tr", {"class": 'infraTrClara'})
 
         processos = [func.armazena_tags(
@@ -143,17 +144,19 @@ class Sei(Page):
         self._set_processos(processos)
 
     def contatos_cadastrados(self, nome):
-        if self.get_title() != 'Sei - Contatos':
-            self.ir_pagina_contato
+        if self.get_title() != 'Sei - locators.Contatos':
+            self.ir_pagina_contato()
 
-        contato = self.wait_for_element_to_click(loc.Tipos.CONTATO)
+        contato = self.wait_for_element_to_click(locators.Tipos.CONTATO)
 
         contato.clear()
 
         contato.send_keys(nome + Keys.RETURN)
 
-        if not self.elem_is_visible(By.LINK_TEXT, "Nenhum Registro Encontrado"):
-            self.wait_for_element_to_be_visible(By.CLASS_NAME, 'infraTrClara')
+        # if not self.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
+        try:
+
+            self.wait_for_element_to_be_visible((By.CLASS_NAME, 'infraTrClara'))
 
             html = Soup(self.driver.page_source, 'lxml')
 
@@ -161,11 +164,77 @@ class Sei(Page):
 
             return (len(tags), tags)
 
-        return (0, '')
+        except TimeoutException:
+
+            return (0, '')
+
+        finally:
+
+            return (0, '')
+
+    def atualiza_elemento(self, id, dado):
+
+        elem = self.wait_for_element(id)
+
+        elem.clear()
+
+        elem.send_keys(dado)
+
+    def atualizar_contato(self, dados):
+
+        tipo = Select(self.wait_for_element_to_be_visible(locators.Contato.TIPO))
+
+        tipo.select_by_visible_text("Pessoa Física")
+
+        self.wait_for_element_to_click(locators.Contato.PF).click()
+
+        self.atualiza_elemento(locators.Contato.SIGLA, dados['CPF'])
+
+        if dados['SEXO'] == 'MASCULINO':
+
+            self.wait_for_element_to_click(locators.Contato.MASCULINO).click()
+
+        elif dados['SEXO'] == 'FEMININO':
+
+            self.wait_for_element_to_click(locators.Contato.FEMININO).click()
+
+        self.atualiza_elemento(locators.Contato.NOME, dados['NOME'])
+
+        self.atualiza_elemento(locators.Contato.END, dados['ENDERECO'] + ' ' + dados['NUM'])
+
+        self.atualiza_elemento(locators.Contato.COMP, dados['COMP'])
+
+        self.atualiza_elemento(locators.Contato.BAIRRO, dados['BAIRRO'])
+
+        uf = Select(self.wait_for_element(locators.Contato.UF))
+
+        uf.select_by_visible_text(dados['UF'])
+
+        cidade = Select(self.wait_for_element_to_be_visible(locators.Contato.CIDADE))
+
+        cidade.select_by_visible_text(dados["CIDADE"])
+
+        self.atualiza_elemento(locators.Contato.CEP, dados['CEP'])
+
+        self.atualiza_elemento(locators.Contato.CPF, dados['CPF'])
+
+        self.atualiza_elemento(locators.Contato.RG, dados['RG'])
+
+        self.atualiza_elemento(locators.Contato.ORG, dados['ORG'])
+
+        self.atualiza_elemento(locators.Contato.NASC, dados['NASC'])
+
+        self.atualiza_elemento(locators.Contato.FONE, dados['FONE'])
+
+        self.atualiza_elemento(locators.Contato.CEL, dados['CEL'])
+
+        self.atualiza_elemento(locators.Contato.EMAIL, dados['EMAIL'])
+
+        self.wait_for_element_to_click(locators.Contato.SALVAR).click()
 
     def ir_pagina_contato(self):
 
-        html = soup(self.driver.page_source, 'lxml')
+        html = Soup(self.driver.page_source, 'lxml')
 
         tag = html.find('li', string='Listar')
 
@@ -197,8 +266,7 @@ class Processo(Sei):
         self.driver.switch_to_frame("ifrArvore")
 
         with self.wait_for_page_load():
-
-            html_tree = soup(self.driver.page_source, "lxml")
+            html_tree = Soup(self.driver.page_source, "lxml")
 
             info = html_tree.find(title=re.compile(num_doc)).string
 
@@ -219,7 +287,7 @@ class Processo(Sei):
 
         self.wait_for_element(locators.Central.ACOES)
 
-        html_frame = soup(self.driver.page_source, "lxml")
+        html_frame = Soup(self.driver.page_source, "lxml")
 
         buttons = html_frame.find(id="divArvoreAcoes").contents
 

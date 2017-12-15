@@ -8,6 +8,8 @@ Created on Mon Aug 28 20:19:59 2017
 
 from selenium.webdriver.common.by import By
 
+servicos =
+
 
 class Login(object):
 
@@ -135,6 +137,10 @@ class Central(object):
     ACOES = (By.ID, "divArvoreAcoes")
     
     IN_AND = (By.ID, "txaDescricao")
+
+    IN_POSTIT = (By.ID, "txaDescicao")
+
+    BT_POSTIT = (By.NAME, "sbmRegistrarAnotacao")
     
     SV_AND = (By.ID, "sbmSalvar")
     

@@ -404,8 +404,22 @@ def navigate_link_to_new_window(driver, link):
     return (main_window, windows[-1])
 
 
+def main(bloco):
+    driver = webdriver.Chrome()
+
+    sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
+
+    sei.expedir_bloco(bloco)
+
+
+if __name__ == 'main':
+    main(sys.argv[1])
+
+
 driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-sei.expedir_bloco(78440)
+sei.expedir_bloco(79023)
+
+sei.expedir_bloco(79152)

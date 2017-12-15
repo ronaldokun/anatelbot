@@ -136,7 +136,11 @@ def armazena_tags(lista_tags):
 
     processo = lista_tags[2].find('a')
 
-    dict_tags['processo'] = processo
+    dict_tags['link'] = processo.attrs['href']
+
+    dict_tags['numero'] = processo.string
+
+    dict_tags['visualizado'] = True if processo.attrs['class'] == 'processoVisualizado' else False
 
     try:
 
@@ -144,7 +148,7 @@ def armazena_tags(lista_tags):
 
     except:
 
-        pass
+        dict_tags['atribuicao'] = ''
 
     dict_tags['tipo'] = lista_tags[4].string
 

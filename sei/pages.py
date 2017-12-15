@@ -1,5 +1,6 @@
 import re
 
+import unidecode
 from bs4 import BeautifulSoup as Soup
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
@@ -10,6 +11,8 @@ from sei import functions as func
 from sei import locators
 from sei.base import Page
 
+servicos = ('Outorga: Rádio do Cidadão', 'Outorga: Radioamador', 'Outorga: Limitado Móvel Aeronáutico',
+            'Outorga: Limitado Móvel Marítimo')
 
 def login_sei(driver, usr, pwd):
     """
@@ -51,7 +54,10 @@ class Sei(Page):
         return self._processos
         
     def _set_processos(self, processos):
-        self._processos = {p['processo'].string: p for p in processos}
+        self._processos = {p['numero']: p for p in processos}
+
+    def _filtra_processos(self, processos, servicos=servicos):
+        self._processos = {k: v for k, v in processos.items() if v.get('tipo') in servicos}
 
     def cria_processo(self, num, tags=None):
         return Processo(self.driver, num, tags)
@@ -144,6 +150,9 @@ class Sei(Page):
         self._set_processos(processos)
 
     def contatos_cadastrados(self, nome):
+
+        nome = unidecode._unidecode(nome)
+
         if self.get_title() != 'Sei - locators.Contatos':
             self.ir_pagina_contato()
 
@@ -156,11 +165,11 @@ class Sei(Page):
         # if not self.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
         try:
 
-            self.wait_for_element_to_be_visible((By.CLASS_NAME, 'infraTrClara'))
+            elem = self.wait_for_element_to_be_visible((By.XPATH, "//*[contains(text(), nome)]"))
 
             html = Soup(self.driver.page_source, 'lxml')
 
-            tags = html.find_all('tr', class_='infraTrClara')
+            tags = html.find_all(string=re.compile(nome))
 
             return (len(tags), tags)
 
@@ -168,9 +177,6 @@ class Sei(Page):
 
             return (0, '')
 
-        finally:
-
-            return (0, '')
 
     def atualiza_elemento(self, id, dado):
 
@@ -403,3 +409,25 @@ class Processo(Sei):
         self.enviar_processo_sede(buttons)
 
         # self.driver.switch_to_window(main_window)
+
+    def limpar_marcadores(self):
+        if self.tags.get('anotacao'):
+            link = self.tags.get('anotacao_link')
+
+            (main, new) = func.nav_link_to_new_win(self.driver, link)
+
+            postit = self.wait_for_element(Central.IN_POSTIT)
+
+            postit.clear()
+
+            btn = self.wait_for_element_to_click(Central.BT_POSTIT)
+
+            btn.click()
+
+            self.close()
+
+            self.driver.switch_to_window(main)
+
+            self.tags['anotacao'] = ''
+
+        # if self.tags.get('marcador'):

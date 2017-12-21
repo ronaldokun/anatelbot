@@ -420,6 +420,4 @@ driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-sei.expedir_bloco(79023)
-
-sei.expedir_bloco(79152)
+sei.expedir_bloco(79628)

@@ -8,8 +8,6 @@ Created on Mon Aug 28 20:19:59 2017
 
 from selenium.webdriver.common.by import By
 
-servicos =
-
 
 class Login(object):
 
@@ -935,6 +933,8 @@ class Tipos(object):
 
 
 class Contato(object):
+    TITLE = 'SEI - Contatos'
+
     TIPO = (By.ID, 'selTipocontato')
 
     SIGLA = (By.ID, 'txtSigla')

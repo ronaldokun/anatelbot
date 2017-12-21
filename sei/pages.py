@@ -153,7 +153,7 @@ class Sei(Page):
 
         nome = unidecode._unidecode(nome)
 
-        if self.get_title() != 'Sei - locators.Contatos':
+        if self.get_title() != locators.Contato.TITLE:
             self.ir_pagina_contato()
 
         contato = self.wait_for_element_to_click(locators.Tipos.CONTATO)
@@ -162,21 +162,19 @@ class Sei(Page):
 
         contato.send_keys(nome + Keys.RETURN)
 
+        self.wait_for_page_load()
+
+        time
+
         # if not self.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
-        try:
 
-            elem = self.wait_for_element_to_be_visible((By.XPATH, "//*[contains(text(), nome)]"))
+        self.wait_for_element_to_be_visible((By.XPATH, "//*[contains(text(), nome)]"))
 
-            html = Soup(self.driver.page_source, 'lxml')
+        html = Soup(self.driver.page_source, 'lxml')
 
-            tags = html.find_all(string=re.compile(nome))
+        tags = html.find_all('tr', class_='infraTrClara')
 
-            return (len(tags), tags)
-
-        except TimeoutException:
-
-            return (0, '')
-
+        return (len(tags), tags) if tags else (0, None)
 
     def atualiza_elemento(self, id, dado):
 
@@ -186,7 +184,9 @@ class Sei(Page):
 
         elem.send_keys(dado)
 
-    def atualizar_contato(self, dados):
+    def atualizar_contato(self, link, dados):
+
+        self.go(link)
 
         tipo = Select(self.wait_for_element_to_be_visible(locators.Contato.TIPO))
 

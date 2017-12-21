@@ -24,6 +24,7 @@ PASS = 'Savorthemom3nts'
 
 
 def init_browser(login, senha, webdriver=webdriver.Firefox()):
+
     page = Page(webdriver)
 
     page.driver.get('http://sistemasnet')
@@ -37,17 +38,21 @@ def init_browser(login, senha, webdriver=webdriver.Firefox()):
 
     return page
 
-def save_page(driver, filename):
+
+def save_page(page, filename):
 
     with open(filename, 'w') as file:
 
         #html = soup(driver.page_source).prettify()
 
         # write image
-        file.write(driver.page_source)
+        file.write(page.driver.page_source)
+
+        # TODO: install weasyprint
+
+        # TODO; autoit
 
     # driver.close()
-
 
 def last_day_of_month():
     """ Use datetime module and manipulation to return the last day
@@ -64,7 +69,6 @@ def last_day_of_month():
     date = date.strftime("%d%m%y")
 
     return date
-
 
 def imprime_boleto(page, ident, id_type='cpf'):
     """ This function receives a webdriver object, navigates it to the
@@ -133,6 +137,30 @@ def imprime_boleto(page, ident, id_type='cpf'):
     except:
 
         print("A espera pela nova janela não funcionou!")
+
+        return False
+
+    try:
+
+        windows = page.driver.window_handles
+
+        main = windows[0]
+
+        boleto = windows[1]
+
+        page.driver.switch_to_window(boleto)
+
+        save_page(page, ident)
+
+        page.close()
+
+        page.driver.switch_to_window(main)
+
+    except:
+
+        print("Não foi possível salvar a nova janela")
+
+
 
         return False
 

@@ -21,6 +21,8 @@ from sei.base import Page
 from sei.locators import (Base, Bloco, Envio, LatMenu, Blocos, Login,
                           Main, Processo, Central)
 
+from time import sleep
+
 
 class LoginPage(Page):
 
@@ -258,7 +260,13 @@ class PagInicial(Page):
         # Troca o foco do navegador
         self.driver.switch_to_window(janela_andamento)
 
-        self.wait_for_element_to_click(Envio.OPEN).click()
+        # Atraso no acesso ao checkbox abaixo gerando erro
+        sleep(0.5)
+
+        checkbox = self.wait_for_element_to_click(Envio.OPEN)\
+
+
+        checkbox.click()
 
         self.wait_for_element_to_click(Envio.RET_DIAS).click()
 
@@ -420,4 +428,5 @@ driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-sei.expedir_bloco(79628)
+
+sei.expedir_bloco(81186)

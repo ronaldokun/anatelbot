@@ -2,6 +2,7 @@ import re
 
 import unidecode
 from bs4 import BeautifulSoup as Soup
+from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys

@@ -76,7 +76,7 @@ class Sec(object):
 
     Prova_Res = 'http://sistemasnet/SEC/Prova/Resultado/Tela.asp?SISQSmodulo=3872'
 
-class Entidade(object):
+class Entidade_SEC(object):
 
     cpf = (By.ID, 'pNumCnpjCpf')
 
@@ -128,6 +128,20 @@ class Entidade(object):
 class Scpx(object):
 
     Consulta = 'http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714'
+
+    Entidade.AlterarSituacao = "http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp?SISQSmodulo=16372"
+
+    Entidade.Incluir = "http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I&SISQSmodulo=12721"
+
+    Estacao.Alterar = "http://sistemasnet/scpx/Estacao/Tela.asp?OP=A&SISQSmodulo=12724"
+
+    Estacao.Excluir = "http://sistemasnet/scpx/Estacao/Tela.asp?OP=E&SISQSmodulo=12725"
+
+    Estacao.Incluir = "http://sistemasnet/scpx/Estacao/Tela.asp?OP=I&SISQSmodulo=12723"
+
+    Estacao.Licenciar = "http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp?SISQSmodulo=12730"
+
+    Licenca.Imprimir = "http://sistemasnet/scpx/Licenca/Tela.asp?SISQSmodulo=12727"
 
 
 class Sigec(object):

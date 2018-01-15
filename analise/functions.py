@@ -13,8 +13,9 @@ from time import sleep
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 
-from analise.locators import Boleto, Sec, Entidade, Scpx, Sigec
+from locators import Boleto, Sec, Entidade, Scpx, Sigec
 from sei.base import Page
 
 os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
@@ -23,18 +24,27 @@ USER = 'rsilva'
 PASS = 'Savorthemom3nts'
 
 
-def init_browser(login, senha, webdriver=webdriver.Firefox()):
+
+def init_browser(login=USER, senha=PASS, webdriver=webdriver.Firefox()):
 
     page = Page(webdriver)
 
     page.driver.get('http://sistemasnet')
 
-    alert = page.alert_is_present()
+    alert = page.alert_is_present(timeout=5)
+
 
     if alert:
-        alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
 
-        alert.accept()
+        try:
+
+            alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
+
+            alert.accept()
+
+        except:
+
+            return page
 
     return page
 
@@ -78,7 +88,7 @@ def imprime_boleto(page, ident, id_type='cpf'):
     # navigate to page
     page.driver.get(Boleto.URL)
 
-    if id_type == 'cpf':
+    if id_type in ('cpf', 'cnpj'):
 
         cpf = page.wait_for_element_to_click(Boleto.B_CPF)
 
@@ -351,9 +361,14 @@ def consultaSigec(page, ident, tipo='cpf'):
 
         raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
 
+    if tipo == 'cnpj' and len(ident) != 14:
+
+        raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
+
+
     page.driver.get(Sigec.consulta)
 
-    if tipo == 'cpf':
+    if tipo in ('cpf', 'cnpj'):
 
         elem = page.wait_for_element_to_click(Sigec.cpf)
 

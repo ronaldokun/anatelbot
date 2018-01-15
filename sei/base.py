@@ -53,11 +53,11 @@ class Page(object):
         WebDriverWait(self.driver, self.timeout).until(
             EC.staleness_of(old_page))
 
-    def alert_is_present(self):
+    def alert_is_present(self, timeout=5):
 
         try:
 
-            alert = WebDriverWait(self.driver, self.timeout).until(
+            alert = WebDriverWait(self.driver, timeout).until(
                 EC.alert_is_present())
 
         except (TimeoutException, WebDriverException):

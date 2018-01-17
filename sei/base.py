@@ -15,9 +15,6 @@ from selenium.webdriver.support import expected_conditions as EC
 # WAIT AND CONDITIONS METHODS
 from selenium.webdriver.support.ui import WebDriverWait
 
-from sei.locators import Base
-
-
 class Page(object):
     """Page Class Object with common navigation functions"""
 
@@ -32,14 +29,6 @@ class Page(object):
     def __enter__(self):
         """ Implementation class """
         return self
-
-    def go(self, link):
-        """ Simplifies the navigation of href pages on sei.anatel.gov.br
-        by pre-appending the required prefix NAV_URL
-       """
-        link = Base.URL + link
-
-        self.driver.get(link)
 
     def close(self):
         """ Basic implementation class"""

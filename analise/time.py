@@ -6,7 +6,7 @@ os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
 import datetime as dt
 from time import sleep
 from selenium.webdriver.common.by import By
-from functions import init_browser
+from functions import *
 import random
 
 
@@ -16,7 +16,7 @@ url = "http://sistemasnet/sarh/horarioflexivelNovo/lancamento/LancamentoHoras.as
 
 
 
-def leave(time):
+def leave(time, browser):
 
 
     while time > dt.datetime.now():
@@ -25,7 +25,8 @@ def leave(time):
 
         sleep(60 * random.randint(5,10))
 
-    page = init_browser()
+    page = init_browser(webdriver=browser)
+
     page.driver.get(url)
 
     btn = page.wait_for_element_to_click((By.ID, 'image2'))
@@ -38,13 +39,17 @@ def leave(time):
 
         alert.accept()
 
-    except:
+        sleep(5)
 
         page.close()
 
-    page.close()
+    except:
 
-def enter(time):
+        pass
+
+
+
+def enter(time, webdriver):
 
     while time > dt.datetime.now():
 
@@ -52,35 +57,37 @@ def enter(time):
 
         sleep(60 * random.randint(10, 20))
 
-    page = init_browser()
+    page = init_browser(webdriver=webdriver)
+
     page.driver.get(url)
 
     btn = page.wait_for_element_to_click((By.ID, 'image1'))
 
     btn.click()
 
-    alert = page.alert_is_present(timeout=5)
-
     try:
+
+        sleep(2)
 
         alert = page.alert_is_present(timeout=5)
 
-        alert.accept()
+        alert.dismiss()
 
-    except:
+        sleep(2)
 
         page.close()
 
-    sleep(30)
+    except:
 
-    page.close()
+        pass
 
 
-entra = dt.datetime(2018, 1, 11, 7)
 
-#sai = dt.datetime(2018, 1, 10, 21, 15)
+entra = dt.datetime(2018, 1, 18, 7, 21)
 
-#leave(sai)
+sai = dt.datetime(2018, 1, 17, 21, 33)
 
-enter(entra)
+leave(sai, webdriver.Firefox())
+
+enter(entra, webdriver.Ie())
 

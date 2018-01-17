@@ -1,5 +1,7 @@
 from selenium.webdriver.common.by import By
 
+BASE = 'http://sistemasnet/'
+
 class Boleto(object):
 
     URL = 'http://sistemasnet/boleto/Boleto/ConsultaDebitos.asp?SISQSmodulo=6853'
@@ -76,77 +78,63 @@ class Sec(object):
 
     Prova_Res = 'http://sistemasnet/SEC/Prova/Resultado/Tela.asp?SISQSmodulo=3872'
 
-class Entidade_SEC(object):
-
-    cpf = (By.ID, 'pNumCnpjCpf')
-
-    fistel = (By.ID, 'pNumFistel')
-
-    indicativo = (By.ID, 'pIndicativo')
-
-    nome = (By.ID, 't_NomeEntidade')
-
-    email = (By.ID, 't_EndEletronico')
-
-    rg = (By.ID, 'pf_NumIdentidade')
-
-    orgexp = (By.ID, 'pf_SiglaOrgaoExp')
-
-    nasc = (By.ID, 'pf_DataNascimento')
-
-    ddd = (By.ID, 'tel_NumCodigoNacional0')
-
-    fone = (By.ID, 'tel_NumTelefone0')
-
-    cep = (By.ID, 'CodCep1')
-
-    bt_cep = (By.ID, 'buscarEndereco')
-
-    logr = (By.ID, 'EndLogradouro1')
-
-    num = (By.ID, 'EndNumero1')
-
-    comp = (By.ID, 'EndComplemento1')
-
-    bairro = (By.ID, 'EndBairro1')
-
-    uf = (By.ID, 'SiglaUf1')
-
-    cidade = (By.ID, 'CodMunicipio1')
-
-    confirmar = (By.ID, 'botaoFlatConfirmar')
-
-    bt_dados = (By.ID, 'botaoFlatDadosComplementares')
-
-    bt_fone = (By.ID, 'botaoFlatTelefones')
-
-    bt_end = (By.ID, 'botaoFlatEndereço')
-
     submit = "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')"
+
+
+Entidade = {'cpf':(By.ID, 'pNumCnpjCpf'),
+            'fistel':(By.ID, 'pNumFistel'),
+            'indicativo':(By.ID, 'pIndicativo'),
+            'nome':(By.ID, 't_NomeEntidade'),
+            'email':(By.ID, 't_EndEletronico'),
+            'rg':(By.ID, 'pf_NumIdentidade'),
+            'orgexp':(By.ID, 'pf_SiglaOrgaoExp'),
+            'nasc':(By.ID, 'pf_DataNascimento'),
+            'ddd':(By.ID, 'tel_NumCodigoNacional0'),
+            'fone':(By.ID, 'tel_NumTelefone0'),
+            'cep':(By.ID, 'CodCep1'),
+            'bt_cep':(By.ID, 'buscarEndereco'),
+            'logr':(By.ID, 'EndLogradouro1'),
+            'num':(By.ID, 'EndNumero1'),
+            'comp':(By.ID, 'EndComplemento1'),
+            'bairro':(By.ID, 'EndBairro1'),
+            'uf':(By.ID, 'SiglaUf1'),
+            'cidade':(By.ID, 'CodMunicipio1'),
+            'confirmar':(By.ID, 'botaoFlatConfirmar'),
+            'bt_dados':(By.ID, 'botaoFlatDadosComplementares'),
+            'bt_fone':(By.ID, 'botaoFlatTelefones'),
+            'bt_end':(By.ID, 'botaoFlatEndereço')}
 
 
 class Scpx(object):
 
     Consulta = 'http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714'
 
-    Entidade.AlterarSituacao = "http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp?SISQSmodulo=16372"
+    Entidade = {'AlterarSituacao' : "http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
+                'Incluir' : "http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I",
+                'Alterar' : "http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
+                'Excluir' : "http://sistemasnet/scpx/Estacao/Tela.asp?OP=E"}
 
-    Entidade.Incluir = "http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I&SISQSmodulo=12721"
+    Estacao = {'Incluir' : "http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
+               'Licenciar' : "http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp"}
 
-    Estacao.Alterar = "http://sistemasnet/scpx/Estacao/Tela.asp?OP=A&SISQSmodulo=12724"
+    Licenca = {'Imprimir' : "http://sistemasnet/scpx/Licenca/Tela.asp"}
 
-    Estacao.Excluir = "http://sistemasnet/scpx/Estacao/Tela.asp?OP=E&SISQSmodulo=12725"
 
-    Estacao.Incluir = "http://sistemasnet/scpx/Estacao/Tela.asp?OP=I&SISQSmodulo=12723"
+class Scra(object):
 
-    Estacao.Licenciar = "http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp?SISQSmodulo=12730"
+    Consulta = 'http://sistemasnet/SCRA/Consulta/Tela.asp'
 
-    Licenca.Imprimir = "http://sistemasnet/scpx/Licenca/Tela.asp?SISQSmodulo=12727"
+class Slmm(object):
 
+    Consulta = 'http://sistemasnet/stel/SCMM/Consulta/Tela.asp'
+
+class Slma(object):
+
+    Consulta = 'http://sistemasnet/stel/SCMA/Consulta/Tela.asp'
 
 class Sigec(object):
 
-    consulta = "http://sistemasnet/sigec/ConsultasGerais/SituacaoCadastral/tela.asp?SISQSmodulo=3748"
+    consulta = "http://sistemasnet/sigec/ConsultasGerais/SituacaoCadastral/tela.asp"
 
     cpf = (By.ID, "NumCNPJCPF")
 

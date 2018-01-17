@@ -154,7 +154,7 @@ class Envio(object):
 
     UNIDS = "SEI - Selecionar Unidades"
 
-    PRAZO = "3"
+    PRAZO = "5"
 
     IN_SIGLA = (By.ID, "txtSiglaUnidade")
 

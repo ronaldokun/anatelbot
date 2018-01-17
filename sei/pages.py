@@ -51,6 +51,14 @@ class Sei(Page):
         super().__init__(driver)
         self._processos = {}
 
+    def go(self, link):
+        """ Simplifies the navigation of href pages on sei.anatel.gov.br
+        by pre-appending the required prefix NAV_URL
+       """
+        link = locators.Base.URL + link
+
+        self.driver.get(link)
+
     def get_processos(self):
         return self._processos
         

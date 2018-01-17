@@ -11,11 +11,13 @@ import os
 import re
 from time import sleep
 
+import string
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
-from locators import Boleto, Sec, Entidade, Scpx, Sigec
+from analise.locators import Boleto, Sec, Entidade, Scpx, Scra, Slmm, Slma, Sigec
 from sei.base import Page
 
 os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
@@ -25,11 +27,13 @@ PASS = 'Savorthemom3nts'
 
 
 
-def init_browser(login=USER, senha=PASS, webdriver=webdriver.Firefox()):
+def init_browser(webdriver, login=USER, senha=PASS):
 
     page = Page(webdriver)
 
     page.driver.get('http://sistemasnet')
+
+    # sleep(1)
 
     alert = page.alert_is_present(timeout=5)
 
@@ -138,43 +142,45 @@ def imprime_boleto(page, ident, id_type='cpf'):
 
         print("Não foi possível imprimir todos os boletos")
 
-        return False
-
-    try:
-
-        page.wait_for_new_window()
-
-    except:
-
-        print("A espera pela nova janela não funcionou!")
-
-        return False
-
-    try:
-
-        windows = page.driver.window_handles
-
-        main = windows[0]
-
-        boleto = windows[1]
-
-        page.driver.switch_to_window(boleto)
-
-        save_page(page, ident)
-
-        page.close()
-
-        page.driver.switch_to_window(main)
-
-    except:
-
-        print("Não foi possível salvar a nova janela")
-
-
-
-        return False
-
-    return True
+    #     return False
+    #
+    # try:
+    #
+    #     page.wait_for_new_window()
+    #
+    # except:
+    #
+    #     print("A espera pela nova janela não funcionou!")
+    #
+    #     return False
+    #
+    # try:
+    #
+    #     windows = page.driver.window_handles
+    #
+    #     main = windows[0]
+    #
+    #     boleto = windows[1]
+    #
+    #     page.driver.switch_to_window(boleto)
+    #
+    #     save_page(page, ident)
+    #
+    #
+    #
+    #     page.close()
+    #
+    #     page.driver.switch_to_window(main)
+    #
+    # except:
+    #
+    #     print("Não foi possível salvar a nova janela")
+    #
+    #
+    #
+    #     return False
+    #
+    # return True
 
 
 def atualiza_cadastro(page, dados):
@@ -324,35 +330,87 @@ def atualiza_cadastro(page, dados):
     
     page.driver.execute_script(Entidade.submit)
     
-def consultaScpx(page, ident, tipo='cpf'):
+def check_input(ident, serv, tipo):
 
     if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
 
         raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
 
-    elif tipo == 'indicativo':
+    if tipo == 'cnpj' and len(ident) != 14:
 
-        pattern = '^(P|p)(X|x)(\d){1}([C-Z,c-z]){1}(\d){4}$'
+        raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
 
-        if not re.match(pattern, ident):
+    ident = str(ident).upper()
+
+    serv = str(serv)
+
+    tipo = str(tipo)
+
+    if serv == "400":
+
+        pattern = r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$'
+
+        sis = Scpx
+
+    elif serv == '302':
+
+        pattern = r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$'
+
+        sis = Scra
+
+    elif serv == "507":
+
+        pattern = r'^(P){1}([A-Z]){4}$'
+
+        sis = Slma
+
+    elif serv == "604":
+
+        pattern = r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})'
+
+        sis = Slmm
+
+    if tipo == 'indicativo':
+
+        if not re.match(pattern, ident, re.I):
 
             raise ValueError("Indicativo Digitado Inválido")
 
-    page.driver.get(Scpx.Consulta)
+    return (ident, serv, tipo, sis)
 
-    if tipo == 'cpf':
 
-        elem = page.wait_for_element_to_click(Entidade.cpf)
+def navigate(page, ident, tipo):
 
-        elem.send_keys(ident + Keys.RETURN)
+    elem = page.wait_for_element_to_click(Entidade[tipo])
 
-    elif tipo == 'fistel':
+    elem.send_keys(ident + Keys.RETURN)
 
-        elem = page.wait_for_element_to_click(Entidade.fistel)
 
-        elem.send_keys(ident + Keys.RETURN)
+def consulta(page, ident, serv, tipo):
 
-    # TODO: implement other elements
+    ident, serv, tipo, sis = check_input(ident, serv, tipo)
+
+    page.driver.get(sis.Consulta)
+
+    navigate(page, ident, tipo)
+
+
+def imprime_licenca(page, ident, serv, tipo):
+
+    ident, serv, tipo, sis = check_input(ident, serv, tipo)
+
+    page.driver.get(sis.Licenca['Imprimir'])
+
+    navigate(page, ident, tipo)
+
+
+
+
+
+
+
+
+
 
 def consultaSigec(page, ident, tipo='cpf'):
 

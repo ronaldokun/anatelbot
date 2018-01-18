@@ -33,11 +33,17 @@ def leave(time, browser):
 
     btn.click()
 
+    alert = page.alert_is_present(timeout=5)
+
+    alert.accept()
+
+    sleep(5)
+
     try:
 
         alert = page.alert_is_present(timeout=5)
 
-        alert.accept()
+        alert.dismiss()
 
         sleep(5)
 
@@ -45,7 +51,7 @@ def leave(time, browser):
 
     except:
 
-        pass
+        print("Entered Except Block!")
 
 
 
@@ -83,9 +89,9 @@ def enter(time, webdriver):
 
 
 
-entra = dt.datetime(2018, 1, 18, 7, 21)
+entra = dt.datetime(2018, 1, 18, 8)
 
-sai = dt.datetime(2018, 1, 17, 21, 33)
+sai = dt.datetime(2018, 1, 17, 21, 00)
 
 leave(sai, webdriver.Firefox())
 

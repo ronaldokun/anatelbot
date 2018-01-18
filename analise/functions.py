@@ -379,9 +379,9 @@ def check_input(ident, serv, tipo):
     return (ident, serv, tipo, sis)
 
 
-def navigate(page, ident, tipo):
+def navigate(page, ident, sis, tipo):
 
-    elem = page.wait_for_element_to_click(Entidade[tipo])
+    elem = page.wait_for_element_to_click(sis[tipo])
 
     elem.send_keys(ident + Keys.RETURN)
 
@@ -390,9 +390,9 @@ def consulta(page, ident, serv, tipo):
 
     ident, serv, tipo, sis = check_input(ident, serv, tipo)
 
-    page.driver.get(sis.Consulta)
+    page.driver.get(sis.Consulta['link'])
 
-    navigate(page, ident, tipo)
+    navigate(page, ident, sis.Consulta, tipo)
 
 
 def imprime_licenca(page, ident, serv, tipo):
@@ -401,7 +401,7 @@ def imprime_licenca(page, ident, serv, tipo):
 
     page.driver.get(sis.Licenca['Imprimir'])
 
-    navigate(page, ident, tipo)
+    navigate(page, ident, sis.Licenca, tipo)
 
 
 

@@ -16,7 +16,7 @@ url = "http://sistemasnet/sarh/horarioflexivelNovo/lancamento/LancamentoHoras.as
 
 
 
-def leave(time, browser):
+def leave(time):
 
 
     while time > dt.datetime.now():
@@ -25,7 +25,7 @@ def leave(time, browser):
 
         sleep(60 * random.randint(5,10))
 
-    page = init_browser(webdriver=browser)
+    page = init_browser(webdriver=webdriver.Firefox())
 
     page.driver.get(url)
 
@@ -55,15 +55,15 @@ def leave(time, browser):
 
 
 
-def enter(time, webdriver):
+def enter(time):
 
     while time > dt.datetime.now():
 
         print(dt.datetime.now())
 
-        sleep(60 * random.randint(10, 20))
+        sleep(60 * random.randint(5, 10))
 
-    page = init_browser(webdriver=webdriver)
+    page = init_browser(webdriver=webdriver.Firefox())
 
     page.driver.get(url)
 
@@ -79,6 +79,12 @@ def enter(time, webdriver):
 
         alert.dismiss()
 
+    except:
+
+        pass
+
+    try:
+
         sleep(2)
 
         page.close()
@@ -89,11 +95,11 @@ def enter(time, webdriver):
 
 
 
-entra = dt.datetime(2018, 1, 18, 8)
+entra = dt.datetime(2018, 1, 25, 9)
 
-sai = dt.datetime(2018, 1, 17, 21, 00)
+#sai = dt.datetime(2018, 1, 22, 20, 22)
 
-leave(sai, webdriver.Firefox())
+#leave(sai)
 
-enter(entra, webdriver.Ie())
+enter(entra)
 

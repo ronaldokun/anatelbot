@@ -378,21 +378,45 @@ def check_input(ident, serv, tipo):
 
     return (ident, serv, tipo, sis)
 
+def navigate(page, ident, tipo):
 
-def navigate(page, ident, sis, tipo):
+    for id in Entidade[tipo]:
 
-    elem = page.wait_for_element_to_click(sis[tipo])
+        try:
 
-    elem.send_keys(ident + Keys.RETURN)
+            elem = page.wait_for_element_to_click(id, timeout=3)
+
+            elem.send_keys(ident + Keys.RETURN)
+
+            break
+
+        except:
+
+            next
+
+    else:
+
+        print("Não foi encontrado o 'id' do identificador {} na página".format(tipo))
+
 
 
 def consulta(page, ident, serv, tipo):
 
     ident, serv, tipo, sis = check_input(ident, serv, tipo)
 
-    page.driver.get(sis.Consulta['link'])
+    page.driver.get(sis.Consulta)
 
-    navigate(page, ident, sis.Consulta, tipo)
+    navigate(page, ident, tipo)
+
+def incluir_estacao(page, ident, serv, tipo):
+
+    ident, serv, tipo, sis = check_input(ident, serv, tipo)
+
+    page.driver.get(sis.Estacao['incluir'])
+
+    navigate(page, ident, tipo)
+
+
 
 
 def imprime_licenca(page, ident, serv, tipo):

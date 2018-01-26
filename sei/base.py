@@ -18,13 +18,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 class Page(object):
     """Page Class Object with common navigation functions"""
 
+    timeout = 30
+
     def __init__(self, driver):
         ''' Initializes the webdriver and the timeout'''
         # if type(driver) != type(webdriver):
         #     raise TypeError("The object {0} must be of type{1}".format(driver,
         #                     type(webdriver)))
         self.driver = driver
-        self.timeout = 30
+        timeout = 30
 
     def __enter__(self):
         """ Implementation class """
@@ -55,7 +57,7 @@ class Page(object):
 
         return alert
 
-    def elem_is_visible(self, *locator):
+    def elem_is_visible(self, *locator, timeout=timeout):
         '''
         Check is locator is visible on page given the timeout
 
@@ -65,10 +67,11 @@ class Page(object):
         '''
         try:
 
-            WebDriverWait(self.driver, self.timeout).until(
+            WebDriverWait(self.driver, timeout).until(
                 EC.visibility_of_element_located(*locator))
         except TimeoutException:
             return False
+
         return True
 
     def find_element(self, *locator):
@@ -95,18 +98,18 @@ class Page(object):
             return False
         return True
 
-    def wait_for_element_to_be_visible(self, *locator):
-        return WebDriverWait(self.driver, self.timeout).until(
+    def wait_for_element_to_be_visible(self, *locator, timeout=timeout):
+        return WebDriverWait(self.driver, timeout).until(
             EC.visibility_of_element_located(*locator))
 
-    def wait_for_element(self, *locator):
-        return WebDriverWait(self.driver, self.timeout).until(
+    def wait_for_element(self, *locator, timeout=timeout):
+        return WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located(*locator))
 
-    def wait_for_element_to_click(self, *locator):
-        return WebDriverWait(self.driver, self.timeout).until(
+    def wait_for_element_to_click(self, *locator, timeout=timeout):
+        return WebDriverWait(self.driver, timeout).until(
             EC.element_to_be_clickable(*locator))
 
-    def wait_for_new_window(self):
-        return WebDriverWait(self.driver, self.timeout).until(
+    def wait_for_new_window(self, timeout=timeout):
+        return WebDriverWait(self.driver, timeout).until(
             EC.number_of_windows_to_be(2))

@@ -81,9 +81,10 @@ class Sec(object):
     submit = "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')"
 
 
-Entidade = {'cpf':(By.ID, 'pNumCnpjCpf'),
-            'fistel':(By.ID, 'pNumFistel'),
-            'indicativo':(By.ID, 'pIndicativo'),
+Entidade = {'cpf':[(By.ID, 'pNumCnpjCpf'),(By.ID, 'pnumCPFCNPJ')],
+            'cnpj': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ')],
+            'fistel':[(By.ID, 'pNumFistel'),(By.ID, 'pnumFistel')],
+            'indicativo':[(By.ID, 'pIndicativo')],
             'nome':(By.ID, 't_NomeEntidade'),
             'email':(By.ID, 't_EndEletronico'),
             'rg':(By.ID, 'pf_NumIdentidade'),
@@ -107,53 +108,50 @@ Entidade = {'cpf':(By.ID, 'pNumCnpjCpf'),
 
 class Scpx(object):
 
-    Consulta = dict(link='http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714', cpf=Entidade['cpf'],
-                    fistel=Entidade['fistel'], indicativo=Entidade['indicativo'])
+    Consulta = dict(link='http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714')
 
-    Ent = dict(AlterarSituacao="http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
-                    Incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I",
-                    Alterar="http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
-                    Excluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=E")
+    Ent =      dict(alterar_situacao="http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
+                    incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I")
 
-    Estacao = dict(Incluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
-                   Licenciar="http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp")
+    Estacao =  dict(incluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
+                    alterar="http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
+                    excluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=E",
+                    licenciar="http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp")
 
-    Licenca = dict(Imprimir="http://sistemasnet/scpx/Licenca/Tela.asp", cpf=(By.ID, 'pnumCPFCNPJ'),
-                   fistel=(By.ID, 'pnumFistel'), indicativo=Entidade['indicativo'])
-
+    Licenca =  dict(imprimir="http://sistemasnet/scpx/Licenca/Tela.asp",
+                    cpf=(By.ID, 'pnumCPFCNPJ'),
+                    fistel=(By.ID, 'pnumFistel'),
+                    indicativo=Entidade['indicativo'])
 
 class Scra(object):
 
-    Consulta = dict(link='http://sistemasnet/SCRA/Consulta/Tela.asp',
-                    cpf=Entidade['cpf'], fistel=Entidade['fistel'],
-                    indicativo=Entidade['indicativo'])
+    Consulta = dict(link='http://sistemasnet/SCRA/Consulta/Tela.asp')
 
-    Licenca = dict(Imprimir="http://sistemasnet/SCRA/Chamada/Licenca.asp?SISQSmodulo=7132",
-                   cpf=(By.ID, 'pnumCPFCNPJ'),
-                   fistel=(By.ID, 'pnumFistel'),
-                   indicativo=Entidade['indicativo'])
+    Ent =      dict(alterar_situacao="http://sistemasnet/scra/Chamada/CadastroSRFRegularizado.asp",
+                    incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I")
+
+    Estacao =  dict(alterar="http://sistemasnet/acra/Chamada/Entidade.asp?OP=A",
+                    alterar_indicativo='http://sistemasnet/SCRA/IndicativoAlterar/Tela.asp?OP=A',
+                    excluir="http://sistemasnet/SCRA/Estacao/Tela.asp?OP=E",
+                    incluir='http://sistemasnet/SCRA/Estacao/Tela.asp?OP=I',
+                    licenciar='http://sistemasnet/SCRA/EstacaoLicenciar/Tela.asp')
+
+    Licenca =  dict(imprimir="http://sistemasnet/SCRA/Chamada/Licenca.asp")
 
 class Slmm(object):
 
-    Consulta = dict(link='http://sistemasnet/stel/SCMM/Consulta/Tela.asp', cpf=Entidade['cpf'],
-                    fistel=Entidade['fistel'], indicativo=Entidade['indicativo'])
+    Consulta = 'http://sistemasnet/stel/SCMM/Consulta/Tela.asp'
 
-
-    Licenca = {"Imprimir": "http://sistemasnet/stel/SCMM/LicencaImprimir/Tela.asp?SISQSmodulo=7766",
-               'cpf': Entidade['cpf'],
-               'fistel': Entidade['fistel'],
-               'indicativo': Entidade['indicativo']}
+    Licenca = {"imprimir": "http://sistemasnet/stel/SCMM/LicencaImprimir/Tela.asp?SISQSmodulo=7766"}
 
 
 class Slma(object):
 
-    Consulta = dict(link="http://sistemasnet/stel/SCMA/Consulta/Tela.asp", cpf=Entidade['cpf'],
-                    fistel=Entidade['fistel'], indicativo=Entidade['indicativo'])
+    Consulta = "http://sistemasnet/stel/SCMA/Consulta/Tela.asp"
 
-    Licenca = {"Imprimir": "http://sistemasnet/stel/SCMA/LicencaPadrao/ImpressaoLicenca.asp?SISQSmodulo=7005",
-               'cpf': Entidade['cpf'],
-               'fistel': Entidade['fistel'],
-               'indicativo': Entidade['indicativo']}
+
+    Licenca = {"imprimir": "http://sistemasnet/stel/SCMA/LicencaPadrao/ImpressaoLicenca.asp?SISQSmodulo=7005"}
+
 
 class Sigec(object):
 

@@ -11,23 +11,15 @@ import os
 import re
 from time import sleep
 
-import string
-
-from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 
 from analise.locators import Boleto, Sec, Entidade, Scpx, Scra, Slmm, Slma, Sigec
 from sei.base import Page
 
 os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
 
-USER = 'rsilva'
-PASS = 'Savorthemom3nts'
 
-
-
-def init_browser(webdriver, login=USER, senha=PASS):
+def init_browser(webdriver, login, senha):
 
     page = Page(webdriver)
 
@@ -370,6 +362,18 @@ def check_input(ident, serv, tipo):
 
         sis = Slmm
 
+    elif serv == "boleto":
+
+        sis = Boleto
+
+    elif serv == "sec":
+
+        sis = Sec
+
+    else:
+
+        raise ValueError("Não foi encontrado o Serviço {}".format(serv))
+
     if tipo == 'indicativo':
 
         if not re.match(pattern, ident, re.I):
@@ -408,6 +412,7 @@ def consulta(page, ident, serv, tipo):
 
     navigate(page, ident, tipo)
 
+
 def incluir_estacao(page, ident, serv, tipo):
 
     ident, serv, tipo, sis = check_input(ident, serv, tipo)
@@ -417,8 +422,6 @@ def incluir_estacao(page, ident, serv, tipo):
     navigate(page, ident, tipo)
 
 
-
-
 def imprime_licenca(page, ident, serv, tipo):
 
     ident, serv, tipo, sis = check_input(ident, serv, tipo)
@@ -426,14 +429,6 @@ def imprime_licenca(page, ident, serv, tipo):
     page.driver.get(sis.Licenca['Imprimir'])
 
     navigate(page, ident, sis.Licenca, tipo)
-
-
-
-
-
-
-
-
 
 
 def consultaSigec(page, ident, tipo='cpf'):

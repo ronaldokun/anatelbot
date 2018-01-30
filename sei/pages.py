@@ -2,7 +2,6 @@ import re
 
 import unidecode
 from bs4 import BeautifulSoup as Soup
-from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -12,7 +11,9 @@ from sei import functions as func
 from sei import locators
 from sei.base import Page
 
-servicos = ('Outorga: Rádio do Cidadão', 'Outorga: Radioamador', 'Outorga: Limitado Móvel Aeronáutico',
+servicos = ('Outorga: Rádio do Cidadão',
+            'Outorga: Radioamador',
+            'Outorga: Limitado Móvel Aeronáutico',
             'Outorga: Limitado Móvel Marítimo')
 
 def login_sei(driver, usr, pwd):
@@ -173,7 +174,6 @@ class Sei(Page):
 
         self.wait_for_page_load()
 
-        time
 
         # if not self.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
 

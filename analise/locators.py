@@ -81,7 +81,7 @@ class Sec(object):
     submit = "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')"
 
 
-Entidade = {'cpf':[(By.ID, 'pNumCnpjCpf'),(By.ID, 'pnumCPFCNPJ')],
+Entidade = {'cpf': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'NumCNPJCPF')],
             'cnpj': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ')],
             'fistel':[(By.ID, 'pNumFistel'),(By.ID, 'pnumFistel')],
             'indicativo':[(By.ID, 'pIndicativo')],

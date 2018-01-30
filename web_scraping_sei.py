@@ -6,6 +6,7 @@ Created on Thu Aug 24 23:14:09 2017
 @author: ronaldo
 """
 import re
+from time import sleep
 
 from bs4 import BeautifulSoup as soup
 # INITIALIZE DRIVER
@@ -20,8 +21,6 @@ from selenium.webdriver.support.ui import Select
 from sei.base import Page
 from sei.locators import (Base, Bloco, Envio, LatMenu, Blocos, Login,
                           Main, Processo, Central)
-
-from time import sleep
 
 
 class LoginPage(Page):
@@ -428,7 +427,6 @@ driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
+sei.expedir_bloco(82644)
 
-sei.expedir_bloco(82281)
-
-
+sei.expedir_bloco(82825)

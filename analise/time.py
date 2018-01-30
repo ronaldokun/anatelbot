@@ -33,17 +33,13 @@ def leave(time):
 
     btn.click()
 
-    alert = page.alert_is_present(timeout=5)
-
-    alert.accept()
-
     sleep(5)
 
     try:
 
         alert = page.alert_is_present(timeout=5)
 
-        alert.dismiss()
+        alert.accept()
 
         sleep(5)
 
@@ -51,7 +47,9 @@ def leave(time):
 
     except:
 
-        print("Entered Except Block!")
+        print("Entered Except Block on Leave!")
+
+
 
 
 
@@ -71,35 +69,29 @@ def enter(time):
 
     btn.click()
 
+    sleep(2)
+
     try:
 
-        sleep(2)
 
         alert = page.alert_is_present(timeout=5)
 
-        alert.dismiss()
-
-    except:
-
-        pass
-
-    try:
-
-        sleep(2)
+        if alert:
+            alert.accept()
 
         page.close()
 
+
     except:
 
-        pass
+        print("Entered Except Block in Enter")
 
 
+entra = dt.datetime(2018, 1, 30, 8)
 
-entra = dt.datetime(2018, 1, 25, 9)
+sai = dt.datetime(2018, 1, 29, 21, 30)
 
-#sai = dt.datetime(2018, 1, 22, 20, 22)
-
-#leave(sai)
+leave(sai)
 
 enter(entra)
 

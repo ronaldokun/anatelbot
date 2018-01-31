@@ -12,6 +12,8 @@ import re
 from time import sleep
 
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+
 
 from analise.locators import Boleto, Sec, Entidade, Scpx, Scra, Slmm, Slma, Sigec
 from sei.base import Page

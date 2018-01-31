@@ -21,7 +21,7 @@ class Sis(Page):
 
         self.driver.get('http://sistemasnet')
 
-        alert = self.alert_is_present(timeout=5)
+        alert = self.alert_is_present(timeout=3)
 
         if alert:
 
@@ -65,7 +65,37 @@ class Sis(Page):
 
         id, serv, id_type, sis = func.check_input(id, serv, id_type)
 
-        self._navigate(self, sis.Consulta, id, id_type)
+        self._navigate(sis.Consulta, id, id_type)
+
+    def imprime_consulta(self, id, serv, id_type):
+
+        self.consulta(id, serv, id_type)
+
+
+
+        try:
+
+            elem = self.wait_for_element_to_click((By.ID, "botaoFlatEstação"))
+
+            elem.click()
+
+        except:
+
+            print("Não foi possível clicar no botão 'Estação' na página consulta")
+
+            return
+
+        try:
+
+            elem = self.wait_for_element_to_click((By.ID, "botaoFlatVersãoparaImpressão"),
+                                                  timeout=5)
+
+        except:
+
+            print("Não foi possível clicar no Botão 'Versão para Impressão")
+
+            return
+
 
     def imprime_boleto(self, id, id_type):
         """ This function receives a webdriver object, navigates it to the
@@ -168,6 +198,43 @@ class Sis(Page):
         #     return False
         #
         # return True
+
+    def save_new_window(self, filename):
+
+
+        try:
+
+            self.wait_for_new_window(timeout=5)
+
+        except TimeoutError:
+
+            print("Não foi possível identificar a nova Janela para salvar")
+
+            return False
+
+        # Guarda as janelas do navegador presentes
+        windows = self.driver.window_handles
+
+        # Troca o foco do navegador
+        self.driver.switch_to_window(windows[-1])
+
+        with open(filename + '.html', 'w') as file:
+            # html = soup(driver.page_source).prettify()
+
+            # write image
+            file.write(self.driver.page_source)
+
+        self.driver.close()
+
+        self.driver.switch_to_window(windows[0])
+
+        return True
+
+
+
+
+
+
 
 
 def atualiza_cadastro(page, dados):
@@ -318,6 +385,7 @@ def imprime_licenca(page, ident, serv, tipo):
 
 
 def consultaSigec(page, ident, tipo='cpf'):
+
     if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
         raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
 

@@ -9,11 +9,13 @@ from selenium.webdriver.common.by import By
 from functions import *
 import random
 
-
+from selenium import webdriver
 
 
 url = "http://sistemasnet/sarh/horarioflexivelNovo/lancamento/LancamentoHoras.asp?SISQSmodulo=18384"
 
+USER = 'rsilva'
+PASS = 'Savorthemom3nts'
 
 
 def leave(time):
@@ -25,7 +27,7 @@ def leave(time):
 
         sleep(60 * random.randint(5,10))
 
-    page = init_browser(webdriver=webdriver.Firefox())
+    page = init_browser(webdriver=webdriver.Firefox(), login=USER, senha=PASS)
 
     page.driver.get(url)
 
@@ -41,14 +43,22 @@ def leave(time):
 
         alert.accept()
 
-        sleep(5)
-
-        page.close()
 
     except:
 
         print("Entered Except Block on Leave!")
 
+    try
+
+        alert = page.alert_is_present(timeout=5)
+
+        alert.accept()
+
+        page.close()
+
+    except:
+
+        print("Entered second Except Block")
 
 
 
@@ -87,11 +97,11 @@ def enter(time):
         print("Entered Except Block in Enter")
 
 
-entra = dt.datetime(2018, 1, 30, 8)
+#entra = dt.datetime(2018, 1, 30, 8)
 
 sai = dt.datetime(2018, 1, 29, 21, 30)
 
 leave(sai)
 
-enter(entra)
+#enter(entra)
 

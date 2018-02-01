@@ -8,6 +8,8 @@ Created on Thu Aug 24 23:14:09 2017
 import re
 from time import sleep
 
+from random import randint
+
 from bs4 import BeautifulSoup as soup
 # INITIALIZE DRIVER
 from selenium import webdriver
@@ -167,6 +169,8 @@ class PagInicial(Page):
 
         processos = self.armazena_bloco(numero)
 
+        counter = 0
+
         for p in processos:
 
             if podeExpedir(p):
@@ -184,7 +188,15 @@ class PagInicial(Page):
 
                 chk.click()
 
-        ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
+                #counter += 1
+
+                #sleep(30*random.randint(1,4))
+
+        #if counter == len(processos):
+
+            #concluir_bl = self.wait_for_element_to_click(Bloco)
+
+            #ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
 
         # ret.click()
 
@@ -427,6 +439,8 @@ driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-sei.expedir_bloco(82644)
+sei.expedir_bloco(82886)
 
-sei.expedir_bloco(82825)
+sei.expedir_bloco(82962)
+
+sei.close()

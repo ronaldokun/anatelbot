@@ -20,12 +20,21 @@ PASS = 'Savorthemom3nts'
 
 def leave(time):
 
-
     while time > dt.datetime.now():
 
         print(dt.datetime.now())
 
         sleep(60 * random.randint(5,10))
+
+    try:
+
+        import web_scraping_sei
+
+    except:
+
+        print("Problema na emissão dos bloco")
+
+    print("Emissão de Bloco efetuada com sucesso")
 
     page = init_browser(webdriver=webdriver.Firefox(), login=USER, senha=PASS)
 
@@ -48,7 +57,7 @@ def leave(time):
 
         print("Entered Except Block on Leave!")
 
-    try
+    try:
 
         alert = page.alert_is_present(timeout=5)
 
@@ -71,7 +80,16 @@ def enter(time):
 
         sleep(60 * random.randint(5, 10))
 
-    page = init_browser(webdriver=webdriver.Firefox())
+    try:
+
+        import web_scraping_sei
+
+    except:
+
+        pass
+
+
+    page = init_browser(webdriver=webdriver.Firefox(), login=USER, senha=PASS)
 
     page.driver.get(url)
 
@@ -97,11 +115,11 @@ def enter(time):
         print("Entered Except Block in Enter")
 
 
-#entra = dt.datetime(2018, 1, 30, 8)
+entra = dt.datetime(2018, 2, 1, 8 , 10)
 
-sai = dt.datetime(2018, 1, 29, 21, 30)
+#sai = dt.datetime(2018, 1, 29, 21, 30)
 
-leave(sai)
+#leave(sai)
 
-#enter(entra)
+enter(entra)
 

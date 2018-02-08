@@ -5,7 +5,7 @@ from os.path import exists
 from bs4 import BeautifulSoup as soup
 from selenium.webdriver.common.by import By
 
-from analise.functions import *
+from sistemas.functions import *
 
 
 def save_source(browser, df, path, start, end):

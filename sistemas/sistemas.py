@@ -2,8 +2,8 @@ from time import sleep
 
 from selenium.webdriver.common.keys import Keys
 
-import analise.functions as func
-from analise.locators import *
+import sistemas.functions as func
+from sistemas.locators import *
 from sei.base import Page
 
 USER = 'rsilva'

@@ -435,12 +435,12 @@ if __name__ == 'main':
     main(sys.argv[1])
 
 
-driver = webdriver.Chrome()
+driver = webdriver.Firefox()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-sei.expedir_bloco(82886)
+sei.expedir_bloco(83389)
 
-sei.expedir_bloco(82962)
+sei.expedir_bloco(83501)
 
 sei.close()

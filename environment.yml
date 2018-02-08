@@ -1,0 +1,29 @@
+name: automation
+dependencies:
+    certifi:         2018.1.18-py36_0
+    click:           6.7-py36hec8c647_0
+    comtypes:        1.1.4-py36_0
+    flask:           0.12.2-py36h98b5e8f_0
+    icc_rt:          2017.0.4-h97af966_0
+    intel-openmp:    2018.0.0-hd92c6cd_8
+    itsdangerous:    0.24-py36hb6c5a24_1
+    jinja2:          2.10-py36h292fed1_0
+    markupsafe:      1.0-py36h0e26971_1
+    mkl:             2018.0.1-h2108138_4
+    numpy:           1.14.0-py36h4a99626_1
+    pandas:          0.22.0-py36h6538335_0
+    pip:             9.0.1-py36h226ae91_4
+    python:          3.6.4-h6538335_1
+    python-dateutil: 2.6.1-py36h509ddcb_1
+    pytz:            2017.3-py36h1d3fa6b_0
+    pywin32:         222-py36hfa6e2cd_0
+    selenium:        3.8.1-py36_0
+    setuptools:      38.4.0-py36_0
+    six:             1.11.0-py36h4db2310_1
+    unidecode:       0.04.21-py36_0
+    vc:              14-h0510ff6_3
+    vs2015_runtime:  14.0.25123-3
+    werkzeug:        0.14.1-py36_0
+    wheel:           0.30.0-py36h6c3ec14_1
+    wincertstore:    0.2-py36h7fe50ca_0
+    xlwings:         0.11.5-py36_0

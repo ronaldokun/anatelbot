@@ -7,9 +7,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
+from base import Page
 from sei import functions as func
 from sei import locators
-from sei.base import Page
 
 servicos = ('Outorga: Rádio do Cidadão',
             'Outorga: Radioamador',

@@ -1,7 +1,5 @@
 __author__ = 'dag'
 
-import re
-
 from win32com.client import Dispatch
 
 

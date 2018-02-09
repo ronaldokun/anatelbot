@@ -8,8 +8,6 @@ Created on Thu Aug 24 23:14:09 2017
 import re
 from time import sleep
 
-from random import randint
-
 from bs4 import BeautifulSoup as soup
 # INITIALIZE DRIVER
 from selenium import webdriver
@@ -20,7 +18,7 @@ from selenium.webdriver.common.keys import Keys
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
-from sei.base import Page
+from base import Page
 from sei.locators import (Base, Bloco, Envio, LatMenu, Blocos, Login,
                           Main, Processo, Central)
 

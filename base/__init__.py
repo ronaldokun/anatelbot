@@ -16,6 +16,6 @@ from selenium.common.exceptions import TimeoutException, \
 # Other modules
 from bs4 import BeautifulSoup as Soup
 
-__all__ = ['wd', 'ec', 'WebdriverWait', 'ActionChains',
+__all__ = ['selenium','webdriver', 'ec', 'WebDriverWait', 'ActionChains',
            'By', 'Select', 'TimeoutException',
            'WebDriverException', 'Soup']

@@ -8,6 +8,8 @@ Created on Mon Aug 28 20:44:15 2017
 
 from contextlib import contextmanager
 
+from __main__ import *
+
 # Base Class
 class Page(object):
     """
@@ -19,9 +21,14 @@ class Page(object):
 
     def __init__(self, driver):
         """ Initializes the webdriver and the timeout"""
-        if not isinstance(driver, webdriver):
-            raise TypeError("The object {0} must be of type{1}".format(driver, type(webdriver)))
-        self.driver = driver
+        try:
+
+            self.driver = driver
+
+        except TypeError:
+
+            print("The object {0} must be of type{1}".format(driver, type(base.webdriver)))
+
 
     def __enter__(self):
         """ Implementation class """
@@ -36,17 +43,17 @@ class Page(object):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name('title')
         yield
-        WebDriverWait(self.driver, timeout).until(
-            ec.staleness_of(old_page))
+        base.WebDriverWait(self.driver, timeout).until(
+            base.ec.staleness_of(old_page))
 
     def alert_is_present(self, timeout=timeout):
 
         try:
 
-            alert = WebDriverWait(self.driver, timeout).until(
-                ec.alert_is_present())
+            alert = base.WebDriverWait(self.driver, timeout).until(
+                base.ec.alert_is_present())
 
-        except (TimeoutException, WebDriverException):
+        except (base.TimeoutException, base.WebDriverException):
 
             return False
 
@@ -62,10 +69,10 @@ class Page(object):
         """
         try:
 
-            WebDriverWait(self.driver, timeout).until(
-                ec.visibility_of_element_located(*locator))
+            base.WebDriverWait(self.driver, timeout).until(
+                base.ec.visibility_of_element_located(*locator))
 
-        except TimeoutException:
+        except base.TimeoutException:
             return False
 
         return True
@@ -84,28 +91,28 @@ class Page(object):
 
     def hover(self, *locator):
         element = self.find_element(*locator)
-        hover = ActionChains(self.driver).move_to_element(element)
+        hover = base.ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
     def check_element_exists(self, *locator):
         try:
             self.wait_for_element(*locator)
-        except TimeoutException:
+        except base.TimeoutException:
             return False
         return True
 
     def wait_for_element_to_be_visible(self, *locator, timeout=timeout):
-        return WebDriverWait(self.driver, timeout).until(
-            ec.visibility_of_element_located(*locator))
+        return base.WebDriverWait(self.driver, timeout).until(
+            base.ec.visibility_of_element_located(*locator))
 
     def wait_for_element(self, *locator, timeout=timeout):
-        return WebDriverWait(self.driver, timeout).until(
-            ec.presence_of_element_located(*locator))
+        return base.WebDriverWait(self.driver, timeout).until(
+            base.ec.presence_of_element_located(*locator))
 
     def wait_for_element_to_click(self, *locator, timeout=timeout):
-        return WebDriverWait(self.driver, timeout).until(
-            ec.element_to_be_clickable(*locator))
+        return base.WebDriverWait(self.driver, timeout).until(
+            base.ec.element_to_be_clickable(*locator))
 
     def wait_for_new_window(self, timeout=timeout):
-        return WebDriverWait(self.driver, timeout).until(
-            ec.number_of_windows_to_be(2))
+        return base.WebDriverWait(self.driver, timeout).until(
+            base.ec.number_of_windows_to_be(2))

@@ -8,25 +8,19 @@ Created on Mon Aug 28 20:44:15 2017
 
 from contextlib import contextmanager
 
-# Exceptions
-from selenium.common.exceptions import TimeoutException, WebDriverException
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support import expected_conditions as ec
-# WAIT AND CONDITIONS METHODS
-from selenium.webdriver.support.ui import WebDriverWait
-
-
+# Base Class
 class Page(object):
-    """Page Class Object with common navigation functions"""
+    """
+    This Base Class implements common Selenium Webdriver
+    navigation methods
+    """
 
     timeout = 30
 
     def __init__(self, driver):
-        # noinspection SpellCheckingInspection
         """ Initializes the webdriver and the timeout"""
-        # if type(driver) != type(webdriver):
-        #     raise TypeError("The object {0} must be of type{1}".format(driver,
-        #                     type(webdriver)))
+        if not isinstance(driver, webdriver):
+            raise TypeError("The object {0} must be of type{1}".format(driver, type(webdriver)))
         self.driver = driver
 
     def __enter__(self):
@@ -38,14 +32,14 @@ class Page(object):
         self.driver.close()
 
     @contextmanager
-    def wait_for_page_load(self):
+    def wait_for_page_load(self, timeout=timeout):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name('title')
         yield
-        WebDriverWait(self.driver, self.timeout).until(
+        WebDriverWait(self.driver, timeout).until(
             ec.staleness_of(old_page))
 
-    def alert_is_present(self, timeout=5):
+    def alert_is_present(self, timeout=timeout):
 
         try:
 
@@ -70,6 +64,7 @@ class Page(object):
 
             WebDriverWait(self.driver, timeout).until(
                 ec.visibility_of_element_located(*locator))
+
         except TimeoutException:
             return False
 

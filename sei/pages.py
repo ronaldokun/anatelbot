@@ -1,13 +1,10 @@
+# modules only
 import re
 
 import unidecode
-from bs4 import BeautifulSoup as Soup
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
 
 from base import Page
+
 from sei import functions as func
 from sei import locators
 

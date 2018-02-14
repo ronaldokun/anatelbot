@@ -11,10 +11,10 @@ import os
 import re
 from time import sleep
 
+from locators import Boleto, Sec, Entidade, Scpx, Scra, Slmm, Slma, Sigec
 from selenium.webdriver.common.keys import Keys
 
-from base import Page
-from sistemas.locators import Boleto, Sec, Entidade, Scpx, Scra, Slmm, Slma, Sigec
+from page import Page
 
 os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
 

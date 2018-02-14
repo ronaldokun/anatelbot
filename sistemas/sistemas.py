@@ -3,7 +3,7 @@ from time import sleep
 from selenium.webdriver.common.keys import Keys
 
 import sistemas.functions as func
-from base import Page
+from page import Page
 from sistemas.locators import *
 
 USER = 'rsilva'

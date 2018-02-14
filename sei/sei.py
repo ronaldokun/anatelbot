@@ -3,15 +3,17 @@ import re
 
 import unidecode
 
-from base import Page
-
-from sei import functions as func
+from page import *
+from page.page import Page
+from sei import functions
 from sei import locators
+from sei.functions import pode_expedir
 
-servicos = ('Outorga: Rádio do Cidadão',
-            'Outorga: Radioamador',
-            'Outorga: Limitado Móvel Aeronáutico',
-            'Outorga: Limitado Móvel Marítimo')
+_servicos = ('Outorga: Rádio do Cidadão',
+             'Outorga: Radioamador',
+             'Outorga: Limitado Móvel Aeronáutico',
+             'Outorga: Limitado Móvel Marítimo')
+
 
 def login_sei(driver, usr, pwd):
     """
@@ -20,12 +22,12 @@ def login_sei(driver, usr, pwd):
     SEI. 
     """
 
-    page = Page(driver)
-    page.driver.get(locators.Login.URL)
+    browser = Page(driver)
+    browser.driver.get(locators.Login.URL)
     # page.driver.maximize_window()
 
-    usuario = page.wait_for_element_to_click(locators.Login.LOG)
-    senha = page.wait_for_element_to_click(locators.Login.PWD)
+    usuario = browser.wait_for_element_to_click(locators.Login.LOG)
+    senha = browser.wait_for_element_to_click(locators.Login.PWD)
 
     # Clear any clutter on the form
     usuario.clear()
@@ -37,7 +39,7 @@ def login_sei(driver, usr, pwd):
     # Hit Enter
     senha.send_keys(Keys.RETURN)
 
-    return Sei(page.driver)
+    return Sei(browser.driver)
 
 
 class Sei(Page):
@@ -45,6 +47,7 @@ class Sei(Page):
     Esta subclasse da classe Page define métodos de execução de ações na
     página principal do SEI e de resgate de informações
     """
+
     def __init__(self, driver):
         super().__init__(driver)
         self._processos = {}
@@ -59,11 +62,11 @@ class Sei(Page):
 
     def get_processos(self):
         return self._processos
-        
+
     def _set_processos(self, processos):
         self._processos = {p['numero']: p for p in processos}
 
-    def _filtra_processos(self, processos, servicos=servicos):
+    def filtra_processos(self, processos, servicos=_servicos):
         self._processos = {k: v for k, v in processos.items() if v.get('tipo') in servicos}
 
     def cria_processo(self, num, tags=None):
@@ -143,18 +146,25 @@ class Sei(Page):
         paginas = [pag.text for pag in contador.options]
 
         for pag in paginas:
-
             # One simple repetition to avoid more complex code
             contador = Select(self.wait_for_element(locators.Main.CONT))
             contador.select_by_visible_text(pag)
             html_sei = Soup(self.driver.page_source, "lxml")
             processos += html_sei("tr", {"class": 'infraTrClara'})
 
-        processos = [func.armazena_tags(
-                    [tag for tag in line.contents if tag != '\n'])
-                     for line in processos]
+        processos = [functions.armazena_tags(
+            [tag for tag in line.contents if tag != '\n'])
+            for line in processos]
 
         self._set_processos(processos)
+
+    def atualiza_elemento(self, elem_id, dado):
+
+        elem = self.wait_for_element(elem_id)
+
+        elem.clear()
+
+        elem.send_keys(dado)
 
     def contatos_cadastrados(self, nome):
 
@@ -171,7 +181,6 @@ class Sei(Page):
 
         self.wait_for_page_load()
 
-
         # if not self.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
 
         self.wait_for_element_to_be_visible((By.XPATH, "//*[contains(text(), nome)]"))
@@ -181,14 +190,6 @@ class Sei(Page):
         tags = html.find_all('tr', class_='infraTrClara')
 
         return (len(tags), tags) if tags else (0, None)
-
-    def atualiza_elemento(self, id, dado):
-
-        elem = self.wait_for_element(id)
-
-        elem.clear()
-
-        elem.send_keys(dado)
 
     def atualizar_contato(self, link, dados):
 
@@ -256,7 +257,7 @@ class Sei(Page):
         link = tag.a.attrs['href']
 
         self.go(link)
-    
+
 
 class Processo(Sei):
 
@@ -270,7 +271,6 @@ class Processo(Sei):
         self.driver.close()
 
     def info_oficio(self, num_doc):
-
         assert self.get_title() == locators.Processo.TITLE, \
             "Erro ao navegar para o processo"
 
@@ -290,7 +290,6 @@ class Processo(Sei):
             return info
 
     def acoes_oficio(self):
-
         assert self.get_title() == locators.Processo.TITLE, \
             "Erro ao navegar para o processo"
 
@@ -308,7 +307,6 @@ class Processo(Sei):
         return buttons
 
     def atualiza_andamento(self, buttons, info):
-
         assert self.get_title() == locators.Processo.TITLE, \
             "Erro ao navegar para o processo"
 
@@ -316,7 +314,7 @@ class Processo(Sei):
 
         link = locators.Base.URL + andamento.attrs['href']
 
-        (proc_window, and_window) = func.nav_link_to_new_win(self.driver, link)
+        (proc_window, and_window) = Page.nav_link_to_new_win(self.driver, link)
 
         input_and = self.wait_for_element(locators.Central.IN_AND)
 
@@ -331,9 +329,7 @@ class Processo(Sei):
         self.driver.switch_to_window(proc_window)
 
     def enviar_processo_sede(self, buttons):
-
         with self.wait_for_page_load():
-
             assert self.get_title() == locators.Processo.TITLE, \
                 "Erro na função 'enviar_processo_sede"
 
@@ -341,11 +337,10 @@ class Processo(Sei):
 
             link = locators.Base.URL + enviar.attrs["href"]
 
-            (janela_processo, janela_enviar) = func.nav_link_to_new_win(
+            (janela_processo, janela_enviar) = Page.nav_link_to_new_win(
                 self.driver, link)
 
         with self.wait_for_page_load():
-
             assert self.get_title() == locators.Envio.TITLE, \
                 "Erro ao clicar no botão 'Enviar Processo'"
 
@@ -403,7 +398,6 @@ class Processo(Sei):
         self.driver.switch_to_window(janela_processo)
 
     def expedir_oficio(self, num_doc):
-
         info = self.info_oficio(num_doc)
 
         # self.driver.switch_to_window(self.window)
@@ -420,13 +414,13 @@ class Processo(Sei):
         if self.tags.get('anotacao'):
             link = self.tags.get('anotacao_link')
 
-            (main, new) = func.nav_link_to_new_win(self.driver, link)
+            (main, new) = Page.nav_link_to_new_win(self.driver, link)
 
-            postit = self.wait_for_element(Central.IN_POSTIT)
+            postit = self.wait_for_element(locators.Central.IN_POSTIT)
 
             postit.clear()
 
-            btn = self.wait_for_element_to_click(Central.BT_POSTIT)
+            btn = self.wait_for_element_to_click(locators.Central.BT_POSTIT)
 
             btn.click()
 
@@ -437,3 +431,116 @@ class Processo(Sei):
             self.tags['anotacao'] = ''
 
         # if self.tags.get('marcador'):
+
+
+def cria_processo(Sei, tipo, desc='', inter='', nivel='público'):
+    tipo = str(tipo)
+
+    assert tipo in loc.Tipos.PROCS, \
+        print("O tipo de processo digitado {0}, não é válido".format(str(tipo)))
+
+    Sei.exibir_menu_lateral()
+
+    init_proc = Sei.wait_for_element_to_click(loc.LatMenu.INIT_PROC)
+
+    init_proc.click()
+
+    filtro = Sei.wait_for_element_to_click(loc.Tipos.FILTRO)
+
+    filtro.send_keys(tipo)
+
+    # exibe_todos = Sei.wait_for_element_to_click(loc.Tipos.EXIBE_ALL)
+
+    # exibe_todos.click()
+
+    # select = Select(Sei.wait_for_element(loc.Tipos.SL_TIP_PROC))
+
+    tipo = Sei.wait_for_element_to_click((By.LINK_TEXT, tipo))
+
+    tipo.click()
+
+    if desc:
+        espec = Sei.wait_for_element(loc.Processo.ESPEC)
+
+        espec.send_keys(desc)
+
+    if inter:
+        Sei.cadastrar_interessado(inter)
+        Sei.consultar_contato(inter)
+
+    if nivel == 'público':
+
+        nivel = Sei.wait_for_element(loc.Processo.PUBL)
+
+    elif nivel == 'restrito':
+
+        nivel = Sei.wait_for_element(loc.Processo.REST)
+
+    else:
+
+        nivel = Sei.wait_for_element(loc.Processo.SIG)
+
+    nivel.click()
+
+
+def exibir_bloco(Sei, numero):
+    if Sei.get_title() != loc.Blocos.TITLE:
+        Sei.go_to_blocos()
+
+    try:
+        Sei.wait_for_element((By.LINK_TEXT, str(numero))).click()
+
+    except:
+        print("O Bloco de Assinatura informado não existe ou está \
+              concluído!")
+
+
+def armazena_bloco(Sei, numero):
+    if Sei.get_title() != loc.Bloco.TITLE + " " + str(numero):
+        Sei.exibir_bloco(numero)
+
+    html_bloco = Soup(Sei.driver.page_source, "lxml")
+    linhas = html_bloco.find_all(
+        "tr", class_=['infraTrClara', 'infraTrEscura'])
+
+    chaves = ['checkbox', 'seq', "processo", 'documento', 'data', 'tipo',
+              'assinatura', 'anotacoes', 'acoes']
+
+    lista_processos = []
+
+    for linha in linhas:
+
+        proc = {k: None for k in chaves}
+
+        cols = [v for v in linha.contents if v != "\n"]
+
+        assert len(chaves) == len(cols), "Verifique as linhas do bloco!"
+
+        for k, v in zip(chaves, cols):
+            proc[k] = v
+
+        # proc["expedido"] = False
+
+        lista_processos.append(proc)
+
+    return lista_processos
+
+
+def expedir_bloco(Sei, numero):
+    processos = Sei.armazena_bloco(numero)
+
+    for p in processos:
+
+        if pode_expedir(p):
+            proc = p['processo'].a.string
+
+            num_doc = p['documento'].a.string
+
+            link = Sei.go(p['processo'].a.attrs['href'])
+
+            (bloco_window, proc_window) = nav_link_to_new_win(
+                Sei.driver, link)
+
+            processo = Processo(Sei.driver, proc_window)
+
+            processo.expedir_oficio(proc, num_doc, link)

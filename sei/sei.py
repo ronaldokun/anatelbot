@@ -7,7 +7,6 @@ from page import *
 from page.page import Page
 from sei import functions
 from sei import locators
-from sei.functions import pode_expedir
 
 _servicos = ('Outorga: Rádio do Cidadão',
              'Outorga: Radioamador',

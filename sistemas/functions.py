@@ -14,7 +14,7 @@ from time import sleep
 from locators import Boleto, Sec, Entidade, Scpx, Scra, Slmm, Slma, Sigec
 from selenium.webdriver.common.keys import Keys
 
-from page import Page
+from page.page import Page
 
 os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
 

@@ -2,9 +2,9 @@ from time import sleep
 
 from selenium.webdriver.common.keys import Keys
 
-import sistemas.functions as func
-from page import Page
-from sistemas.locators import *
+import functions as func
+from page.page import Page
+from locators import *
 
 USER = 'rsilva'
 PASS = 'Savorthemom3nts'

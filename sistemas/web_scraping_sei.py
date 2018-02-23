@@ -19,8 +19,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
 from page.page import Page
-from sei.locators import (Base, Bloco, Envio, LatMenu, Blocos, Login,
-                          Main, Processo, Central)
+from sei._locators import (Base, Bloco, Envio, LatMenu, Blocos, Login,
+                           Main, Processo, Central)
 
 
 class LoginPage(Page):
@@ -219,7 +219,7 @@ class PagInicial(Page):
 
         self.driver.switch_to_window(main_window)
 
-        sleep(60)
+        #sleep(60)
 
     def enviar_processo_sede(self, buttons):
 
@@ -442,12 +442,10 @@ driver = webdriver.Chrome()
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
 
-sei.expedir_bloco(84623)
+sei.expedir_bloco(84888)
 
-sei.expedir_bloco(84670)
+sei.expedir_bloco(84951)
 
-sei.expedir_bloco(84692)
-
-sei.expedir_bloco(84757)
+#sei.expedir_bloco(85118)
 
 sei.close()

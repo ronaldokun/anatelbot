@@ -8,15 +8,13 @@ Created on Mon Aug 28 20:44:15 2017
 
 from contextlib import contextmanager
 
-from selenium.webdriver.common.keys import Keys
-
 import page
 
 
 # Base Class
 class Page(object):
     """
-    This Base Class implements common Selenium Webdriver
+    This Base Class implements common Seslenium Webdriver
     navigation methods
     """
 

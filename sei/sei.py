@@ -5,10 +5,10 @@ import unidecode
 
 from page import *
 from page.page import Page
-from sei import functions
-from sei import locators
+from sei import _functions
+from sei import _locators
 
-_servicos = ('Outorga: Rádio do Cidadão',
+SERVICOS = ('Outorga: Rádio do Cidadão',
              'Outorga: Radioamador',
              'Outorga: Limitado Móvel Aeronáutico',
              'Outorga: Limitado Móvel Marítimo')
@@ -22,11 +22,11 @@ def login_sei(driver, usr, pwd):
     """
 
     browser = Page(driver)
-    browser.driver.get(locators.Login.URL)
+    browser.driver.get(_locators.Login.URL)
     # page.driver.maximize_window()
 
-    usuario = browser.wait_for_element_to_click(locators.Login.LOG)
-    senha = browser.wait_for_element_to_click(locators.Login.PWD)
+    usuario = browser.wait_for_element_to_click(_locators.Login.LOG)
+    senha = browser.wait_for_element_to_click(_locators.Login.PWD)
 
     # Clear any clutter on the form
     usuario.clear()
@@ -55,7 +55,7 @@ class Sei(Page):
         """ Simplifies the navigation of href pages on sei.anatel.gov.br
         by pre-appending the required prefix NAV_URL
        """
-        link = locators.Base.URL + link
+        link = _locators.Base.URL + link
 
         self.driver.get(link)
 
@@ -65,18 +65,18 @@ class Sei(Page):
     def _set_processos(self, processos):
         self._processos = {p['numero']: p for p in processos}
 
-    def filtra_processos(self, processos, servicos=_servicos):
+    def filter_processos(self, processos, servicos=SERVICOS):
         self._processos = {k: v for k, v in processos.items() if v.get('tipo') in servicos}
 
-    def cria_processo(self, num, tags=None):
+    def create_processo(self, num, tags=None):
         return Processo(self.driver, num, tags)
 
-    def ver_proc_detalhado(self):
+    def see_detailed(self):
         """
         Expands the visualization from the main page in SEI
         """
         try:
-            ver_todos = self.wait_for_element_to_click(locators.Main.ATR)
+            ver_todos = self.wait_for_element_to_click(_locators.Main.ATR)
 
             if ver_todos.text == "Ver todos os processos":
                 ver_todos.click()
@@ -89,7 +89,7 @@ class Sei(Page):
         try:
 
             visual_detalhado = self.wait_for_element_to_click(
-                locators.Main.VISUAL)
+                _locators.Main.VISUAL)
 
             if visual_detalhado.text == "Visualização detalhada":
                 visual_detalhado.click()
@@ -99,27 +99,27 @@ class Sei(Page):
             print("A página não carregou no tempo limite ou cheque o link\
             de visualização detalhada")
 
-    def is_pagina_inicial(self):
+    def is_init_page(self):
         """Retorna True se a página estiver na página inicial do SEI, False
         caso contrário"""
-        return self.get_title() == locators.Main.TITLE
+        return self.get_title() == _locators.Main.TITLE
 
-    def go_to_initial_page(self):
+    def go_to_init_page(self):
         """
         Navega até a página inicial do SEI caso já esteja nela
         a página é recarregada
         Assume que o link está presente em qualquer subpágina do SEI
         """
         self.wait_for_element_to_click(
-            locators.Base.INIT).click()
+            _locators.Base.INIT).click()
 
-    def exibir_menu_lateral(self):
+    def show_lat_menu(self):
         """
         Exibe o Menu Lateral á Esquerda no SEI para acessos aos seus diversos
         links
         Assume que o link está presente em qualquer subpágina do SEI
         """
-        menu = self.wait_for_element(locators.Base.MENU)
+        menu = self.wait_for_element(_locators.Base.MENU)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -134,30 +134,30 @@ class Sei(Page):
         processos = []
 
         # assegura que está inicial
-        if not self.is_pagina_inicial():
-            self.go_to_initial_page()
+        if not self.is_init_page():
+            self.go_to_init_page()
 
         # Mostra página com informações detalhadas
-        self.ver_proc_detalhado()
+        self.see_detailed()
 
-        contador = Select(self.wait_for_element(locators.Main.CONT))
+        contador = Select(self.wait_for_element(_locators.Main.CONT))
 
         paginas = [pag.text for pag in contador.options]
 
         for pag in paginas:
             # One simple repetition to avoid more complex code
-            contador = Select(self.wait_for_element(locators.Main.CONT))
+            contador = Select(self.wait_for_element(_locators.Main.CONT))
             contador.select_by_visible_text(pag)
             html_sei = Soup(self.driver.page_source, "lxml")
             processos += html_sei("tr", {"class": 'infraTrClara'})
 
-        processos = [functions.armazena_tags(
+        processos = [_functions.armazena_tags(
             [tag for tag in line.contents if tag != '\n'])
             for line in processos]
 
         self._set_processos(processos)
 
-    def atualiza_elemento(self, elem_id, dado):
+    def update_elem(self, elem_id, dado):
 
         elem = self.wait_for_element(elem_id)
 
@@ -165,14 +165,15 @@ class Sei(Page):
 
         elem.send_keys(dado)
 
-    def contatos_cadastrados(self, nome):
+    # noinspection PyProtectedMember
+    def see_contacts(self, nome):
 
         nome = unidecode._unidecode(nome)
 
-        if self.get_title() != locators.Contato.TITLE:
-            self.ir_pagina_contato()
+        if self.get_title() != _locators.Contato.TITLE:
+            self.go_to_contact_page()
 
-        contato = self.wait_for_element_to_click(locators.Tipos.CONTATO)
+        contato = self.wait_for_element_to_click(_locators.Tipos.CONTATO)
 
         contato.clear()
 
@@ -190,61 +191,61 @@ class Sei(Page):
 
         return (len(tags), tags) if tags else (0, None)
 
-    def atualizar_contato(self, link, dados):
+    def update_contacts(self, link, dados):
 
         self.go(link)
 
-        tipo = Select(self.wait_for_element_to_be_visible(locators.Contato.TIPO))
+        tipo = Select(self.wait_for_element_to_be_visible(_locators.Contato.TIPO))
 
         tipo.select_by_visible_text("Pessoa Física")
 
-        self.wait_for_element_to_click(locators.Contato.PF).click()
+        self.wait_for_element_to_click(_locators.Contato.PF).click()
 
-        self.atualiza_elemento(locators.Contato.SIGLA, dados['CPF'])
+        self.update_elem(_locators.Contato.SIGLA, dados['CPF'])
 
         if dados['SEXO'] == 'MASCULINO':
 
-            self.wait_for_element_to_click(locators.Contato.MASCULINO).click()
+            self.wait_for_element_to_click(_locators.Contato.MASCULINO).click()
 
         elif dados['SEXO'] == 'FEMININO':
 
-            self.wait_for_element_to_click(locators.Contato.FEMININO).click()
+            self.wait_for_element_to_click(_locators.Contato.FEMININO).click()
 
-        self.atualiza_elemento(locators.Contato.NOME, dados['NOME'])
+        self.update_elem(_locators.Contato.NOME, dados['NOME'])
 
-        self.atualiza_elemento(locators.Contato.END, dados['ENDERECO'] + ' ' + dados['NUM'])
+        self.update_elem(_locators.Contato.END, dados['ENDERECO'] + ' ' + dados['NUM'])
 
-        self.atualiza_elemento(locators.Contato.COMP, dados['COMP'])
+        self.update_elem(_locators.Contato.COMP, dados['COMP'])
 
-        self.atualiza_elemento(locators.Contato.BAIRRO, dados['BAIRRO'])
+        self.update_elem(_locators.Contato.BAIRRO, dados['BAIRRO'])
 
-        uf = Select(self.wait_for_element(locators.Contato.UF))
+        uf = Select(self.wait_for_element(_locators.Contato.UF))
 
         uf.select_by_visible_text(dados['UF'])
 
-        cidade = Select(self.wait_for_element_to_be_visible(locators.Contato.CIDADE))
+        cidade = Select(self.wait_for_element_to_be_visible(_locators.Contato.CIDADE))
 
         cidade.select_by_visible_text(dados["CIDADE"])
 
-        self.atualiza_elemento(locators.Contato.CEP, dados['CEP'])
+        self.update_elem(_locators.Contato.CEP, dados['CEP'])
 
-        self.atualiza_elemento(locators.Contato.CPF, dados['CPF'])
+        self.update_elem(_locators.Contato.CPF, dados['CPF'])
 
-        self.atualiza_elemento(locators.Contato.RG, dados['RG'])
+        self.update_elem(_locators.Contato.RG, dados['RG'])
 
-        self.atualiza_elemento(locators.Contato.ORG, dados['ORG'])
+        self.update_elem(_locators.Contato.ORG, dados['ORG'])
 
-        self.atualiza_elemento(locators.Contato.NASC, dados['NASC'])
+        self.update_elem(_locators.Contato.NASC, dados['NASC'])
 
-        self.atualiza_elemento(locators.Contato.FONE, dados['FONE'])
+        self.update_elem(_locators.Contato.FONE, dados['FONE'])
 
-        self.atualiza_elemento(locators.Contato.CEL, dados['CEL'])
+        self.update_elem(_locators.Contato.CEL, dados['CEL'])
 
-        self.atualiza_elemento(locators.Contato.EMAIL, dados['EMAIL'])
+        self.update_elem(_locators.Contato.EMAIL, dados['EMAIL'])
 
-        self.wait_for_element_to_click(locators.Contato.SALVAR).click()
+        self.wait_for_element_to_click(_locators.Contato.SALVAR).click()
 
-    def ir_pagina_contato(self):
+    def go_to_contact_page(self):
 
         html = Soup(self.driver.page_source, 'lxml')
 
@@ -257,6 +258,56 @@ class Sei(Page):
 
         self.go(link)
 
+    def cria_processo(self, tipo, desc='', inter='', nivel='público'):
+
+        tipo = str(tipo)
+
+        assert tipo in _locators.Tipos.PROCS, \
+            print("O tipo de processo digitado {0}, não é válido".format(str(tipo)))
+
+        self.show_lat_menu()
+
+        init_proc = self.wait_for_element_to_click(_locators.LatMenu.INIT_PROC)
+
+        init_proc.click()
+
+        filtro = self.wait_for_element_to_click(_locators.Tipos.FILTRO)
+
+        filtro.send_keys(tipo)
+
+        # exibe_todos = Sei.wait_for_element_to_click(loc.Tipos.EXIBE_ALL)
+
+        # exibe_todos.click()
+
+        # select = Select(Sei.wait_for_element(loc.Tipos.SL_TIP_PROC))
+
+        tipo = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
+
+        tipo.click()
+
+        if desc:
+            espec = self.wait_for_element(_locators.Processo.ESPEC)
+
+            espec.send_keys(desc)
+
+        if inter:
+            self.cadastrar_interessado(inter)
+            self.consultar_contato(inter)
+
+        if nivel == 'público':
+
+            nivel = self.wait_for_element(_locators.Processo.PUBL)
+
+        elif nivel == 'restrito':
+
+            nivel = self.wait_for_element(_locators.Processo.REST)
+
+        else:
+
+            nivel = self.wait_for_element(_locators.Processo.SIG)
+
+        nivel.click()
+
 
 class Processo(Sei):
 
@@ -266,11 +317,14 @@ class Processo(Sei):
         self.tags = tags
         self.tree = {}
 
-    def fecha_processo_atual(self):
+    def get_tags(self):
+        return self.tags
+
+    def close_processo(self):
         self.driver.close()
 
     def info_oficio(self, num_doc):
-        assert self.get_title() == locators.Processo.TITLE, \
+        assert self.get_title() == _locators.Processo.TITLE, \
             "Erro ao navegar para o processo"
 
         # Switch to tree frame
@@ -288,14 +342,14 @@ class Processo(Sei):
 
             return info
 
-    def acoes_oficio(self):
-        assert self.get_title() == locators.Processo.TITLE, \
+    def actions_oficio(self):
+        assert self.get_title() == _locators.Processo.TITLE, \
             "Erro ao navegar para o processo"
 
         # Switch to central frame
         self.driver.switch_to_frame("ifrVisualizacao")
 
-        self.wait_for_element(locators.Central.ACOES)
+        self.wait_for_element(_locators.Central.ACOES)
 
         html_frame = Soup(self.driver.page_source, "lxml")
 
@@ -305,45 +359,45 @@ class Processo(Sei):
 
         return buttons
 
-    def atualiza_andamento(self, buttons, info):
-        assert self.get_title() == locators.Processo.TITLE, \
+    def update_andamento(self, buttons, info):
+        assert self.get_title() == _locators.Processo.TITLE, \
             "Erro ao navegar para o processo"
 
         andamento = buttons[4]
 
-        link = locators.Base.URL + andamento.attrs['href']
+        link = _locators.Base.URL + andamento.attrs['href']
 
         (proc_window, and_window) = Page.nav_link_to_new_win(self.driver, link)
 
-        input_and = self.wait_for_element(locators.Central.IN_AND)
+        input_and = self.wait_for_element(_locators.Central.IN_AND)
 
-        text = locators.Central.AND_PRE + info + locators.Central.AND_POS
+        text = _locators.Central.AND_PRE + info + _locators.Central.AND_POS
 
         input_and.send_keys(text)
 
-        self.wait_for_element_to_click(locators.Central.SV_AND).click()
+        self.wait_for_element_to_click(_locators.Central.SV_AND).click()
 
         self.driver.close()
 
         self.driver.switch_to_window(proc_window)
 
-    def enviar_processo_sede(self, buttons):
+    def send_proc_to_sede(self, buttons):
         with self.wait_for_page_load():
-            assert self.get_title() == locators.Processo.TITLE, \
-                "Erro na função 'enviar_processo_sede"
+            assert self.get_title() == _locators.Processo.TITLE, \
+                "Erro na função 'send_proc_to_sede"
 
             enviar = buttons[3]
 
-            link = locators.Base.URL + enviar.attrs["href"]
+            link = _locators.Base.URL + enviar.attrs["href"]
 
             (janela_processo, janela_enviar) = Page.nav_link_to_new_win(
                 self.driver, link)
 
         with self.wait_for_page_load():
-            assert self.get_title() == locators.Envio.TITLE, \
+            assert self.get_title() == _locators.Envio.TITLE, \
                 "Erro ao clicar no botão 'Enviar Processo'"
 
-            self.driver.execute_script(locators.Envio.LUPA)
+            self.driver.execute_script(_locators.Envio.LUPA)
 
             # Guarda as janelas do navegador presentes
             windows = self.driver.window_handles
@@ -353,23 +407,23 @@ class Processo(Sei):
             # Troca o foco do navegador
             self.driver.switch_to_window(janela_unidades)
 
-        assert self.get_title() == locators.Envio.UNIDS, \
+        assert self.get_title() == _locators.Envio.UNIDS, \
             "Erro ao clicar na lupa 'Selecionar Unidades'"
 
-        unidade = self.wait_for_element(locators.Envio.IN_SIGLA)
+        unidade = self.wait_for_element(_locators.Envio.IN_SIGLA)
 
         unidade.clear()
 
-        unidade.send_keys(locators.Envio.SIGLA + Keys.RETURN)
+        unidade.send_keys(_locators.Envio.SIGLA + Keys.RETURN)
 
-        sede = self.wait_for_element(locators.Envio.ID_SEDE)
+        sede = self.wait_for_element(_locators.Envio.ID_SEDE)
 
-        assert sede.get_attribute("title") == locators.Envio.SEDE, \
+        assert sede.get_attribute("title") == _locators.Envio.SEDE, \
             "Erro ao selecionar a Unidade Protocolo.Sede para envio"
 
         sede.click()
 
-        self.wait_for_element_to_click(locators.Envio.B_TRSP).click()
+        self.wait_for_element_to_click(_locators.Envio.B_TRSP).click()
 
         # Fecha a janela_unidades
         self.driver.close()
@@ -377,19 +431,19 @@ class Processo(Sei):
         # Troca o foco do navegador
         self.driver.switch_to_window(janela_enviar)
 
-        self.wait_for_element_to_click(locators.Envio.OPEN).click()
+        self.wait_for_element_to_click(_locators.Envio.OPEN).click()
 
-        self.wait_for_element_to_click(locators.Envio.RET_DIAS).click()
+        self.wait_for_element_to_click(_locators.Envio.RET_DIAS).click()
 
-        prazo = self.wait_for_element(locators.Envio.NUM_DIAS)
+        prazo = self.wait_for_element(_locators.Envio.NUM_DIAS)
 
         prazo.clear()
 
-        prazo.send_keys(locators.Envio.PRAZO)
+        prazo.send_keys(_locators.Envio.PRAZO)
 
-        self.wait_for_element_to_click(locators.Envio.UTEIS).click()
+        self.wait_for_element_to_click(_locators.Envio.UTEIS).click()
 
-        self.wait_for_element_to_click(locators.Envio.ENVIAR).click()
+        self.wait_for_element_to_click(_locators.Envio.ENVIAR).click()
 
         # fecha a janela_enviar
         self.driver.close()
@@ -397,29 +451,28 @@ class Processo(Sei):
         self.driver.switch_to_window(janela_processo)
 
     def expedir_oficio(self, num_doc):
+
         info = self.info_oficio(num_doc)
 
-        # self.driver.switch_to_window(self.window)
+        buttons = self.actions_oficio()
 
-        buttons = self.acoes_oficio()
+        self.update_andamento(buttons, info)
 
-        self.atualiza_andamento(buttons, info)
+        self.send_proc_to_sede(buttons)
 
-        self.enviar_processo_sede(buttons)
+    def clean_marcadores(self):
 
-        # self.driver.switch_to_window(main_window)
-
-    def limpar_marcadores(self):
         if self.tags.get('anotacao'):
+
             link = self.tags.get('anotacao_link')
 
             (main, new) = Page.nav_link_to_new_win(self.driver, link)
 
-            postit = self.wait_for_element(locators.Central.IN_POSTIT)
+            postit = self.wait_for_element(_locators.Central.IN_POSTIT)
 
             postit.clear()
 
-            btn = self.wait_for_element_to_click(locators.Central.BT_POSTIT)
+            btn = self.wait_for_element_to_click(_locators.Central.BT_POSTIT)
 
             btn.click()
 
@@ -428,59 +481,6 @@ class Processo(Sei):
             self.driver.switch_to_window(main)
 
             self.tags['anotacao'] = ''
-
-        # if self.tags.get('marcador'):
-
-
-def cria_processo(Sei, tipo, desc='', inter='', nivel='público'):
-    tipo = str(tipo)
-
-    assert tipo in loc.Tipos.PROCS, \
-        print("O tipo de processo digitado {0}, não é válido".format(str(tipo)))
-
-    Sei.exibir_menu_lateral()
-
-    init_proc = Sei.wait_for_element_to_click(loc.LatMenu.INIT_PROC)
-
-    init_proc.click()
-
-    filtro = Sei.wait_for_element_to_click(loc.Tipos.FILTRO)
-
-    filtro.send_keys(tipo)
-
-    # exibe_todos = Sei.wait_for_element_to_click(loc.Tipos.EXIBE_ALL)
-
-    # exibe_todos.click()
-
-    # select = Select(Sei.wait_for_element(loc.Tipos.SL_TIP_PROC))
-
-    tipo = Sei.wait_for_element_to_click((By.LINK_TEXT, tipo))
-
-    tipo.click()
-
-    if desc:
-        espec = Sei.wait_for_element(loc.Processo.ESPEC)
-
-        espec.send_keys(desc)
-
-    if inter:
-        Sei.cadastrar_interessado(inter)
-        Sei.consultar_contato(inter)
-
-    if nivel == 'público':
-
-        nivel = Sei.wait_for_element(loc.Processo.PUBL)
-
-    elif nivel == 'restrito':
-
-        nivel = Sei.wait_for_element(loc.Processo.REST)
-
-    else:
-
-        nivel = Sei.wait_for_element(loc.Processo.SIG)
-
-    nivel.click()
-
 
 def exibir_bloco(Sei, numero):
     if Sei.get_title() != loc.Blocos.TITLE:
@@ -526,6 +526,7 @@ def armazena_bloco(Sei, numero):
 
 
 def expedir_bloco(Sei, numero):
+
     processos = Sei.armazena_bloco(numero)
 
     for p in processos:

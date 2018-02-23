@@ -4,4 +4,4 @@ This Module initialize the current directory to be imported and
 puts all the imports here for a cleaner initialization
 """
 
-#__all__ = ['functions', 'locators']
+all__ = ['sei']

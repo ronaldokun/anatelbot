@@ -80,13 +80,13 @@ def enter(time):
 
         sleep(60 * random.randint(5, 10))
 
-    try:
+    #try:
 
-        import web_scraping_sei
+    #    import web_scraping_sei
 
-    except:
+    #except:
 
-        pass
+    #   pass
 
 
     page = init_browser(webdriver=webdriver.Firefox(), login=USER, senha=PASS)
@@ -115,11 +115,11 @@ def enter(time):
         print("Entered Except Block in Enter")
 
 
-entra = dt.datetime(2018, 2, 21, 8,10)
+entra = dt.datetime(2018, 2, 23, 7, 10)
 
-#sai = dt.datetime(2018, 1, 29, 21, 30)
+sai = dt.datetime(2018, 2, 22, 19, 30)
 
-#leave(sai)
+leave(sai)
 
 enter(entra)
 

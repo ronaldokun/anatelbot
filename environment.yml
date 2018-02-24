@@ -1,29 +1,42 @@
-name: automation
+name: selenium_env
+channels:
+  - defaults
 dependencies:
-    certifi:         2018.1.18-py36_0
-    click:           6.7-py36hec8c647_0
-    comtypes:        1.1.4-py36_0
-    flask:           0.12.2-py36h98b5e8f_0
-    icc_rt:          2017.0.4-h97af966_0
-    intel-openmp:    2018.0.0-hd92c6cd_8
-    itsdangerous:    0.24-py36hb6c5a24_1
-    jinja2:          2.10-py36h292fed1_0
-    markupsafe:      1.0-py36h0e26971_1
-    mkl:             2018.0.1-h2108138_4
-    numpy:           1.14.0-py36h4a99626_1
-    pandas:          0.22.0-py36h6538335_0
-    pip:             9.0.1-py36h226ae91_4
-    python:          3.6.4-h6538335_1
-    python-dateutil: 2.6.1-py36h509ddcb_1
-    pytz:            2017.3-py36h1d3fa6b_0
-    pywin32:         222-py36hfa6e2cd_0
-    selenium:        3.8.1-py36_0
-    setuptools:      38.4.0-py36_0
-    six:             1.11.0-py36h4db2310_1
-    unidecode:       0.04.21-py36_0
-    vc:              14-h0510ff6_3
-    vs2015_runtime:  14.0.25123-3
-    werkzeug:        0.14.1-py36_0
-    wheel:           0.30.0-py36h6c3ec14_1
-    wincertstore:    0.2-py36h7fe50ca_0
-    xlwings:         0.11.5-py36_0
+  - ca-certificates=2017.08.26=h1d4fec5_0
+  - certifi=2018.1.18=py36_0
+  - freetype=2.8=hab7d2ae_1
+  - intel-openmp=2018.0.0=hc7b2577_8
+  - jpeg=9b=h024ee3a_2
+  - libedit=3.1=heed3624_0
+  - libffi=3.2.1=hd88cf55_4
+  - libgcc-ng=7.2.0=h7cc24e2_2
+  - libgfortran-ng=7.2.0=h9f7466a_2
+  - libpng=1.6.34=hb9fc6fc_0
+  - libstdcxx-ng=7.2.0=h7a57d05_2
+  - libtiff=4.0.9=h28f6b97_0
+  - mkl=2018.0.1=h19d6760_4
+  - ncurses=6.0=h9df7e31_2
+  - numpy=1.14.0=py36h3dfced4_1
+  - olefile=0.45.1=py36_0
+  - openssl=1.0.2n=hb7f436b_0
+  - pandas=0.22.0=py36hf484d3e_0
+  - pillow=5.0.0=py36h3deb7b8_0
+  - pip=9.0.1=py36h6c6f9ce_4
+  - python=3.6.4=hc3d631a_1
+  - python-dateutil=2.6.1=py36h88d3b88_1
+  - pytz=2017.3=py36h63b9c63_0
+  - readline=7.0=ha6073c6_4
+  - selenium=3.8.1=py36_0
+  - setuptools=38.4.0=py36_0
+  - six=1.11.0=py36h372c433_1
+  - sqlite=3.22.0=h1bed415_0
+  - tk=8.6.7=hc745277_3
+  - unidecode=0.04.21=py36_0
+  - wheel=0.30.0=py36hfd4bba0_1
+  - xz=5.2.3=h55aa19d_2
+  - zlib=1.2.11=ha838bed_2
+  - pip:
+    - beautifulsoup4==4.6.0
+    - bs4==0.0.1
+prefix: /home/ronaldo/anaconda3/envs/selenium_env
+

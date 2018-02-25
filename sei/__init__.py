@@ -3,5 +3,3 @@
 This Module initialize the current directory to be imported and
 puts all the imports here for a cleaner initialization
 """
-
-all__ = ['sei']

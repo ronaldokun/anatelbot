@@ -2,18 +2,6 @@ name: selenium_env
 channels:
   - defaults
 dependencies:
-  - ca-certificates=2017.08.26=h1d4fec5_0
-  - certifi=2018.1.18=py36_0
-  - freetype=2.8=hab7d2ae_1
-  - intel-openmp=2018.0.0=hc7b2577_8
-  - jpeg=9b=h024ee3a_2
-  - libedit=3.1=heed3624_0
-  - libffi=3.2.1=hd88cf55_4
-  - libgcc-ng=7.2.0=h7cc24e2_2
-  - libgfortran-ng=7.2.0=h9f7466a_2
-  - libpng=1.6.34=hb9fc6fc_0
-  - libstdcxx-ng=7.2.0=h7a57d05_2
-  - libtiff=4.0.9=h28f6b97_0
   - mkl=2018.0.1=h19d6760_4
   - ncurses=6.0=h9df7e31_2
   - numpy=1.14.0=py36h3dfced4_1
@@ -38,5 +26,5 @@ dependencies:
   - pip:
     - beautifulsoup4==4.6.0
     - bs4==0.0.1
-prefix: /home/ronaldo/anaconda3/envs/selenium_env
+
 

@@ -11,7 +11,7 @@ import os
 import re
 from time import sleep
 
-from sistemas.locators import Boleto, Sec, Entidade, Scpx, Scra, Slmm, Slma, Sigec
+from sistemas._locators import Boleto, Sec, Entidade, Scpx, Scra, Slmm, Slma, Sigec
 from selenium.webdriver.common.keys import Keys
 
 from page.page import Page

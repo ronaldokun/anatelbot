@@ -2,8 +2,8 @@ from time import sleep
 
 from page import *
 from page.page import Page
-from sistemas import locators
-from sistemas import functions
+from sistemas import _locators
+from sistemas import _functions
 
 
 class Sis(Page):
@@ -16,13 +16,13 @@ class Sis(Page):
 
         super().__init__(driver)
 
-        functions.init_browser(self.driver, login, senha)
+        _functions.init_browser(self.driver, login, senha)
 
     def _navigate(self, link, ident, id_type):
 
         self.driver.get(link)
 
-        for id in locators.Entidade[id_type]:
+        for id in _locators.Entidade[id_type]:
 
             try:
 
@@ -42,7 +42,7 @@ class Sis(Page):
 
     def consulta(self, ident, serv, id_type):
 
-        ident, serv, id_type, sis = functions.check_input(ident, serv, id_type)
+        ident, serv, id_type, sis = _functions.check_input(ident, serv, id_type)
 
         self._navigate(sis.Consulta, ident, id_type)
 
@@ -81,7 +81,7 @@ class Sis(Page):
         field and commands the print of the boleto
         """
 
-        ident, serv, id_type, sis = functions.check_input(ident, 'boleto', id_type)
+        ident, serv, id_type, sis = _functions.check_input(ident, 'boleto', id_type)
 
         self.driver.get(sis.URL)
 
@@ -111,7 +111,7 @@ class Sis(Page):
 
         date.clear()
 
-        date.send_keys(functions.last_day_of_month() + Keys.RETURN)
+        date.send_keys(_functions.last_day_of_month() + Keys.RETURN)
 
         #
         # try:
@@ -233,9 +233,9 @@ def atualiza_cadastro(page, dados):
 
         # Navigate to page
 
-    page.driver.get(locators.Sec.Ent_Alt)
+    page.driver.get(_locators.Sec.Ent_Alt)
 
-    cpf = page.wait_for_element_to_click(locators.Entidade.cpf)
+    cpf = page.wait_for_element_to_click(_locators.Entidade.cpf)
 
     cpf.send_keys(str(dados['CPF']) + Keys.RETURN)
 
@@ -360,17 +360,17 @@ def consultaSigec(page, ident, tipo='cpf'):
     if tipo == 'cnpj' and len(ident) != 14:
         raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
 
-    page.driver.get(locators.Sigec.consulta)
+    page.driver.get(_locators.Sigec.consulta)
 
     if tipo in ('cpf', 'cnpj'):
 
-        elem = page.wait_for_element_to_click(locators.Sigec.cpf)
+        elem = page.wait_for_element_to_click(_locators.Sigec.cpf)
 
         elem.send_keys(ident + Keys.RETURN)
 
     elif tipo == 'fistel':
 
-        elem = page.wait_for_element_to_click(locators.Sigec.fistel)
+        elem = page.wait_for_element_to_click(_locators.Sigec.fistel)
 
         elem.send_keys(ident + Keys.RETURN)
 

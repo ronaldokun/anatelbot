@@ -267,7 +267,7 @@ class Sei(Page):
 
         self.show_lat_menu()
 
-        init_proc = self.wait_for_element_to_click(_locators.LatMenu.INIT_PROC)
+        init_proc = self.wait_for_element_to_click(_locators.Menu.INIT_PROC)
 
         init_proc.click()
 

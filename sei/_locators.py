@@ -22,6 +22,10 @@ class Login(object):
 
 class Base(object):
 
+    """
+    Esta classe base contém identificadores disponíveis em todas as páginas do SEI
+    """
+
     INIT = (By.ID, "lnkControleProcessos")
 
     MENU = (By.ID, "lnkInfraMenuSistema")
@@ -29,7 +33,7 @@ class Base(object):
     URL = "https://sei.anatel.gov.br/sei/"
 
 
-class LatMenu(object):
+class Menu(object):
     
     CLT_PROC = (By.LINK_TEXT, "Controle de Processos")
     
@@ -75,7 +79,7 @@ class Main(object):
     CONT = (By.ID, "selInfraPaginacaoSuperior")
 
 
-class Blocos(object):
+class PagBlocos(object):
 
     TITLE = "SEI - Blocos de Assinatura"
 

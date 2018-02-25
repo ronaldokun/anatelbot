@@ -9,6 +9,17 @@ import re
 
 import pandas as pd
 
+KEYS = ['processo',
+        'tipo',
+        'atribuicao',
+        'marcador',
+        'anotação',
+        'prioridade',
+        'peticionamento',
+        'aviso',
+        'situacao',
+        'interessado']
+
 
 def pode_expedir(linha):
     """Verifica algumas condições necessárias para expedição do Ofício no SEI
@@ -29,6 +40,24 @@ def pode_expedir(linha):
 
     return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
 
+def tag_mouseover(tag, tipo):
+
+    tag_split = tag.attrs['onmouseover'].split("'")
+
+    if tipo == 'anotacao':
+
+        return ' '.join(tag_split[1:4:2])
+
+    elif tipo == 'situacao':
+
+        return tag_split[1]
+
+    elif tipo == 'marcador':
+
+        return ' '.join(tag_split[1:4:2])
+    else:
+
+        raise ValueError("O tipo de tag repassado não é válido: {}".format(tipo))
 
 def armazena_tags(lista_tags):
     """ Recebe uma lista de tags de cada linha do processo  da página inicial
@@ -45,7 +74,7 @@ def armazena_tags(lista_tags):
 
     controles = lista_tags[1].find_all('a')
 
-    dict_tags['aviso'] = ''
+    dict_tags['aviso'] = ""
 
     for tag_a in controles:
 
@@ -93,128 +122,98 @@ def armazena_tags(lista_tags):
 
     dict_tags['visualizado'] = True if processo.attrs['class'] == 'processoVisualizado' else False
 
-    try:
+    tag = lista_tags[3].find('a')
 
-        dict_tags['atribuicao'] = lista_tags[3].find('a').string
-
-    except:
-
-        dict_tags['atribuicao'] = ''
+    dict_tags['atribuicao'] = tag.string if tag else ''
 
     dict_tags['tipo'] = lista_tags[4].string
 
-    try:
 
-        dict_tags['interessado'] = lista_tags[5].find(
-            class_='spanItemCelula').string
+    tag = lista_tags[5].find(class_='spanItemCelula')
 
-    except:
-
-        dict_tags['interessado'] = ''
+    dict_tags['interessado'] = tag.string if tag else ''
 
     return dict_tags
 
+def tag_controle(tag):
+
+    key, value = "", ""
+
+    img = str(tag.img['src'])
+
+    # TODO: change to tag.attrs.get(onmouseover)
+    pattern = re.search('\((.*)\)', tag.attrs['onmouseover'])
+
+    if 'imagens/sei_anotacao' in img:
+
+        # Separa o texto interno retornado pelo js onmouseover delimitado
+        # pelas aspas simples. Salvo somente o primeiro e terceiro items
+
+        value = pattern.group().split("'")[1:4:2]
+
+        key = "postit_red" if 'prioridade' in img else "postit"
+
+    elif 'imagens/sei_situacao' in img:
+
+        key = 'situacao'
+        value = pattern.group().split("'")[1]
+
+    elif 'imagens/marcador' in img:
+
+        marcador = pattern.group().split("'")[1:4:2]
+        key = 'marcador'
+        value =  "".join(marcador)
+
+    elif 'imagens/exclamacao' in img:
+
+        key = 'aviso'
+        value = True
+
+    return key, value
 
 def cria_dict_tags(lista_tags):
     """ Recebe uma lista de tags de cada linha do processo  da página inicial
     do SEI, retorna um dicionário dessas tags
     """
 
-    dict_tags = {}
+    dict_tags = {key:"" for key in keys}
 
     assert len(lista_tags) == 6, "Verifique o nº de tags de cada linha do \
     processo, valor diferente de 10"
 
-    controles = lista_tags[1].find_all('a')
+    controles = {k:v for k, v in tag_controle(tag) for tag in lista_tags[1].find_all('a')}
 
-    dict_tags['aviso'] = 'NÃO'
+    dict_tags = {**dict_tags, **controles}
 
-    for tag_a in controles:
+    peticionamento = lista_tags[1].find(src=re.compile('peticionamento'))
 
-        img = str(tag_a.img['src'])
+    if peticionamento:
 
-        pattern = re.search('\((.*)\)', tag_a.attrs['onmouseover'])
+        pattern = re.search(
+            '\((.*)\)', peticionamento.attrs['onmouseover'])
 
-        if 'imagens/sei_anotacao' in img:
-
-            # Separa o texto interno retornado pelo js onmouseover delimitado
-            # pelas aspas simples. Salvo somente o primeiro e terceiro items
-            dict_tags['ANOTACAO'] = pattern.group().split("'")[1:4:2]
-
-            if 'prioridade' in img:
-
-                dict_tags['prioridade'] = 'SIM'
-
-            else:
-
-                dict_tags['prioridade'] = 'NÃO'
-
-        elif 'imagens/sei_situacao' in img:
-
-            dict_tags['situacao'] = pattern.group().split("'")[1]
-
-        elif 'imagens/marcador' in img:
-
-            marcador = pattern.group().split("'")[1:4:2]
-
-            dict_tags['marcador'] = marcador[1]
-
-            dict_tags['TEXTO-MARCADOR'] = marcador[0]
-
-        elif 'imagens/exclamacao' in img:
-
-            dict_tags['aviso'] = 'SIM'
-
-        peticionamento = lista_tags[1].find(src=re.compile('peticionamento'))
-
-        if peticionamento:
-            pattern = re.search(
-                '\((.*)\)', peticionamento.attrs['onmouseover'])
-            dict_tags['peticionamento'] = pattern.group().split('"')[1]
+        dict_tags['peticionamento'] = pattern.group().split('"')[1]
 
     processo = lista_tags[2].find('a')
 
     dict_tags['processo'] = processo.string
 
-    try:
+    atribuicao =  lista_tags[3].find("a")
 
-        dict_tags['atribuicao'] = lista_tags[3].find('a').string
+    if atribuicao:
 
-    except:
-
-        pass
+        dict_tags['atribuicao'] = atribuicao.string
 
     dict_tags['tipo'] = lista_tags[4].string
 
-    try:
-        dict_tags['interessado'] = lista_tags[5].find(
-            class_='spanItemCelula').string
 
-    except:
+    interessado = lista_tags[5].find(class_='spanItemCelula')
 
-        pass
+    if interessado:
+
+        dict_tags['interessado'] = interessado.string
 
     return dict_tags
-
-
-def tag_mouseover(tag, tipo):
-    tag_split = tag.attrs['onmouseover'].split("'")
-
-    if tipo == 'anotacao':
-
-        return ' '.join(tag_split[1:4:2])
-
-    elif tipo == 'situacao':
-
-        return tag_split[1]
-
-    elif tipo == 'marcador':
-
-        return ' '.join(tag_split[1:4:2])
-    else:
-
-        raise ValueError("O tipo de tag repassado não é válido: {}".format(tipo))
-
 
 def dict_to_df(processos):
     """Recebe a lista processos contendo um dicionário das tags de cada

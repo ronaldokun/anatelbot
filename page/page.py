@@ -73,6 +73,7 @@ class Page(object):
                 page.ec.visibility_of_element_located(*locator))
 
         except page.TimeoutException:
+
             return False
 
         return True

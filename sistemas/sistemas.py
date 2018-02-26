@@ -1,10 +1,13 @@
-from time import sleep
+import re
 
 from page import *
 from page.page import Page
-from sistemas import _locators
-from sistemas import _functions
+from sistemas import locators
 
+SERVIÇOS = ['ra', 'px', 'ma', 'mm', 'boleto', 'sec']
+
+classes = {"ra":locators.Scra, "px": locators.Scpx, 'ma': locators.Slma,
+           "mm": locators.Slmm, 'boleto': locators.Boleto, 'sec': locators.Sec}
 
 class Sis(Page):
     """
@@ -16,35 +19,127 @@ class Sis(Page):
 
         super().__init__(driver)
 
-        _functions.init_browser(self.driver, login, senha)
+        self.auth = self._authenticate(login, senha)
 
-    def _navigate(self, link, ident, id_type):
+    def _authenticate(self, login, senha):
 
-        self.driver.get(link)
+        self.driver.get('http://sistemasnet')
 
-        for id in _locators.Entidade[id_type]:
+        alert = self.alert_is_present(timeout=5)
+
+        if alert:
 
             try:
 
-                elem = self.wait_for_element_to_click(id, timeout=5)
+                alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
 
-                elem.send_keys(ident + Keys.RETURN)
+                alert.accept()
 
-            except NoSuchElementException:
+                return True
 
-                print("The html id: {} is not present on this webpage".format(ident))
+            except:
 
-        else:
+                return False
 
-            raise ValueError("Não foi encontrado um 'id' html válido nessa página para o identificador {},"
-                  " verifique as htmls id's no arquivo 'locators'".format(ident))
+        return True
 
+    def check_input(self, ident, serv, tipo):
+        """
+        This function parse the data to the ANATEL sistemas
+
+        :param ident: string - the input to navigate the systems:
+        :param serv: string - one of the intranet pages defined in SERVIÇOS
+        :param tipo: check if it's one of the 3 valid types = 'cpf', 'fistel', 'indicativo'
+        :return: The input if the parse went smooth, otherwise ValueError
+        """
+
+        ident = str(ident)
+
+        serv = str(serv)
+
+        tipo = str(tipo)
+
+        if serv not in SERVIÇOS:
+
+            raise ValueError("Os Serviços disponíveis para consulta são {}".format(SERVIÇOS))
+
+        if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
+
+            raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
+
+        elif tipo == 'cnpj' and len(ident) != 14:
+
+            raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
+
+        elif tipo == 'indicativo':
+
+            if serv in ("boleto", "sec"):
+                raise ValueError(
+                    "Não esta disponível consulta por Indicativo no serviço {}, use cpf/fistel".format(serv))
+
+            elif serv == "px":
+
+                pattern = r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$'
+
+            elif serv == 'ra':
+
+                pattern = r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$'
+
+            elif serv == "ma":
+
+                pattern = r'^(P){1}([A-Z]){4}$'
+
+            elif serv == "mm":
+
+                pattern = r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})'
+
+            if not re.match(pattern, ident, re.I):
+
+                raise ValueError("Indicativo Digitado Inválido")
+
+        return (ident, tipo, classes[serv])
+
+    def _navigate(self, link, ident, id_elem):
+        """
+        This is a simple wrapper to navigate the anatel systems page
+
+        :param link: string with the link to follow
+        :param ident: id ty
+        :param id_type:
+        :return:
+        """
+
+        self.driver.get(link)
+
+        try:
+
+             elem = self.wait_for_element_to_click(id_elem, timeout=5)
+
+             elem.send_keys(ident + Keys.RETURN)
+
+        except NoSuchElementException:
+
+             print("The html id: {} is not present on this webpage".format(ident))
 
     def consulta(self, ident, serv, id_type):
 
-        ident, serv, id_type, sis = _functions.check_input(ident, serv, id_type)
+        ident, id_type, sis = check_input(ident, serv, id_type)
 
-        self._navigate(sis.Consulta, ident, id_type)
+        self._navigate(sis.Consulta['link'], ident, sis.Consulta['id'])
+
+
+class Px(Sis):
+
+    def __init__(self, driver, login, senha):
+
+        super().__init__(driver, login, senha)
+
+        self.serv = 'px'
+
+    def consulta(self, ident, id_type):
+
+            super().consulta(ident, self.serv, id_type)
+
 
     def imprime_consulta(self, ident, serv, id_type):
 
@@ -75,305 +170,3 @@ class Sis(Page):
 
             return
 
-    def imprime_boleto(self, ident, id_type):
-        """ This function receives a webdriver object, navigates it to the
-        loc.Boleto page, inserts the identification 'ident' in the proper
-        field and commands the print of the boleto
-        """
-
-        ident, serv, id_type, sis = _functions.check_input(ident, 'boleto', id_type)
-
-        self.driver.get(sis.URL)
-
-        if id_type in ('cpf', 'cnpj'):
-
-            elem = self.wait_for_element_to_click(sis.B_CPF)
-
-            elem.click()
-
-            elem = self.wait_for_element_to_click(sis.INPUT_CPF)
-
-        else:
-
-            elem = self.wait_for_element_to_click(sis.B_FISTEL)
-
-            elem.click()
-
-            elem = self.wait_for_element_to_click(sis.INPUT_FISTEL)
-
-        # self._navigate(sis.URL, id, id_type)
-
-        elem.clear()
-
-        elem.send_keys(ident)
-
-        date = self.wait_for_element_to_click(sis.INPUT_DATA)
-
-        date.clear()
-
-        date.send_keys(_functions.last_day_of_month() + Keys.RETURN)
-
-        #
-        # try:
-        #
-        #     marcar = self.wait_for_element_to_click(sis.MRK_TODOS)
-        #
-        #     marcar.click()
-        #
-        #     sleep(5)
-        #
-        # except:
-        #
-        #     print("Não foi possível marcar todos os boletos")
-        #
-        #     return False
-        #
-        # try:
-        #
-        #     imprimir = self.wait_for_element_to_click(sis.PRINT)
-        #
-        #     imprimir.click()
-        #
-        # except:
-        #
-        #     print("Não foi possível imprimir todos os boletos")
-        #
-        #     return False
-
-        try:
-
-            self.wait_for_new_window()
-
-        except:
-
-            print("A espera pela nova janela não funcionou!")
-
-        #
-        # try:
-        #
-        #     windows = page.driver.window_handles
-        #
-        #     main = windows[0]
-        #
-        #     boleto = windows[1]
-        #
-        #     page.driver.switch_to_window(boleto)
-        #
-        #     save_page(page, ident)
-        #
-        #
-        #
-        #     page.close()
-        #
-        #     page.driver.switch_to_window(main)
-        #
-        # except:
-        #
-        #     print("Não foi possível salvar a nova janela")
-        #
-        #
-        #
-        #     return False
-        #
-        # return True
-
-    def save_new_window(self, filename):
-
-        try:
-
-            self.wait_for_new_window(timeout=5)
-
-        except TimeoutError:
-
-            print("Não foi possível identificar a nova Janela para salvar")
-
-            return False
-
-        # Guarda as janelas do navegador presentes
-        windows = self.driver.window_handles
-
-        # Troca o foco do navegador
-        self.driver.switch_to_window(windows[-1])
-
-        with open(filename + '.html', 'w') as file:
-            # html = soup(driver.page_source).prettify()
-
-            # write image
-            file.write(self.driver.page_source)
-
-        self.driver.close()
-
-        self.driver.switch_to_window(windows[0])
-
-        return True
-
-    def incluir_estacao(self, ident, serv, tipo):
-
-        ident, serv, tipo, sis = check_input(ident, serv, tipo)
-
-        self._navigate(sis.Estacao['incluir'], ident, tipo)
-
-
-def atualiza_cadastro(page, dados):
-    if 'CPF' not in dados:
-        raise ValueError("É Obrigatório informar o CPF")
-
-    if len(str(dados['CPF'])) != 11:
-        raise ValueError("O CPF deve ter 11 caracteres!")
-
-    def atualiza_campo(data, locator):
-
-        data = str(data)
-
-        elem = page.wait_for_element(locator)
-
-        elem.clear()
-
-        elem.send_keys(data)
-
-        # Navigate to page
-
-    page.driver.get(_locators.Sec.Ent_Alt)
-
-    cpf = page.wait_for_element_to_click(_locators.Entidade.cpf)
-
-    cpf.send_keys(str(dados['CPF']) + Keys.RETURN)
-
-    if 'Email' in dados:
-        atualiza_campo(dados['Email'], locatos.En.email)
-
-    btn = page.wait_for_element_to_click(locatos.En.bt_dados)
-
-    btn.click()
-
-    if 'RG' in dados:
-        atualiza_campo(dados['RG'], locatos.En.rg)
-
-    if 'Orgexp' in dados:
-        atualiza_campo(dados['Orgexp'], locatos.En.orgexp)
-
-    if 'Data de Nascimento' in dados:
-        data = dados['Data de Nascimento']
-
-        data = data.replace('-', '')
-
-        atualiza_campo(data, locatos.En.nasc)
-
-    btn = page.wait_for_element_to_click(locatos.En.bt_fone)
-
-    btn.click()
-
-    if 'ddd' in dados:
-
-        atualiza_campo(dados['ddd'], locatos.En.ddd)
-
-    else:
-
-        ddd = '11'
-
-        atualiza_campo(ddd, locatos.En.ddd)
-
-        # if 'Fone' in dados:
-
-    #   atualiza_campo(dados['Fone'], Entidade.fone)
-
-    # else:
-
-    #   fone = '123456789'
-
-    #  atualiza_campo(fone, Entidade.fone)
-
-    btn = page.wait_for_element_to_click(locatos.En.bt_end)
-
-    btn.click()
-
-    if 'Cep' in dados:
-
-        cep = dados['Cep']
-
-        cep = cep.replace('-', '')
-
-        atualiza_campo(cep, locatos.En.cep)
-
-        cep = page.wait_for_element_to_click(locatos.En.bt_cep)
-
-        cep.click()
-
-        for i in range(30):
-
-            logr = page.wait_for_element(locatos.En.logr)
-
-            if logr.get_attribute('value'):
-                break
-
-            sleep(1)
-
-        else:
-
-            if 'Logradouro' not in dados:
-                raise ValueError("É Obrigatório informar o logradouro")
-            atualiza_campo(dados['Logradouro'], locatos.En.logr)
-
-        if 'Número' not in dados:
-
-            raise ValueError("É obrigatório informar o número na atualização\
-            do endereço")
-
-        else:
-
-            atualiza_campo(dados['Número'], locatos.En.num)
-
-            if 'Complemento' in dados:
-                atualiza_campo(dados['Complemento'], locatos.En.comp)
-
-            bairro = page.wait_for_element(locatos.En.bairro)
-
-            if not bairro.get_attribute('value'):
-
-                if 'Bairro' not in dados:
-                    raise ValueError("É obrigatório informar o bairro na atualização\
-                                     do endereço")
-
-            else:
-
-                atualiza_campo(dados['Bairro'], locatos.En.bairro)
-
-            # confirmar = page.wait_for_element(Entidade.confirmar)
-
-            # confirmar.click()
-
-            page.driver.execute_script(locatos.En.submit)
-
-
-def imprime_licenca(page, ident, serv, tipo):
-    ident, serv, tipo, sis = check_input(ident, serv, tipo)
-
-    page.driver.get(sis.Licenca['Imprimir'])
-
-    navigate(page, ident, sis.Licenca, tipo)
-
-
-def consultaSigec(page, ident, tipo='cpf'):
-    if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
-        raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
-
-    if tipo == 'cnpj' and len(ident) != 14:
-        raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
-
-    page.driver.get(_locators.Sigec.consulta)
-
-    if tipo in ('cpf', 'cnpj'):
-
-        elem = page.wait_for_element_to_click(_locators.Sigec.cpf)
-
-        elem.send_keys(ident + Keys.RETURN)
-
-    elif tipo == 'fistel':
-
-        elem = page.wait_for_element_to_click(_locators.Sigec.fistel)
-
-        elem.send_keys(ident + Keys.RETURN)
-
-    page.wait_for_page_load()
-
-    # TODO: implement other elements

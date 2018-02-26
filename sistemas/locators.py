@@ -108,7 +108,8 @@ Entidade = {'cpf': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'Num
 
 class Scpx(object):
 
-    Consulta = dict(link='http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714')
+    Consulta = dict(link='http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714',
+                    id="")
 
     Ent =      dict(alterar_situacao="http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
                     incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I")
@@ -137,6 +138,7 @@ class Scra(object):
                     licenciar='http://sistemasnet/SCRA/EstacaoLicenciar/Tela.asp')
 
     Licenca =  dict(imprimir="http://sistemasnet/SCRA/Chamada/Licenca.asp")
+
 
 class Slmm(object):
 

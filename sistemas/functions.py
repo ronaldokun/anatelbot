@@ -8,13 +8,13 @@ Created on Tue Nov  7 14:05:59 2017
 
 import datetime as dt
 import os
-import re
 from time import sleep
 
-from sistemas._locators import Boleto, Sec, Entidade, Scpx, Scra, Slmm, Slma, Sigec
+from sistemas.locators import Boleto, Sec, Entidade, Sigec
 from selenium.webdriver.common.keys import Keys
 
 from page.page import Page
+from sistemas.sistemas import check_input
 
 os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
 
@@ -25,7 +25,6 @@ def init_browser(webdriver, login, senha):
 
     page.driver.get('http://sistemasnet')
 
-    # sleep(1)
 
     alert = page.alert_is_present(timeout=5)
 
@@ -44,66 +43,6 @@ def init_browser(webdriver, login, senha):
 
     return page
 
-
-def check_input(ident, serv, tipo):
-
-    if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
-
-        raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
-
-    if tipo == 'cnpj' and len(ident) != 14:
-
-        raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
-
-    ident = str(ident)
-
-    serv = str(serv)
-
-    tipo = str(tipo)
-
-    if serv == "400":
-
-        pattern = r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$'
-
-        sis = Scpx
-
-    elif serv == '302':
-
-        pattern = r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$'
-
-        sis = Scra
-
-    elif serv == "507":
-
-        pattern = r'^(P){1}([A-Z]){4}$'
-
-        sis = Slma
-
-    elif serv == "604":
-
-        pattern = r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})'
-
-        sis = Slmm
-
-    elif serv == "boleto":
-
-        sis = Boleto
-
-    elif serv == "sec":
-
-        sis = Sec
-
-    else:
-
-        raise ValueError("Não foi encontrado o Serviço {}".format(serv))
-
-    if tipo == 'indicativo':
-
-        if not re.match(pattern, ident, re.I):
-
-            raise ValueError("Indicativo Digitado Inválido")
-
-    return (ident, serv, tipo, sis)
 
 def save_page(page, filename):
 

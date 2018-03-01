@@ -8,15 +8,27 @@ Created on Mon Aug 28 20:44:15 2017
 
 from contextlib import contextmanager
 
-import base
+# Main package
+import selenium.webdriver as webdriver
+# Utilities
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException, WebDriverException
+# Methods used from selenium submodules
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.ui import WebDriverWait
+
+
+# Exceptions
 
 
 # Base Class
 class Page(object):
+    # noinspection SpellCheckingInspection
     """
-    This Base Class implements common Seslenium Webdriver
-    navigation methods
-    """
+        This Base Class implements common Selenium Webdriver
+        navigation methods
+        """
 
     timeout = 30
 
@@ -28,7 +40,7 @@ class Page(object):
 
         except TypeError:
 
-            print("The object {0} must be of type{1}".format(driver, type(base.webdriver)))
+            print("The object {0} must be of type{1}".format(driver, type(webdriver)))
 
     def __enter__(self):
         """ Implementation class """
@@ -42,18 +54,18 @@ class Page(object):
     def wait_for_page_load(self, timeout=timeout):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name('title')
+
         yield
-        base.WebDriverWait(self.driver, timeout).until(
-            base.ec.staleness_of(old_page))
+
+        WebDriverWait(self.driver, timeout).until(ec.staleness_of(old_page))
 
     def alert_is_present(self, timeout=timeout):
 
         try:
 
-            alert = base.WebDriverWait(self.driver, timeout).until(
-                base.ec.alert_is_present())
+            alert = WebDriverWait(self.driver, timeout).until(ec.alert_is_present())
 
-        except (base.TimeoutException, base.WebDriverException):
+        except (TimeoutException, WebDriverException):
 
             return False
 
@@ -69,11 +81,10 @@ class Page(object):
         """
         try:
 
-            base.WebDriverWait(self.driver, timeout).until(
-                base.ec.visibility_of_element_located(*locator))
+            WebDriverWait(self.driver, timeout).until(
+                ec.visibility_of_element_located(*locator))
 
-        except base.TimeoutException:
-
+        except TimeoutException:
             return False
 
         return True
@@ -92,31 +103,31 @@ class Page(object):
 
     def hover(self, *locator):
         element = self.find_element(*locator)
-        hover = base.ActionChains(self.driver).move_to_element(element)
+        hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
     def check_element_exists(self, *locator):
         try:
             self.wait_for_element(*locator)
-        except base.TimeoutException:
+        except TimeoutException:
             return False
         return True
 
     def wait_for_element_to_be_visible(self, *locator, timeout=timeout):
-        return base.WebDriverWait(self.driver, timeout).until(
-            base.ec.visibility_of_element_located(*locator))
+        return WebDriverWait(self.driver, timeout).until(
+            ec.visibility_of_element_located(*locator))
 
     def wait_for_element(self, *locator, timeout=timeout):
-        return base.WebDriverWait(self.driver, timeout).until(
-            base.ec.presence_of_element_located(*locator))
+        return WebDriverWait(self.driver, timeout).until(
+            ec.presence_of_element_located(*locator))
 
     def wait_for_element_to_click(self, *locator, timeout=timeout):
-        return base.WebDriverWait(self.driver, timeout).until(
-            base.ec.element_to_be_clickable(*locator))
+        return WebDriverWait(self.driver, timeout).until(
+            ec.element_to_be_clickable(*locator))
 
     def wait_for_new_window(self, timeout=timeout):
-        return base.WebDriverWait(self.driver, timeout).until(
-            base.ec.number_of_windows_to_be(2))
+        return WebDriverWait(self.driver, timeout).until(
+            ec.number_of_windows_to_be(2))
 
     def nav_elem_to_new_win(self, elem):
         """ navigate the link present in element to a new window

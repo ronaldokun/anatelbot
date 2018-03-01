@@ -3,9 +3,7 @@ import re
 
 import unidecode
 
-from base import *
-from base.page import Page
-import helpers
+from page import Page
 from sei import helpers
 
 SERVICOS = ('Outorga: Rádio do Cidadão',

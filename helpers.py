@@ -1,355 +1,1138 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov  1 16:50:19 2017
+Created on Mon Aug 28 20:19:59 2017
 
-@author: rsilva
+@author: ronaldo
 """
-import datetime as dt
-import re
-from time import sleep
 
-import pandas as pd
+from selenium.webdriver.common.by import By
 
-import helpers
-from base.page import Page
+SISTEMASNET = 'http://sistemasnet/'
 
-KEYS = ['processo',
-        'tipo',
-        'atribuicao',
-        'marcador',
-        'anotação',
-        'prioridade',
-        'peticionamento',
-        'aviso',
-        'situacao',
-        'interessado']
 
+class Login(object):
+    URL = "https://sei.anatel.gov.br"
 
-def pode_expedir(linha):
-    """Verifica algumas condições necessárias para expedição do Ofício no SEI
-    Args:
-        linha: Dicionário das html tags presentes nas linhas
-                   do bloco de assinatura.
+    TITLE = "SEI / ANATEL"
 
-        Return: Boolean
-    """
+    LOG = (By.ID, "txtUsuario")
 
-    t1 = linha['processo'].find_all('a', class_="protocoloAberto")
+    PWD = (By.ID, "pwdSenha")
 
-    t2 = linha['tipo'].find_all(string="Ofício")
 
-    t3 = linha['assinatura'].find_all(string=re.compile("Coordenador"))
+class Base(object):
+    INIT = (By.ID, "lnkControleProcessos")
 
-    t4 = linha['assinatura'].find_all(string=re.compile("Gerente"))
+    MENU = (By.ID, "lnkInfraMenuSistema")
 
-    return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
+    URL = "https://sei.anatel.gov.br/sei/"
 
-def tag_mouseover(tag, tipo):
 
-    tag_split = tag.attrs['onmouseover'].split("'")
+class LatMenu(object):
+    CLT_PROC = (By.LINK_TEXT, "Controle de Processos")
 
-    if tipo == 'anotacao':
+    INIT_PROC = (By.LINK_TEXT, "Iniciar Processo")
 
-        return ' '.join(tag_split[1:4:2])
+    RET_PROG = (By.LINK_TEXT, "Retorno Programado")
 
-    elif tipo == 'situacao':
+    PESQ = (By.LINK_TEXT, "Pesquisa")
 
-        return tag_split[1]
+    BASE_KNW = (By.LINK_TEXT, "Base de Conhecimento")
 
-    elif tipo == 'marcador':
+    TXT_PDR = (By.LINK_TEXT, "Textos Padrão")
 
-        return ' '.join(tag_split[1:4:2])
-    else:
+    MDL_FAV = (By.LINK_TEXT, "Modelos Favoritos")
 
-        raise ValueError("O tipo de tag repassado não é válido: {}".format(tipo))
+    BL_ASS = (By.LINK_TEXT, "Blocos de Assinatura")
 
-def armazena_tags(lista_tags):
-    """ Recebe uma lista de tags de cada linha do processo  da página inicial
-    do Sei, retorna um dicionário dessas tags
-    """
+    BL_REU = (By.LINK_TEXT, "Blocos de Reunião")
 
-    dict_tags = {}
+    BL_INT = (By.LINK_TEXT, "Blocos Internos")
 
-    if len(lista_tags) != 6:
-        raise ValueError("Verifique o nº de tags de cada linha do \
-        processo: {}. O valor diferente de 6".format(len(lista_tags)))
+    CONTS = (By.LINK_TEXT, "Contatos")
 
-    dict_tags['checkbox'] = lista_tags[0].find('input', class_='infraCheckbox')
+    CONTS_LISTAR = (By.LINK_TEXT, 'Listar')
 
-    controles = lista_tags[1].find_all('a')
+    SOBRS = (By.LINK_TEXT, "Processos Sobrestados")
 
-    dict_tags['aviso'] = ""
+    AC_ESP = (By.LINK_TEXT, "Acompanhamento Especial")
 
-    for tag_a in controles:
+    MRKS = (By.LINK_TEXT, "Marcadores")
 
-        img = str(tag_a.img['src'])
+    PT_CTRL = (By.LINK_TEXT, "Pontos de Controle")
 
-        if 'imagens/sei_anotacao' in img:
 
-            dict_tags['anotacao'] = tag_mouseover(tag_a, 'anotacao')
+class Main(object):
+    TITLE = 'SEI - Controle de Processos'
 
-            dict_tags['anotacao_link'] = tag_a.attrs['href']
+    ATR = (By.ID, "ancVisualizacao1")
 
-        elif 'imagens/sei_situacao' in img:
+    VISUAL = (By.ID, "ancTipoVisualizacao")
 
-            dict_tags['situacao'] = tag_mouseover(tag_a, 'situacao')
+    CONT = (By.ID, "selInfraPaginacaoSuperior")
 
-            dict_tags['situacao_link'] = tag_a.attrs['href']
 
-        elif 'imagens/marcador' in img:
+class Blocos(object):
+    TITLE = "SEI - Blocos de Assinatura"
 
-            dict_tags['marcador'] = tag_mouseover(tag_a, 'marcador')
 
-            dict_tags['marcador_link'] = tag_a.attrs['href']
+class Bloco(object):
+    TITLE = "SEI - Documentos do Bloco de Assinatura"
 
-        elif 'imagens/exclamacao' in img:
+    RET_BLOCO = ((By.ID, 'btnExcluir'))
 
-            dict_tags['aviso'] = True
 
-        peticionamento = lista_tags[1].find(src=re.compile('peticionamento'))
+class Processo(object):
+    TITLE = "SEI - Processo"
 
-        if peticionamento:
+    ESPEC = (By.ID, 'txtDescricao')
 
-            pattern = re.search(
-                '\((.*)\)', peticionamento.attrs['onmouseover'])
-            dict_tags['peticionamento'] = pattern.group().split('"')[1]
+    INTER = (By.ID, 'txtInteressadoProcedimento')
 
-        else:
+    SIG = (By.ID, 'optSigiloso')
 
-            dict_tags['peticionamento'] = ''
+    REST = (By.ID, 'optRestrito')
 
-    processo = lista_tags[2].find('a')
+    PUBL = (By.ID, 'optPublico')
 
-    dict_tags['link'] = processo.attrs['href']
+    HIP_LEGAL = (By.ID, 'selHipoteseLegal')
 
-    dict_tags['numero'] = processo.string
+    HIPS = ['',
+            'Controle Interno (Art. 26, § 3º, da Lei nº 10.180/2001)',
+            'Direito Autoral (Art. 24, III, da Lei nº 9.610/1998)',
+            'Documento Preparatório (Art. 7º, § 3º, da Lei nº 12.527/2011)',
+            'Fiscalização / Investigação da Anatel (Art. 174 da Lei nº 9.472/1997)',
+            'Informação Pessoal (Art. 31 da Lei nº 12.527/2011)',
+            'Informações Contábeis de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+            'Informações Econômico-Financeiras de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+            'Informações Operacionais de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+            'Informações Privilegiadas de Sociedades Anônimas (Art. 155, § 2º, da Lei nº 6.404/1976)',
+            'Informações Técnicas de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+            'Interceptação de Comunicações Telefônicas (Art. 8º, caput, da Lei nº 9.296/1996)',
+            'Investigação de Responsabilidade de Servidor (Art. 150 da Lei nº 8.112/1990)',
+            'Livros e Registros Contábeis Empresariais (Art. 1.190 do Código Civil)',
+            'Operações Bancárias (Art. 1º da Lei Complementar nº 105/2001)',
+            'Proteção da Propriedade Intelectual de Software (Art. 2º da Lei nº 9.609/1998)',
+            'Protocolo -Pendente Análise de Restrição de Acesso (Art. 6º, III, da Lei nº 12.527/2011)',
+            'Segredo de Justiça no Processo Civil (Art. 189 do Código de Processo Civil)',
+            'Segredo de Justiça no Processo Penal (Art. 201, § 6º, do Código de Processo Penal)',
+            'Segredo Industrial (Art. 195, XIV, Lei nº 9.279/1996)',
+            'Sigilo das Comunicações (Art. 3º, V, da Lei nº 9.472/1997)',
+            'Sigilo de Empresa em Situação Falimentar (Art. 169 da Lei nº 11.101/2005)',
+            'Sigilo do Inquérito Policial (Art. 20 do Código de Processo Penal)',
+            'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)'
+            ]
 
-    dict_tags['visualizado'] = True if processo.attrs['class'] == 'processoVisualizado' else False
 
-    tag = lista_tags[3].find('a')
+class Central(object):
+    ACOES = (By.ID, "divArvoreAcoes")
 
-    dict_tags['atribuicao'] = tag.string if tag else ''
+    IN_AND = (By.ID, "txaDescricao")
 
-    dict_tags['tipo'] = lista_tags[4].string
+    IN_POSTIT = (By.ID, "txaDescicao")
 
+    BT_POSTIT = (By.NAME, "sbmRegistrarAnotacao")
 
-    tag = lista_tags[5].find(class_='spanItemCelula')
+    SV_AND = (By.ID, "sbmSalvar")
+
+    AND_PRE = "Solicita-se ao protocolo a expedição do "
+
+    AND_MID = " ( SEI nº "
+
+    AND_POS = "por meio de correspondência simples com aviso de recebimento."
+
+
+class Envio(object):
+    TITLE = "SEI - Enviar Processo"
+
+    UNIDS = "SEI - Selecionar Unidades"
+
+    PRAZO = "5"
+
+    IN_SIGLA = (By.ID, "txtSiglaUnidade")
+
+    SIGLA = "Protocolo.Sede"
+
+    SEDE = "Protocolo.Sede - Protocolo da Sede"
+
+    ID_SEDE = (By.ID, "chkInfraItem0")
+
+    B_TRSP = (By.ID, "btnTransportarSelecao")
+
+    LUPA = "objLupaUnidades.selecionar(700,500)"
+
+    IDUNIDADE = (By.ID, "txtUnidade")
+
+    OPEN = (By.ID, "chkSinManterAberto")
+
+    IDRETDATA = (By.ID, "optDataCerta")
+
+    RET_DIAS = (By.ID, "optDias")
+
+    NUM_DIAS = (By.ID, "txtDias")
+
+    UTEIS = (By.ID, "chkSinDiasUteis")
+
+    ENVIAR = (By.ID, "sbmEnviar")
+
+
+class Tipos(object):
+    EXIBE_ALL = (By.ID, 'imgExibirTiposProcedimento')
+
+    FILTRO = (By.ID, 'txtFiltro')
+
+    SL_TIP_PROC = (By.ID, "selTipoProcedimento")
+
+    CONTATO = (By.ID, "txtPalavrasPesquisaContatos")
+
+    PROCS = {'',
+             'Acesso à Informação: Demanda do e-SIC',
+             'Acompanhamento Competição: Monitoramento Mercados',
+             'Acompanhamento da Ordem Econômica: Anuência Prévia',
+             'Acompanhamento da Ordem Econômica: Aprovação Posterior',
+             'Acompanhamento da Ordem Econômica: Ato de Concentração',
+             'Acompanhamento da Ordem Econômica: Condicionamentos',
+             'Acompanhamento da Ordem Econômica: Proposta de Grupo PMS',
+             'Acompanhamento da Ordem Econômica: Registro de Alterações Contratuais ou do Estatuto Social',
+             'Acompanhamento da Ordem Econômica: Revisão de Grupo PMS',
+             'Acompanhamento Econômico: Estudo de AIR',
+             'Acompanhamento Econômico: RAEC',
+             'Acompanhamento Legislativo: Câmara dos Deputados',
+             'Acompanhamento Legislativo: Congresso Nacional',
+             'Acompanhamento Legislativo: Estadual/Distrital',
+             'Acompanhamento Legislativo: Municipal',
+             'Acompanhamento Legislativo: Senado Federal',
+             'Anuências: Bens Reversíveis',
+             'Anuências: Contratos Vinculados à Concessão',
+             'Aquisição: Adesão a Ata de RP-Não Participante',
+             'Aquisição: Adesão a Ata de RP-Participante',
+             'Aquisição: Aplicação de Sanção decorrente de Procedimento Licitatório',
+             'Aquisição: Concorrência',
+             'Aquisição: Concorrência-Registro de Preço',
+             'Aquisição: Concurso',
+             'Aquisição: Consulta',
+             'Aquisição: Convite',
+             'Aquisição: Coordenação das Gerências Regionais',
+             'Aquisição: Dispensa - Acima de R$ 8 mil',
+             'Aquisição: Dispensa - Até R$ 8 mil',
+             'Aquisição: Inexigibilidade',
+             'Aquisição: Leilão',
+             'Aquisição: Plano de Aquisições',
+             'Aquisição: Pregão Eletrônico',
+             'Aquisição: Pregão Eletrônico-Registro de Preço',
+             'Aquisição: Pregão Presencial',
+             'Aquisição: Regime Diferenciado de Contratação-RDC',
+             'Aquisição: Tomada de Preços',
+             'Arrecadação: Compensação',
+             'Arrecadação: Controle de Depósito Judicial',
+             'Arrecadação: Cumprimento de Ação Judicial',
+             'Arrecadação: Encaminhamento para Dívida Ativa',
+             'Arrecadação: Normatização Interna',
+             'Arrecadação: Notificação/Comunicado de Cobrança',
+             'Arrecadação: Parcelamento Administrativo',
+             'Arrecadação: Parcelamento do Programa de Regularização de Débitos (PRD)',
+             'Arrecadação: Receita',
+             'Arrecadação: Regularização de Indébitos',
+             'Arrecadação: Restituição',
+             'Arrecadação: Restituição/Compensação',
+             'Arrecadação: Retificação de Declaração - Fust',
+             'Arrecadação: Subsidiar Ação Judicial',
+             'CADE: Indícios de Infração à Ordem Econômica',
+             'CADE: Subsídios',
+             'Certificação de Produto: Alteração de Escopo de Laboratório',
+             'Certificação de Produto: Alteração de Escopo de OCD',
+             'Certificação de Produto: Auditoria de Laboratório',
+             'Certificação de Produto: Auditoria de OCD',
+             'Certificação de Produto: Autorização de Ensaios em Laboratórios de Ordem Inferior de Prioridade',
+             'Certificação de Produto: Autorização para Teste Piloto de Produto',
+             'Certificação de Produto: Designação de OCD',
+             'Certificação de Produto: Habilitação de Laboratório',
+             'Certificação de Produto: Homologação',
+             'Certificação de Produto: Monitoramento de Produto',
+             'Certificação de Produto: Requisitos Técnicos',
+             'Comunicação: Demanda de Comunicação',
+             'Comunicação: Evento Institucional Público Externo',
+             'Comunicação: Evento Institucional Público Interno',
+             'Comunicação: Pedido de Apoio Institucional',
+             'Comunicação: Plano Anual de Comunicação',
+             'Comunicação: Publicidade Institucional',
+             'Comunicação: Publicidade Legal',
+             'Conselho Consultivo: Deliberações Gerais',
+             'Conselho Consultivo: Organização de Reunião',
+             'Conselho Diretor: Deliberações Gerais',
+             'Conselho Diretor: Organização de Reunião',
+             'Consumidor: Avaliação Técnica do SAC de Operadora',
+             'Consumidor: Canais de Atendimento da Anatel',
+             'Consumidor: Comitês de Defesa dos Consumidores',
+             'Consumidor: Conselho de Usuários de Serviços',
+             'Consumidor: Coordenação das Gerências Regionais',
+             'Consumidor: Diagnóstico da Prestação de Serviço',
+             'Consumidor: Divulgação de Informações',
+             'Consumidor: Indicador de Atendimento',
+             'Consumidor: Interação Institucional',
+             'Consumidor: Pesquisa de Opinião',
+             'Consumidor: Pesquisa Qualidade',
+             'Consumidor: Pesquisa Satisfação',
+             'Consumidor: Tratamento de Solicitações',
+             'Consumidor: Tratamento Preventivo e Corretivo',
+             'Contabilidade: Análise Contábil',
+             'Contabilidade: Cadastro e Habilitação no SIAFI',
+             'Contabilidade: Conformidade de Gestão',
+             'Contabilidade: Contratos e Garantias',
+             'Contabilidade: Declarações Diversas',
+             'Contabilidade: Designação/Dispensa Responsável no SIAFI',
+             'Contabilidade: DIRF',
+             'Contabilidade: Encerramento do Exercício',
+             'Contabilidade: Fechamento Contábil - Estoque',
+             'Contabilidade: Fechamento Contábil Patrimonial',
+             'Contabilidade: Manuais',
+             'Contabilidade: Normatização Interna',
+             'Contabilidade: Prestação de Contas',
+             'Controle de Obrigações: Coordenação das Gerências Regionais',
+             'Convênios/Ajustes: Acompanhamento da Execução',
+             'Convênios/Ajustes: Formalização/Alteração com Repasse',
+             'Convênios/Ajustes: Formalização/Alteração sem Repasse',
+             'Corregedoria: Análise Prescricional de Processo',
+             'Corregedoria: Avaliação para Estabilidade',
+             'Corregedoria: Correição',
+             'Corregedoria: Investigação Preliminar',
+             'Corregedoria: Procedimento Geral',
+             'Corregedoria: Processo Administrativo Disciplinar',
+             'Corregedoria: Sindicância Punitiva',
+             'Demanda Externa: Cidadão (Pessoa Física)',
+             'Demanda Externa: Deputado Estadual/Distrital',
+             'Demanda Externa: Deputado Federal',
+             'Demanda Externa: Judiciário',
+             'Demanda Externa: Ministério Público Estadual',
+             'Demanda Externa: Ministério Público Federal',
+             'Demanda Externa: Órgãos Governamentais Estaduais',
+             'Demanda Externa: Órgãos Governamentais Federais',
+             'Demanda Externa: Órgãos Governamentais Municipais',
+             'Demanda Externa: Outras Entidades Privadas',
+             'Demanda Externa: Outros Órgãos Públicos',
+             'Demanda Externa: Senador',
+             'Demanda Externa: Vereador/Câmara Municipal',
+             'Direito de Exploração: Assuntos Regulatórios',
+             'Direito de Exploração: Satélite Brasileiro',
+             'Direito de Exploração: Satélite Estrangeiro',
+             'Espectro: Coordenação Internacional',
+             'Espectro: Coordenação Nacional',
+             'Espectro: Internalização de Decisão',
+             'Espectro: Notificação de Estações Terrestres, Marítimas e Costeiras',
+             'Finanças: Execução Financeira',
+             'Finanças: Normatização Interna',
+             'Finanças: Reembolso/Ressarcimento',
+             'Finanças: Relatório de Gestão',
+             'Fiscalização Regulatória: Fiscalização e Controle',
+             'Fiscalização: Ampliação de Acesso',
+             'Fiscalização: Área de Cobertura',
+             'Fiscalização: Canais de Atendimento ao Consumidor',
+             'Fiscalização: Certificação de Produtos',
+             'Fiscalização: Clandestinidade',
+             'Fiscalização: Cobrança de Serviços',
+             'Fiscalização: Compromissos Assumidos em Anuências Prévias',
+             'Fiscalização: Conteúdo de Serviços de Radiodifusão',
+             'Fiscalização: Continuidade',
+             'Fiscalização: Coordenação das Gerências Regionais',
+             'Fiscalização: Demandas sobre Grandes Eventos',
+             'Fiscalização: Econômico',
+             'Fiscalização: Estudos e Avaliações',
+             'Fiscalização: Infraestrutura e Funcionamento de Redes',
+             'Fiscalização: Lacração, Apreensão e Interrupção',
+             'Fiscalização: Massificação de Acesso',
+             'Fiscalização: Oferta e Contratação de Serviços',
+             'Fiscalização: Outorga',
+             'Fiscalização: Portabilidade Numérica',
+             'Fiscalização: Processo de Guarda',
+             'Fiscalização: Qualidade',
+             'Fiscalização: Radiomonitoração de Satélites',
+             'Fiscalização: Reclamação de Radiointerferência',
+             'Fiscalização: Relacionamento Pós-Venda',
+             'Fiscalização: SeAC e Serviços de TVC/DTH/MMDS',
+             'Fiscalização: Termo de Ajustamento de Conduta (TAC)',
+             'Fiscalização: Tributário',
+             'Fiscalização: Universalização',
+             'Fiscalização: Uso do Espectro e Órbita e Recursos de Numeração',
+             'Gestão da Informação: Análise de Dados do Setor',
+             'Gestão da Informação: Anulação de Ato Administrativo',
+             'Gestão da Informação: Arrecadação',
+             'Gestão da Informação: Avaliação de Documentos',
+             'Gestão da Informação: Controle de Malote',
+             'Gestão da Informação: Coordenação das Gerências Regionais',
+             'Gestão da Informação: Credenciamento de Segurança',
+             'Gestão da Informação: Disponibilizar Dados do Setor',
+             'Gestão da Informação: Gestão Documental',
+             'Gestão da Informação: Normatização Interna',
+             'Gestão da Informação: Reconstituição Documental',
+             'Gestão da Informação: Rol Anual de Informações Classificadas',
+             'Gestão da Informação: Segurança da Informação e Comunicações',
+             'Gestão de Contrato: Acompanhamento da Execução',
+             'Gestão de Contrato: Alterações Contratuais',
+             'Gestão de Contrato: Aplicação de Sanção Contratual',
+             'Gestão de Contrato: Consultas à PFE-Anatel',
+             'Gestão de Contrato: Execução de Garantia',
+             'Gestão de Contrato: Orientações e Diretrizes Gerais',
+             'Gestão de Contrato: Pagamento Direto a Terceiros',
+             'Gestão de Contrato: Processo de Pagamento',
+             'Gestão de Processos: Mapeamento e Modelagem',
+             'Gestão de Projetos: Planejamento e Execução',
+             'Gestão de TI: CITI',
+             'Gestão de TI: Coordenação das Gerências Regionais',
+             'Gestão de TI: Demanda de Solução de TI',
+             'Gestão e Controle: Coordenação - Demandas Externas',
+             'Gestão e Controle: Coordenação - Demandas Internas',
+             'Gestão e Controle: Demandas de Órgãos de Controle',
+             'Gestão e Controle: Executar Auditoria Interna',
+             'Gestão e Controle: Plano Anual de Auditoria Interna',
+             'Gestão e Controle: Relatório Anual de Auditoria Interna',
+             'Homologação de Contratos: Compartilhamento',
+             'Homologação de Contratos: Interconexão',
+             'Homologação de Contratos: MVNO (Credenciada)',
+             'Homologação de Contratos: ORPA',
+             'Infraestrutura: Abastecimento de Água e Esgoto',
+             'Infraestrutura: Apoio de Engenharia Civil',
+             'Infraestrutura: Fornecimento de Energia Elétrica',
+             'Institucional: Relatório Anual da Anatel',
+             'Licitação: Chamamento Público',
+             'Licitação: Concessão',
+             'Licitação: Direito de Exploração de Satélite',
+             'Licitação: Espectro',
+             'Licitação: Espectro - Radiotáxi',
+             'Licitação: Espectro - SME',
+             'Licitação: Espectro - SMP',
+             'Licitação: Numeração',
+             'Material: Desfazimento de Material de Consumo',
+             'Material: Desfazimento de Material Permanente',
+             'Material: Inventário de Material de Consumo',
+             'Material: Inventário de Material Permanente',
+             'Material: Movimentação de Material de Consumo',
+             'Material: Movimentação de Material Permanente',
+             'Modelo de Custos: Modelo Bottom-up',
+             'Modelo de Custos: Modelo Top-down',
+             'Numeração: Atribuição, Destinação e Designação',
+             'Numeração: Gestão e Administração',
+             'Órbita: Coordenação e Notificação de Redes de Satélite',
+             'Orçamento: Acompanhamento de Despesa Mensal',
+             'Orçamento: Contingenciamento',
+             'Orçamento: Créditos Adicionais',
+             'Orçamento: Descentralização de Créditos',
+             'Orçamento: Manuais',
+             'Orçamento: Programação Orçamentária',
+             'Outorga: Autocadastramento',
+             'Outorga: Autorização de Uso de Radiofrequência',
+             'Outorga: Autorização de Uso de Radiofrequência - Prorrogação',
+             'Outorga: Cassação de Autorização',
+             'Outorga: Coordenação das Gerências Regionais',
+             'Outorga: Dispensa de Autorização',
+             'Outorga: Licenciamento de Estação',
+             'Outorga: Licenciamento de Estações com Uso de Radiofrequência',
+             'Outorga: Limitado Móvel Aeronáutico',
+             'Outorga: Limitado Móvel Marítimo',
+             'Outorga: Procedimento Simplificado de Outorga',
+             'Outorga: Rádio do Cidadão',
+             'Outorga: Radioamador',
+             'Outorga: Radiotelefonista',
+             'Outorga: SCM',
+             'Outorga: SeAC',
+             'Outorga: Serviços Auxiliares de Radiodifusão e Correlatos (SARC)',
+             'Outorga: SLE',
+             'Outorga: SLP',
+             'Outorga: SLP Especial de Radioautocine',
+             'Outorga: SLP Especial de Radiochamada',
+             'Outorga: SLP Especial de Supervisão e Controle',
+             'Outorga: SLP Limitado - Estações Itinerantes',
+             'Outorga: SLP Limitado de Fibras Óticas',
+             'Outorga: SLP Limitado Móvel Privativo',
+             'Outorga: SLP Limitado Privado de Radiochamada',
+             'Outorga: SLP Rádio-Táxi',
+             'Outorga: SLP Serviço Limitado Especializado',
+             'Outorga: SMP',
+             'Outorga: SMP - MVNO',
+             'Outorga: STFC',
+             'Outorga: Uso Temporário do Espectro',
+             'Ouvidoria: Análise Crítica da Anatel',
+             'Ouvidoria: Estudo Temático',
+             'Ouvidoria: Pesquisa de Satisfação da Anatel',
+             'PAC: Acessibilidade - Universalização',
+             'PAC: Alteração Societária',
+             'PAC: Atendimento',
+             'PAC: Banda Larga - PNBL',
+             'PAC: Banda Larga nas Escolas - PBLE',
+             'PAC: Bens de Terceiros e Serviços Contratados Vinculados à Concessão',
+             'PAC: Bens Reversíveis',
+             'PAC: Campanhas de Divulgação - Universalização',
+             'PAC: Cancelamento de Serviço',
+             'PAC: Carregamento de Canais - SeAC',
+             'PAC: Casos Críticos',
+             'PAC: Cobrança',
+             'PAC: Compromisso de Abrangência - SMP',
+             'PAC: Compromisso de Aquisição de Produtos e Sistemas Nacionais',
+             'PAC: Concessão de Créditos',
+             'PAC: Condicionamentos de Atos',
+             'PAC: Conta Vinculada à Concessão (RCBR)',
+             'PAC: Demanda de Acompanhamento e Controle da Prestação de Serviço',
+             'PAC: Direito dos Consumidores',
+             'PAC: Disponibilidade e Funcionamento de TUP',
+             'PAC: Home Passed - SeAC',
+             'PAC: Indicadores de Qualidade',
+             'PAC: Interconexão',
+             'PAC: Interrupções Sistêmicas',
+             'PAC: Invasão de Cobertura',
+             'PAC: Meios de Pagamento e Pontos de Venda - TUP',
+             'PAC: Numeração',
+             'PAC: Obrigações de Qualidade',
+             'PAC: Obrigações Gerais',
+             'PAC: Oferta de Serviço',
+             'PAC: Ônus Contratual da Autorização',
+             'PAC: Ônus Contratual da Concessão',
+             'PAC: Plano de Melhoria do SMP',
+             'PAC: Plano de Seguros do Contrato de Concessão',
+             'PAC: Planos de Serviço',
+             'PAC: Portabilidade Numérica',
+             'PAC: Ressarcimento',
+             'PAC: Serviço de Utilidade Pública',
+             'PAC: TFF, PPDUR e PPDESS',
+             'PAC: Universalização',
+             'PADO: Acessibilidade',
+             'PADO: Alteração Societária',
+             'PADO: Atendimento - Convergente',
+             'PADO: Atendimento - SCM',
+             'PADO: Atendimento - SeAC',
+             'PADO: Atendimento - SMP',
+             'PADO: Atendimento - STFC',
+             'PADO: Banda Larga - PNBL',
+             'PADO: Banda Larga nas Escolas - PBLE',
+             'PADO: Bens Reversíveis',
+             'PADO: Cancelamento de Serviço - Convergente',
+             'PADO: Cancelamento de Serviço - SCM',
+             'PADO: Cancelamento de Serviço - SeAC',
+             'PADO: Cancelamento de Serviço - SMP',
+             'PADO: Cancelamento de Serviço - STFC',
+             'PADO: Carregamento de Canais',
+             'PADO: Carregamento de Canais - SeAC',
+             'PADO: Certificação de Produtos',
+             'PADO: Certificação e Não Outorgado - Radiofrequência',
+             'PADO: Certificação e Não Outorgado - Serviço',
+             'PADO: Certificação e Não Outorgado - Serviço e Radiofrequência',
+             'PADO: Co-billing',
+             'PADO: Cobrança - Convergente',
+             'PADO: Cobrança - SCM',
+             'PADO: Cobrança - SeAC',
+             'PADO: Cobrança - SMP',
+             'PADO: Cobrança - STFC',
+             'PADO: Código de Seleção da Prestadora (CSP)',
+             'PADO: Competição',
+             'PADO: Compromisso de Abrangência - SMP',
+             'PADO: Compromisso de Aquisição de Produtos e Sistemas Nacionais',
+             'PADO: Descumprimento de Determinação',
+             'PADO: Descumprimentos de Condicionamentos de Atos',
+             'PADO: Direitos do Consumidor - Convergente',
+             'PADO: Direitos do Consumidor - SCM',
+             'PADO: Direitos do Consumidor - SeAC',
+             'PADO: Direitos do Consumidor - SMP',
+             'PADO: Direitos do Consumidor - STFC',
+             'PADO: Disponibilidade e Funcionamento de TUP',
+             'PADO: Exploração Industrial de Linha Dedicada',
+             'PADO: Gestão da Qualidade (PGMQ) - SeAC',
+             'PADO: Gestão da Qualidade (RGQ) - SCM',
+             'PADO: Gestão da Qualidade (RGQ) - SMP',
+             'PADO: Gestão da Qualidade (RGQ) - STFC',
+             'PADO: Home Passed - SeAC',
+             'PADO: Inadimplemento de TFF, PPDUR e PPDESS',
+             'PADO: Interconexão',
+             'PADO: Interrupções Sistêmicas - SCM',
+             'PADO: Interrupções Sistêmicas - SeAC',
+             'PADO: Interrupções Sistêmicas - SMP',
+             'PADO: Interrupções Sistêmicas - STFC',
+             'PADO: Irregularidade Técnica',
+             'PADO: Irregularidade Técnica e Certificação',
+             'PADO: Licenciamento de Estação',
+             'PADO: LTOG',
+             'PADO: Má-fé de Controlador ou Administrador',
+             'PADO: Meios de Pagamento e Pontos de Venda - TUP',
+             'PADO: Não Outorgado - Radiofrequência',
+             'PADO: Não Outorgado - Serviço',
+             'PADO: Não Outorgado - Serviço e Radiofrequência',
+             'PADO: Numeração',
+             'PADO: Obrigações Legais e Contratuais',
+             'PADO: Obstrução à Fiscalização',
+             'PADO: Oferta de Serviço - Convergente',
+             'PADO: Oferta de Serviço - SCM',
+             'PADO: Oferta de Serviço - SeAC',
+             'PADO: Oferta de Serviço - SMP',
+             'PADO: Oferta de Serviço - STFC',
+             'PADO: Ônus Contratual da Autorização',
+             'PADO: Ônus Contratual da Concessão',
+             'PADO: Operação fora do prazo',
+             'PADO: Organismo de Certificação Designado (OCD)',
+             'PADO: Plano de Seguros do Contrato de Concessão',
+             'PADO: Planos de Serviço - Convergente',
+             'PADO: Planos de Serviço - SCM',
+             'PADO: Planos de Serviço - SeAC',
+             'PADO: Planos de Serviço - SMP',
+             'PADO: Planos de Serviço - STFC',
+             'PADO: Portabilidade Numérica',
+             'PADO: Rede Externa',
+             'PADO: Remuneração de Redes',
+             'PADO: Ressarcimento - Convergente',
+             'PADO: Ressarcimento - SCM',
+             'PADO: Ressarcimento - SeAC',
+             'PADO: Ressarcimento - SMP',
+             'PADO: Ressarcimento - STFC',
+             'PADO: Rito Sumário',
+             'PADO: SAC - Convergente',
+             'PADO: SAC - SCM',
+             'PADO: SAC - SeAC',
+             'PADO: SAC - SMP',
+             'PADO: SAC - STFC',
+             'PADO: Serviço de Utilidade Pública',
+             'PADO: Tarifação - Convergente',
+             'PADO: Tarifação - SCM',
+             'PADO: Tarifação - SeAC',
+             'PADO: Tarifação - SMP',
+             'PADO: Tarifação - STFC',
+             'PADO: Transferência Irregular de Outorga',
+             'PADO: Universalização',
+             'PAF: CFRP',
+             'PAF: Fust',
+             'PAF: TFF',
+             'PAF: TFI',
+             'PAI: Aspectos Não-Técnicos/Conteúdo',
+             'Patrimônio: Cobrança de Acervo Bibliográfico',
+             'Patrimônio: Gestão de Acervo Bibliográfico',
+             'Patrimônio: Gestão de Bens Imóveis',
+             'PD&I: Gestão do Funttel',
+             'Pessoal: Abono Permanência - Concessão',
+             'Pessoal: Abono Permanência - Revisão',
+             'Pessoal: Adicional de Férias (1/3 constitucional)',
+             'Pessoal: Adicional de Insalubridade',
+             'Pessoal: Adicional de Periculosidade',
+             'Pessoal: Adicional Noturno',
+             'Pessoal: Adicional por Atividade Penosa',
+             'Pessoal: Adicional por Serviço Extraordinário',
+             'Pessoal: Adicional por Tempo de Serviço',
+             'Pessoal: Afastamento para Atividade Desportiva',
+             'Pessoal: Afastamento para Curso de Formação',
+             'Pessoal: Afastamento para Depor',
+             'Pessoal: Afastamento para Exercer Mandato Eletivo',
+             'Pessoal: Afastamento para Pós-Graduação',
+             'Pessoal: Afastamento para Serviço Eleitoral (TRE)',
+             'Pessoal: Afastamento para servir como Jurado',
+             'Pessoal: Afastamento para servir em Organismo Internacional',
+             'Pessoal: Afastamento Pós-graduação - com ônus',
+             'Pessoal: Afastamento Pós-graduação - sem ônus',
+             'Pessoal: Ajuda de Custo com Mudança de Domicílio',
+             'Pessoal: Aposentadoria - Concessão',
+             'Pessoal: Aposentadoria - Contagem Tempo de Serviço',
+             'Pessoal: Aposentadoria - Pensão Temporária',
+             'Pessoal: Aposentadoria - Pensão Vitalícia',
+             'Pessoal: Aposentadoria - Revisão',
+             'Pessoal: Apresentação de Certificado de Curso',
+             'Pessoal: Assentamento Funcional do Servidor',
+             'Pessoal: Ausência em razão de Casamento',
+             'Pessoal: Ausência para Alistamento Eleitoral',
+             'Pessoal: Ausência para Doação de Sangue',
+             'Pessoal: Ausência por Falecimento de Familiar',
+             'Pessoal: Auxílio Acidente',
+             'Pessoal: Auxílio Alimentação/Refeição',
+             'Pessoal: Auxílio Assistência Pré-Escolar/Creche',
+             'Pessoal: Auxílio Doença',
+             'Pessoal: Auxílio Funeral',
+             'Pessoal: Auxílio Moradia',
+             'Pessoal: Auxílio Natalidade',
+             'Pessoal: Auxílio Reclusão',
+             'Pessoal: Auxílio-Transporte',
+             'Pessoal: Avaliação de Desempenho Individual',
+             'Pessoal: Avaliação de Desempenho Institucional',
+             'Pessoal: Avaliação de Estágio Probatório',
+             'Pessoal: Averbação de Tempo de Serviço',
+             'Pessoal: Bolsa de Estudo de Idioma Estrangeiro',
+             'Pessoal: Bolsa de Pós-Graduação',
+             'Pessoal: Cadastro de Dependente no Imposto de Renda',
+             'Pessoal: Cessão de Servidor para outro Órgão',
+             'Pessoal: Coleta de Imagem de Assinatura',
+             'Pessoal: Concurso Público - Exames Admissionais',
+             'Pessoal: Concurso Público - Organização',
+             'Pessoal: Concurso Público - Provas e Títulos',
+             'Pessoal: Controle de Frequência/Abono de Falta',
+             'Pessoal: Controle de Frequência/Cumprir Hora Extra',
+             'Pessoal: Controle de Frequência/Folha de Ponto',
+             'Pessoal: Curso de Pós-Graduação',
+             'Pessoal: Curso no Exterior - com ônus',
+             'Pessoal: Curso no Exterior - ônus limitado',
+             'Pessoal: Curso no Exterior - sem ônus',
+             'Pessoal: Curso Promovido pela própria Instituição',
+             'Pessoal: Curso Promovido por outra Instituição',
+             'Pessoal: Delegação de Competência',
+             'Pessoal: Desconto da Contribuição para o INSS',
+             'Pessoal: Desconto de Contribuição Associativa',
+             'Pessoal: Desconto de Contribuição Sindical',
+             'Pessoal: Desconto de Empréstimo Consignado',
+             'Pessoal: Desconto de Pensão Alimentícia',
+             'Pessoal: Desconto do IRPF Retido na Fonte',
+             'Pessoal: Emissão de Certidões e Declarações',
+             'Pessoal: Emissão de Procuração',
+             'Pessoal: Encargo Patronal - Contribuição para INSS',
+             'Pessoal: Estágio - Dossiê do Estagiário',
+             'Pessoal: Estágio - Frequência/Folha de Ponto',
+             'Pessoal: Estágio - Processo Seletivo',
+             'Pessoal: Estágio de Servidor no Brasil',
+             'Pessoal: Estágio de Servidor no Exterior',
+             'Pessoal: Exoneração de Cargo Efetivo',
+             'Pessoal: Falecimento de Servidor',
+             'Pessoal: Férias - Alteração',
+             'Pessoal: Férias - Interrupção',
+             'Pessoal: Férias - Solicitação',
+             'Pessoal: Ficha Financeira',
+             'Pessoal: Folha de Pagamento',
+             'Pessoal: Gratificação de Desempenho',
+             'Pessoal: Gratificação Natalina (Décimo Terceiro)',
+             'Pessoal: Gratificação por Encargo - Curso/Concurso',
+             'Pessoal: Horário de Expediente - Definição',
+             'Pessoal: Horário de Expediente - Escala de Plantão',
+             'Pessoal: Horário de Expediente - Redução de Jornada',
+             'Pessoal: Horário Especial - Familiar Deficiente',
+             'Pessoal: Horário Especial - Instrutor de Curso',
+             'Pessoal: Horário Especial - Servidor Deficiente',
+             'Pessoal: Horário Especial - Servidor Estudante',
+             'Pessoal: Indenização de Transporte (meio próprio)',
+             'Pessoal: Licença Adotante',
+             'Pessoal: Licença Gestante',
+             'Pessoal: Licença para Atividade Política',
+             'Pessoal: Licença para Capacitação',
+             'Pessoal: Licença para Mandato Classista',
+             'Pessoal: Licença para Serviço Militar',
+             'Pessoal: Licença para Tratamento da Própria Saúde',
+             'Pessoal: Licença para Tratar de Interesses Particulares',
+             'Pessoal: Licença Paternidade',
+             'Pessoal: Licença por Acidente em Serviço',
+             'Pessoal: Licença por Afastamento do Cônjuge',
+             'Pessoal: Licença por Doença em Pessoa da Família',
+             'Pessoal: Licença por Doença Profissional',
+             'Pessoal: Licença Prêmio por Assiduidade',
+             'Pessoal: Licenças por Aborto/Natimorto',
+             'Pessoal: Movimentação de Servidor',
+             'Pessoal: Movimento Reivindicatório',
+             'Pessoal: Negociação Sindical e Acordo Coletivo',
+             'Pessoal: Nomeação/Exoneração de Cargo Comissionado e Designação/Dispensa de Substituto',
+             'Pessoal: Normatização Interna',
+             'Pessoal: Ocupação de Imóvel Funcional',
+             'Pessoal: Orientações e Diretrizes Gerais',
+             'Pessoal: Pagamento de Provento',
+             'Pessoal: Pagamento de Remuneração',
+             'Pessoal: Penalidade Advertência',
+             'Pessoal: Penalidade Cassação de Aposentadoria',
+             'Pessoal: Penalidade Demissão de Cargo Efetivo',
+             'Pessoal: Penalidade Destituição Cargo em Comissão',
+             'Pessoal: Penalidade Disponibilidade',
+             'Pessoal: Penalidade Suspensão',
+             'Pessoal: Pensão por Morte de Servidor',
+             'Pessoal: Planejamento da Força de Trabalho',
+             'Pessoal: Plano de Capacitação',
+             'Pessoal: Prêmios de Reconhecimento',
+             'Pessoal: Processo Seletivo para Ocupação de Cargo',
+             'Pessoal: Progressão e Promoção (Quadro Efetivo)',
+             'Pessoal: Progressão e Promoção (Quadro Específico)',
+             'Pessoal: Provimento - Nomeação para Cargo Efetivo',
+             'Pessoal: Provimento - Nomeação para Cargo em Comissão',
+             'Pessoal: Provimento - por Aproveitamento',
+             'Pessoal: Provimento - por Readaptação',
+             'Pessoal: Provimento - por Recondução',
+             'Pessoal: Provimento - por Reintegração',
+             'Pessoal: Provimento - por Reversão',
+             'Pessoal: Relação com Conselho Profissional',
+             'Pessoal: Remoção a Pedido - Concurso Interno',
+             'Pessoal: Remoção a Pedido com Mudança de Sede',
+             'Pessoal: Remoção a Pedido para Acompanhar Cônjuge',
+             'Pessoal: Remoção a Pedido por Motivo de Saúde',
+             'Pessoal: Remoção a Pedido sem Mudança de Sede',
+             'Pessoal: Remoção de Ofício com Mudança de Sede',
+             'Pessoal: Remoção de Ofício sem Mudança de Sede',
+             'Pessoal: Requisição de Servidor Externo',
+             'Pessoal: Requisição de Servidor Interno',
+             'Pessoal: Ressarcimento ao Erário',
+             'Pessoal: Restruturação de Cargos e Funções',
+             'Pessoal: Retribuição por Cargo em Comissão',
+             'Pessoal: Salário-Família',
+             'Pessoal: Saúde - Atestado de Comparecimento',
+             'Pessoal: Saúde - Auxílio-Saúde GEAP',
+             'Pessoal: Saúde - Cadastro de Dependente Estudante no Auxílio-Saúde',
+             'Pessoal: Saúde - Exclusão de Auxílio-Saúde',
+             'Pessoal: Saúde - Lançamento Mensal do Auxílio-Saúde no SIAPE',
+             'Pessoal: Saúde - Pagamento de Auxílio-Saúde',
+             'Pessoal: Saúde - Pagamento de Retroativo',
+             'Pessoal: Saúde - Ressarcimento ao Erário',
+             'Pessoal: Saúde - Solicitação de Auxílio-Saúde',
+             'Pessoal: Saúde e QVT',
+             'Pessoal: Subsidiar Ação Judicial',
+             'Pessoal: Vacância - Posse em Cargo Inacumulável',
+             'Peticionamento: Intercorrente - Processo Novo Relacionado',
+             'Planejamento da Fiscalização: Diretrizes',
+             'Planejamento da Fiscalização: Plano Anual',
+             'Planejamento da Fiscalização: Plano Operacional',
+             'Planejamento Estratégico: Acompanhamento do Plano Operacional',
+             'Planejamento Estratégico: Agenda Regulatória',
+             'Planejamento Estratégico: Análise de Cenários',
+             'Planejamento Estratégico: Elaboração do Plano Estratégico',
+             'Planejamento Estratégico: Elaboração do Plano Operacional',
+             'Planejamento Estratégico: Elaborar Cenários',
+             'Planejamento Estratégico: Gestão de Risco',
+             'Planejamento Estratégico: Gestão do Plano Estratégico',
+             'Planejamento Estratégico: Inteligência Estratégica',
+             'Planejamento Estratégico: Monitorar Ambiente',
+             'Planos de Serviço: Acompanhamento de Plano do STFC',
+             'Planos de Serviço: Gestão de Ofertas e Promoções',
+             'Planos de Serviço: Gestão de Planos de Serviço',
+             'Planos de Serviço: Homologação de Plano do STFC',
+             'Procedimento Administrativo: Acessibilidade',
+             'Procedimento Administrativo: Alteração Societária',
+             'Procedimento Administrativo: Atendimento',
+             'Procedimento Administrativo: Cancelamento de Serviço',
+             'Procedimento Administrativo: Carregamento de Canais - SeAC',
+             'Procedimento Administrativo: Cobrança',
+             'Procedimento Administrativo: Controle de Fiscalização',
+             'Procedimento Administrativo: Direito dos Consumidores',
+             'Procedimento Administrativo: Inspeção Técnica',
+             'Procedimento Administrativo: Interconexão',
+             'Procedimento Administrativo: Invasão de Cobertura',
+             'Procedimento Administrativo: Numeração',
+             'Procedimento Administrativo: Obrigações Gerais',
+             'Procedimento Administrativo: Oferta de Serviço',
+             'Procedimento Administrativo: Ônus Contratual da Autorização',
+             'Procedimento Administrativo: Ônus Contratual da Concessão',
+             'Procedimento Administrativo: Portabilidade Numérica',
+             'Procedimento Administrativo: Prestação de Informações',
+             'Procedimento Administrativo: Ressarcimento',
+             'Procedimento Administrativo: TFF, PPDUR e PPDESS',
+             'Radiação Restrita: Cadastro de Estação',
+             'Radiodifusão: Alteração de Plano Básico',
+             'Radiodifusão: Alteração de Plano Básico - Outros',
+             'Radiodifusão: Alteração de Plano Básico FM - Alteração de Coordenadas',
+             'Radiodifusão: Alteração de Plano Básico FM - Aumento de Potência',
+             'Radiodifusão: Alteração de Plano Básico FM - Inclusão de Canal',
+             'Radiodifusão: Alteração de Plano Básico FM - Mudança de Canal',
+             'Radiodifusão: Alteração de Plano Básico FM - Outras',
+             'Radiodifusão: Alteração de Plano Básico OM',
+             'Radiodifusão: Alteração de Plano Básico RadCom',
+             'Radiodifusão: Alteração de Plano Básico TV - Alteração de Coordenadas',
+             'Radiodifusão: Alteração de Plano Básico TV - Aumento de Potência',
+             'Radiodifusão: Alteração de Plano Básico TV - Inclusão de Canal',
+             'Radiodifusão: Alteração de Plano Básico TV - Mudança de Canal',
+             'Radiodifusão: Alteração de Plano Básico TV - Outras',
+             'Radiodifusão: Alteração de Plano Básico TV - Redução de Potência',
+             'Radiodifusão: Alteração de Plano Básico TV - Retransmissora Auxiliar',
+             'Radiodifusão: Alteração Técnica',
+             'Radiodifusão: Autocadastramento',
+             'Radiodifusão: Autorização de Uso de Radiofrequência',
+             'Radiodifusão: Autorização para Instalação de Estação Retransmissora Auxiliar',
+             'Radiodifusão: Licenciamento de Estações',
+             'Regulamentação: Análise de Impacto Regulatório',
+             'Regulamentação: Análise de Proposta Normativa',
+             'Regulamentação: Arrecadação',
+             'Regulamentação: Cálculo de Preço Público',
+             'Regulamentação: Certificação de Produto',
+             'Regulamentação: Conselhos e Comitês',
+             'Regulamentação: Exploração de Satélite',
+             'Regulamentação: Geral do Consumidor',
+             'Regulamentação: Numeração',
+             'Regulamentação: Órgãos Internacionais',
+             'Regulamentação: Pesquisas de Qualidade/Satisfação',
+             'Regulamentação: Projetos Especiais',
+             'Regulamentação: Proposição de Ato Normativo',
+             'Regulamentação: Proposição de Edital de Licitação',
+             'Regulamentação: Radiodifusão',
+             'Regulamentação: Universalização/Ampliação Acesso',
+             'Regulamentação: Uso de Radiofrequências',
+             'Relacionamento Institucional: Celebração de Cooperação com outras Instituições',
+             'Relacionamento Institucional: Gestão do Relacionamento',
+             'Relacionamento Institucional: Participação e Representação em Eventos',
+             'Relações Internacionais: Composição de Delegação - com ônus',
+             'Relações Internacionais: Composição de Delegação - ônus limitado',
+             'Relações Internacionais: Composição de Delegação - sem ônus',
+             'Relações Internacionais: Cooperação Internacional',
+             'Relações Internacionais: Gestão do GC-CBC',
+             'Relações Internacionais: Internalização de Decisão',
+             'Relações Internacionais: Proposta de Contribuição',
+             'Resolução de Conflitos: Arbitragem Comum',
+             'Resolução de Conflitos: Arbitragem em Interconexão',
+             'Resolução de Conflitos: Comissão de Resolução de Conflitos das Agência Reguladoras',
+             'Resolução de Conflitos: Mediação',
+             'Resolução de Conflitos: PGMC',
+             'Resolução de Conflitos: Reclamação Administrativa',
+             'Revisão de PADO: De Ofício',
+             'Revisão de PADO: Mediante Pedido do Interessado',
+             'Segurança Institucional: Automação e Controle Predial',
+             'Segurança Institucional: Controle de Acesso/Garagem',
+             'Segurança Institucional: Controle de Acesso/Portaria',
+             'Segurança Institucional: Prevenção contra Incêndio',
+             'Segurança Institucional: Projeto contra Incêndio',
+             'Segurança Institucional: Serviço de Vigilância',
+             'Serviços: Cessão de Uso de Espaço da Anatel',
+             'Suporte à Fiscalização: Celebração de Convênios',
+             'Suporte à Fiscalização: Gestão de Kits de Fiscalização',
+             'Suporte à Fiscalização: Instrumentos e Sistemas',
+             'Suporte à Fiscalização: Normas',
+             'Suporte à Fiscalização: Planejamento de Aquisições',
+             'Suprimento de Fundos: Concessão e Prestação de Contas',
+             'Suprimento de Fundos: Solicitação de Despesa',
+             'TAC: Abertura de Procedimento para Firmar TAC',
+             'TAC: Atendimento',
+             'TAC: Banda Larga - PNBL',
+             'TAC: Banda Larga nas Escolas - PBLE',
+             'TAC: Cancelamento de Serviço',
+             'TAC: Certificação de Produtos',
+             'TAC: Cobrança',
+             'TAC: Compromisso de Abrangência - SMP',
+             'TAC: Decumprimentos de Condicionamentos de Atos',
+             'TAC: Direitos dos Consumidores',
+             'TAC: Disponibilidade e Funcionamento de TUP',
+             'TAC: Gestão da Qualidade (RGQ/PGMQ)',
+             'TAC: Home Passed - SeAC',
+             'TAC: Interrupções Sistêmicas',
+             'TAC: Irregularidade Técnica',
+             'TAC: Irregularidade Técnica e Obstrução',
+             'TAC: Licenciamento de Estação',
+             'TAC: Múltiplas Matérias',
+             'TAC: Não Outorgado',
+             'TAC: Obstrução à Fiscalização',
+             'TAC: Oferta de Serviço',
+             'TAC: Outras Obrigações Legais e Contratuais',
+             'TAC: Planos de Serviço',
+             'TAC: Rede Externa',
+             'TAC: Ressarcimento',
+             'TAC: Tarifação',
+             'TAC: Universalização',
+             'Tarifas e Preços: Acompanhar Tarifas e Preços',
+             'Tarifas e Preços: Cálculo do Fator X',
+             'Tarifas e Preços: Cálculo do Índice',
+             'Tarifas e Preços: Homologação Tarifas',
+             'Tarifas e Preços: Reajuste de Preço',
+             'Tarifas e Preços: Reajuste de Tarifa',
+             'Tarifas e Preços: Revisão de Tarifa',
+             'Universalização/Ampliação do Acesso: Acompanhamento de Políticas Públicas',
+             'Universalização/Ampliação do Acesso: Análise de Impacto Regulatório',
+             'Universalização/Ampliação do Acesso: Contratações',
+             'Universalização/Ampliação do Acesso: Estudos',
+             'Universalização/Ampliação do Acesso: Interação Institucional',
+             'Universalização: Acessibilidade',
+             'Universalização: Acompanhamento do Fust',
+             'Universalização: PGMU',
+             'Universalização: PMU',
+             'Universalização: Proposta de uso do Fust',
+             'Viagem: Exterior - Prestação de Contas',
+             'Viagem: No País - Prestação de Contas',
+             'Viagem: Publicação de Boletim'
+             }
+
+
+class Contato(object):
+    TITLE = 'SEI - Contatos'
+
+    TIPO = (By.ID, 'selTipocontato')
+
+    SIGLA = (By.ID, 'txtSigla')
+
+    PF = (By.ID, 'lblPessoaFisica')
+
+    NOME = (By.ID, 'txtNome')
+
+    END = (By.ID, 'txtEndereco')
+
+    COMP = (By.ID, 'txtComplemento')
+
+    BAIRRO = (By.ID, 'txtBairro')
+
+    UF = (By.ID, 'selUF')
+
+    CIDADE = (By.ID, 'selCidade')
+
+    CEP = (By.ID, 'txtCep')
+
+    MASCULINO = (By.ID, 'optFeminino')
+
+    FEMININO = (By.ID, 'optMasculino')
+
+    CPF = (By.ID, 'txtCpf')
+
+    RG = (By.ID, 'txtRg')
+
+    ORG = (By.ID, 'txtOrgaoExpedidor')
+
+    NASC = (By.ID, 'txtNascimento')
+
+    FONE = (By.ID, 'txtTelefoneFixoPF')
+
+    CEL = (By.ID, 'txtTelefoneCelularPF')
+
+    EMAIL = (By.ID, 'txtEmail')
+
+    SALVAR = (By.NAME, 'sbmAlterarContato')
+
+    OBS = (By.ID, 'txtaObservacao')
+
+class Boleto(object):
+
+    URL = 'http://sistemasnet/boleto/Boleto/ConsultaDebitos.asp?SISQSmodulo=6853'
+
+    B_FISTEL = (By.ID, 'indTipoConsulta0')
+
+    B_CPF = (By.ID, 'indTipoConsulta1')
+
+    INPUT_FISTEL = (By.ID, 'NumFistel')
+
+    INPUT_CPF = (By.ID, 'NumCNPJCPF')
+
+    INPUT_DATA = (By.ID, 'DataPPDUR')
+
+    BUT_CONF = (By.ID, 'botaoFlatConfirmar')
+
+    MRK_TODOS = (By.ID, 'botaoFlatMarcarTodos')
+
+    PRINT = (By.ID, 'botaoFlatImprimirSelecionados')
+
+class Sec(object):
+
+    Base = 'http://sistemasnet/SEC/'
+
+    Consulta = 'http://sistemasnet/SEC/Tela.asp?SISQSmodulo=9336'
+
+    Histor = 'http://sistemasnet/SEC/Chamada/Historico.asp?SISQSmodulo=11380'
+
+    Agenda = 'http://sistemasnet/SEC/Default.asp?SISQSmodulo=7146&SISQSsistema=435'
+
+    Agenda_Alt = 'http://sistemasnet/SEC/Agenda/Tela.asp?OP=a&SISQSmodulo=5817'
+
+    Agenda_Canc = 'http://sistemasnet/SEC/Agenda/Tela.asp?OP=e&SISQSmodulo=5818'
+
+    Agenda_Cons = 'http://sistemasnet/SEC/Agenda/Tela.asp?OP=c&SISQSmodulo=5819'
+
+    Agenda_Incl = 'http://sistemasnet/SEC/Agenda/Tela.asp?OP=i&Acao=i&SISQSmodulo=5813'
+
+    Agenda_TrAval = 'http://sistemasnet/SEC/Morse/AvaliadorAlterar/tela.asp?SISQSmodulo=7851'
+
+    Cert_Alt = 'http://sistemasnet/SEC/Certificado/alterar/tela.asp?SISQSmodulo=12486'
+
+    Cert_Ant = 'http://sistemasnet/SEC/Certificado/Anterior/Tela.asp?SISQSmodulo=10530'
+
+    Cert_Cert = 'http://sistemasnet/SEC/Certificado/Certificar/Tela.asp?SISQSmodulo=4063'
+
+    Cert_Estr_Incl = 'http://sistemasnet/SEC/Certificado/Estrangeiro/Incluir/Tela.asp?SISQSmodulo=11713'
+
+    Cert_Estr_Prorr = 'http://sistemasnet/SEC/Certificado/Estrangeiro/Prorrogar/Tela.asp?SISQSmodulo=11488'
+
+    Cert_Excl = 'http://sistemasnet/SEC/Certificado/Exclusao/Tela.asp?SISQSmodulo=8100'
+
+    Cert_Impr = 'http://sistemasnet/SEC/Certificado/Imprimir/Tela.asp?SISQSmodulo=8370'
+
+    Cert_Mnt = 'http://sistemasnet/SEC/Certificado/Manutencao/Tela.asp?xOp=2&SISQSmodulo=10619'
+
+    Cert_Reat = 'http://sistemasnet/SEC/Certificado/Reativar/Tela.asp?SISQSmodulo=19806'
+
+    Cert_2nVia = 'http://sistemasnet/SEC/Certificado/SegundaVia/Tela.asp?SISQSmodulo=4145'
+
+    Ent_Alt = 'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=A&SISQSmodulo=5263'
+
+    Ent_AltRF = 'http://sistemasnet/SEC/Chamada/CadastroSRFRegularizado.asp?SISQSmodulo=16374'
+
+    Ent_Incl = 'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=I&SISQSmodulo=4150'
+
+    Insc_Canc = 'http://sistemasnet/SEC/Inscricao/Cancelar/Tela.asp?SISQSmodulo=17306'
+
+    Insc_Cons = 'http://sistemasnet/SEC/Consulta/Provamarcada/Tela.asp?SISQSmodulo=4090'
+
+    Insc_Inc = 'http://sistemasnet/SEC/Inscricao/Incluir/Tela.asp?SISQSmodulo=4029'
+
+    Insc_Mnt = 'http://sistemasnet/SEC/Inscricao/Reativar/Tela.asp?SISQSmodulo=18333'
+
+    Prova_Res = 'http://sistemasnet/SEC/Prova/Resultado/Tela.asp?SISQSmodulo=3872'
+
+    submit = "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')"
+
+
+Entidade = {'cpf': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'NumCNPJCPF')],
+            'cnpj': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ')],
+            'fistel':[(By.ID, 'pNumFistel'),(By.ID, 'pnumFistel')],
+            'indicativo':[(By.ID, 'pIndicativo')],
+            'nome':(By.ID, 't_NomeEntidade'),
+            'email':(By.ID, 't_EndEletronico'),
+            'rg':(By.ID, 'pf_NumIdentidade'),
+            'orgexp':(By.ID, 'pf_SiglaOrgaoExp'),
+            'nasc':(By.ID, 'pf_DataNascimento'),
+            'ddd':(By.ID, 'tel_NumCodigoNacional0'),
+            'fone':(By.ID, 'tel_NumTelefone0'),
+            'cep':(By.ID, 'CodCep1'),
+            'bt_cep':(By.ID, 'buscarEndereco'),
+            'logr':(By.ID, 'EndLogradouro1'),
+            'num':(By.ID, 'EndNumero1'),
+            'comp':(By.ID, 'EndComplemento1'),
+            'bairro':(By.ID, 'EndBairro1'),
+            'uf':(By.ID, 'SiglaUf1'),
+            'cidade':(By.ID, 'CodMunicipio1'),
+            'confirmar':(By.ID, 'botaoFlatConfirmar'),
+            'bt_dados':(By.ID, 'botaoFlatDadosComplementares'),
+            'bt_fone':(By.ID, 'botaoFlatTelefones'),
+            'bt_end':(By.ID, 'botaoFlatEndereço')}
+
+
+class Scpx(object):
+
+    Consulta = dict(link='http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714')
+
+    Ent =      dict(alterar_situacao="http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
+                    incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I")
+
+    Estacao =  dict(incluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
+                    alterar="http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
+                    excluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=E",
+                    licenciar="http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp")
+
+    Licenca =  dict(imprimir="http://sistemasnet/scpx/Licenca/Tela.asp",
+                    cpf=(By.ID, 'pnumCPFCNPJ'),
+                    fistel=(By.ID, 'pnumFistel'),
+                    indicativo=Entidade['indicativo'])
+
+class Scra(object):
+
+    Consulta = dict(link='http://sistemasnet/SCRA/Consulta/Tela.asp')
+
+    Ent =      dict(alterar_situacao="http://sistemasnet/scra/Chamada/CadastroSRFRegularizado.asp",
+                    incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I")
+
+    Estacao =  dict(alterar="http://sistemasnet/acra/Chamada/Entidade.asp?OP=A",
+                    alterar_indicativo='http://sistemasnet/SCRA/IndicativoAlterar/Tela.asp?OP=A',
+                    excluir="http://sistemasnet/SCRA/Estacao/Tela.asp?OP=E",
+                    incluir='http://sistemasnet/SCRA/Estacao/Tela.asp?OP=I',
+                    licenciar='http://sistemasnet/SCRA/EstacaoLicenciar/Tela.asp')
+
+    Licenca =  dict(imprimir="http://sistemasnet/SCRA/Chamada/Licenca.asp")
+
+class Slmm(object):
+
+    Consulta = 'http://sistemasnet/stel/SCMM/Consulta/Tela.asp'
+
+    Licenca = {"imprimir": "http://sistemasnet/stel/SCMM/LicencaImprimir/Tela.asp?SISQSmodulo=7766"}
+
+
+class Slma(object):
+
+    Consulta = "http://sistemasnet/stel/SCMA/Consulta/Tela.asp"
+
+
+    Licenca = {"imprimir": "http://sistemasnet/stel/SCMA/LicencaPadrao/ImpressaoLicenca.asp?SISQSmodulo=7005"}
+
+
+class Sigec(object):
+
+    consulta = "http://sistemasnet/sigec/ConsultasGerais/SituacaoCadastral/tela.asp"
+
+    cpf = (By.ID, "NumCNPJCPF")
+
+    fistel = (By.ID, 'NumFistel')
 
-    dict_tags['interessado'] = tag.string if tag else ''
 
-    return dict_tags
 
-def tag_controle(tag):
 
-    key, value = "", ""
 
-    img = str(tag.img['src'])
 
-    # TODO: change to tag.attrs.get(onmouseover)
-    pattern = re.search('\((.*)\)', tag.attrs['onmouseover'])
 
-    if 'imagens/sei_anotacao' in img:
-
-        # Separa o texto interno retornado pelo js onmouseover delimitado
-        # pelas aspas simples. Salvo somente o primeiro e terceiro items
-
-        value = pattern.group().split("'")[1:4:2]
-
-        key = "postit_red" if 'prioridade' in img else "postit"
-
-    elif 'imagens/sei_situacao' in img:
-
-        key = 'situacao'
-        value = pattern.group().split("'")[1]
-
-    elif 'imagens/marcador' in img:
-
-        marcador = pattern.group().split("'")[1:4:2]
-        key = 'marcador'
-        value =  "".join(marcador)
-
-    elif 'imagens/exclamacao' in img:
-
-        key = 'aviso'
-        value = True
-
-    return key, value
-
-def cria_dict_tags(lista_tags):
-    """ Recebe uma lista de tags de cada linha do processo  da página inicial
-    do SEI, retorna um dicionário dessas tags
-    """
-
-    dict_tags = {key:"" for key in keys}
-
-    assert len(lista_tags) == 6, "Verifique o nº de tags de cada linha do \
-    processo, valor diferente de 10"
-
-    controles = {k:v for k, v in tag_controle(tag) for tag in lista_tags[1].find_all('a')}
-
-    dict_tags = {**dict_tags, **controles}
-
-    peticionamento = lista_tags[1].find(src=re.compile('peticionamento'))
-
-    if peticionamento:
-
-        pattern = re.search(
-            '\((.*)\)', peticionamento.attrs['onmouseover'])
-
-        dict_tags['peticionamento'] = pattern.group().split('"')[1]
-
-    processo = lista_tags[2].find('a')
-
-    dict_tags['processo'] = processo.string
-
-    atribuicao =  lista_tags[3].find("a")
-
-    if atribuicao:
-
-        dict_tags['atribuicao'] = atribuicao.string
-
-    dict_tags['tipo'] = lista_tags[4].string
-
-
-    interessado = lista_tags[5].find(class_='spanItemCelula')
-
-    if interessado:
-
-        dict_tags['interessado'] = interessado.string
-
-    return dict_tags
-
-def dict_to_df(processos):
-    """Recebe a lista processos contendo um dicionário das tags de cada
-    processo aberto no SEI. Retorna um Data Frame cujos registros
-    são as string das tags.
-    """
-
-    cols = ['processo', 'tipo', 'atribuicao', 'marcador', 'anotacao', 'prioridade',
-            'peticionamento', 'aviso', 'situacao', 'interessado']
-
-    df = pd.DataFrame(columns=cols)
-
-    for p in processos:
-        df = df.append(pd.Series(p), ignore_index=True)
-
-    df['atribuicao'] = df['atribuicao'].astype("category")
-    df['prioridade'] = df['prioridade'].astype("category")
-    df['tipo'] = df['tipo'].astype("category")
-
-    return df
-
-def init_browser(webdriver, login, senha):
-
-    page = Page(webdriver)
-
-    page.driver.get('http://sistemasnet')
-
-    sleep(1)
-
-    alert = page.alert_is_present(timeout=10)
-
-
-    if alert:
-
-        try:
-
-            alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
-
-            alert.accept()
-
-        except:
-
-            return page
-
-    return page
-
-def check_input(ident, serv, tipo):
-
-    if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
-
-        raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
-
-    if tipo == 'cnpj' and len(ident) != 14:
-
-        raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
-
-    ident = str(ident)
-
-    tipo = str(tipo)
-
-    if serv == "cidadao":
-
-        pattern = r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$'
-
-        sis = sei.helpers.Scpx
-
-    elif serv == 'radioamador':
-
-        pattern = r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$'
-
-        sis = Scra
-
-    elif serv == "aeronautico":
-
-        pattern = r'^(P){1}([A-Z]){4}$'
-
-        sis = Slma
-
-    elif serv == "maritimo":
-
-        pattern = r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})'
-
-        sis = Slmm
-
-    elif serv == "boleto":
-
-        sis = Boleto
-
-    elif serv == "sec":
-
-        sis = Sec
-
-    else:
-
-        raise ValueError("Não foi encontrado o Serviço {}".format(serv))
-
-    if tipo == 'indicativo':
-
-        if not re.match(pattern, ident, re.I):
-
-            raise ValueError("Indicativo Digitado Inválido")
-
-    return (ident, tipo, sis)
-
-def save_page(page, filename):
-
-    with open(filename, 'w') as file:
-
-        #html = soup(driver.page_source).prettify()
-
-        # write image
-        file.write(page.driver.page_source)
-
-        # TODO: install weasyprint
-
-        # TODO; autoit
-
-    # driver.close()
-
-def last_day_of_month():
-    """ Use datetime module and manipulation to return the last day
-        of the current month, it's doesn't matter which.
-        Return: Last day of current month, valid for any month
-    """
-    any_day = dt.date.today()
-
-    next_month = any_day.replace(
-        day=28) + dt.timedelta(days=4)  # this will never fail
-    # this will always result in the last day of the month
-    date = next_month - dt.timedelta(days=next_month.day)
-
-    date = date.strftime("%d%m%y")
-
-    return date

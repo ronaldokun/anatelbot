@@ -18,9 +18,9 @@ from selenium.webdriver.common.keys import Keys
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
-from base.page import Page
-from helpers import (Base, Bloco, Envio, Menu, PagBlocos, Login,
-                     Main, Processo, Central)
+from page import Page
+from functions import (Base, Bloco, Envio, Menu, PagBlocos, Login,
+                       Main, Processo, Central)
 
 
 class LoginPage(Page):

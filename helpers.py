@@ -5,9 +5,14 @@ Created on Wed Nov  1 16:50:19 2017
 
 @author: rsilva
 """
+import datetime as dt
 import re
+from time import sleep
 
 import pandas as pd
+
+import helpers
+from base.page import Page
 
 KEYS = ['processo',
         'tipo',
@@ -234,3 +239,117 @@ def dict_to_df(processos):
     df['tipo'] = df['tipo'].astype("category")
 
     return df
+
+def init_browser(webdriver, login, senha):
+
+    page = Page(webdriver)
+
+    page.driver.get('http://sistemasnet')
+
+    sleep(1)
+
+    alert = page.alert_is_present(timeout=10)
+
+
+    if alert:
+
+        try:
+
+            alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
+
+            alert.accept()
+
+        except:
+
+            return page
+
+    return page
+
+def check_input(ident, serv, tipo):
+
+    if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
+
+        raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
+
+    if tipo == 'cnpj' and len(ident) != 14:
+
+        raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
+
+    ident = str(ident)
+
+    tipo = str(tipo)
+
+    if serv == "cidadao":
+
+        pattern = r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$'
+
+        sis = sei.helpers.Scpx
+
+    elif serv == 'radioamador':
+
+        pattern = r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$'
+
+        sis = Scra
+
+    elif serv == "aeronautico":
+
+        pattern = r'^(P){1}([A-Z]){4}$'
+
+        sis = Slma
+
+    elif serv == "maritimo":
+
+        pattern = r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})'
+
+        sis = Slmm
+
+    elif serv == "boleto":
+
+        sis = Boleto
+
+    elif serv == "sec":
+
+        sis = Sec
+
+    else:
+
+        raise ValueError("Não foi encontrado o Serviço {}".format(serv))
+
+    if tipo == 'indicativo':
+
+        if not re.match(pattern, ident, re.I):
+
+            raise ValueError("Indicativo Digitado Inválido")
+
+    return (ident, tipo, sis)
+
+def save_page(page, filename):
+
+    with open(filename, 'w') as file:
+
+        #html = soup(driver.page_source).prettify()
+
+        # write image
+        file.write(page.driver.page_source)
+
+        # TODO: install weasyprint
+
+        # TODO; autoit
+
+    # driver.close()
+
+def last_day_of_month():
+    """ Use datetime module and manipulation to return the last day
+        of the current month, it's doesn't matter which.
+        Return: Last day of current month, valid for any month
+    """
+    any_day = dt.date.today()
+
+    next_month = any_day.replace(
+        day=28) + dt.timedelta(days=4)  # this will never fail
+    # this will always result in the last day of the month
+    date = next_month - dt.timedelta(days=next_month.day)
+
+    date = date.strftime("%d%m%y")
+
+    return date

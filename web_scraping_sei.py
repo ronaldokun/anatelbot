@@ -18,9 +18,9 @@ from selenium.webdriver.common.keys import Keys
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
-from page.page import Page
-from sei._locators import (Base, Bloco, Envio, Menu, PagBlocos, Login,
-                           Main, Processo, Central)
+from base.page import Page
+from helpers import (Base, Bloco, Envio, Menu, PagBlocos, Login,
+                     Main, Processo, Central)
 
 
 class LoginPage(Page):
@@ -424,21 +424,15 @@ def navigate_link_to_new_window(driver, link):
 
 
 def main(bloco):
-<<<<<<< HEAD:web_scraping_sei.py
-=======
 
     driver = webdriver.Chrome()
->>>>>>> deployment:sistemas/web_scraping_sei.py
 
     sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
     sei.expedir_bloco(bloco)
 
-<<<<<<< HEAD:web_scraping_sei.py
-=======
     sei.close()
 
->>>>>>> deployment:sistemas/web_scraping_sei.py
 if __name__ == 'main':
     main(sys.argv[1])
 
@@ -447,16 +441,10 @@ driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-<<<<<<< HEAD:web_scraping_sei.py
-sei.expedir_bloco(84190)
+sei.expedir_bloco(85288)
 
-=======
+sei.expedir_bloco(85800)
 
-sei.expedir_bloco(84888)
-
-sei.expedir_bloco(84951)
-
-#sei.expedir_bloco(85118)
->>>>>>> deployment:sistemas/web_scraping_sei.py
+sei.expedir_bloco(85928)
 
 sei.close()

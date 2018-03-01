@@ -8,7 +8,7 @@ Created on Mon Aug 28 20:44:15 2017
 
 from contextlib import contextmanager
 
-import page
+import base
 
 
 # Base Class
@@ -28,7 +28,7 @@ class Page(object):
 
         except TypeError:
 
-            print("The object {0} must be of type{1}".format(driver, type(page.webdriver)))
+            print("The object {0} must be of type{1}".format(driver, type(base.webdriver)))
 
     def __enter__(self):
         """ Implementation class """
@@ -43,17 +43,17 @@ class Page(object):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name('title')
         yield
-        page.WebDriverWait(self.driver, timeout).until(
-            page.ec.staleness_of(old_page))
+        base.WebDriverWait(self.driver, timeout).until(
+            base.ec.staleness_of(old_page))
 
     def alert_is_present(self, timeout=timeout):
 
         try:
 
-            alert = page.WebDriverWait(self.driver, timeout).until(
-                page.ec.alert_is_present())
+            alert = base.WebDriverWait(self.driver, timeout).until(
+                base.ec.alert_is_present())
 
-        except (page.TimeoutException, page.WebDriverException):
+        except (base.TimeoutException, base.WebDriverException):
 
             return False
 
@@ -69,10 +69,10 @@ class Page(object):
         """
         try:
 
-            page.WebDriverWait(self.driver, timeout).until(
-                page.ec.visibility_of_element_located(*locator))
+            base.WebDriverWait(self.driver, timeout).until(
+                base.ec.visibility_of_element_located(*locator))
 
-        except page.TimeoutException:
+        except base.TimeoutException:
 
             return False
 
@@ -92,31 +92,31 @@ class Page(object):
 
     def hover(self, *locator):
         element = self.find_element(*locator)
-        hover = page.ActionChains(self.driver).move_to_element(element)
+        hover = base.ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
     def check_element_exists(self, *locator):
         try:
             self.wait_for_element(*locator)
-        except page.TimeoutException:
+        except base.TimeoutException:
             return False
         return True
 
     def wait_for_element_to_be_visible(self, *locator, timeout=timeout):
-        return page.WebDriverWait(self.driver, timeout).until(
-            page.ec.visibility_of_element_located(*locator))
+        return base.WebDriverWait(self.driver, timeout).until(
+            base.ec.visibility_of_element_located(*locator))
 
     def wait_for_element(self, *locator, timeout=timeout):
-        return page.WebDriverWait(self.driver, timeout).until(
-            page.ec.presence_of_element_located(*locator))
+        return base.WebDriverWait(self.driver, timeout).until(
+            base.ec.presence_of_element_located(*locator))
 
     def wait_for_element_to_click(self, *locator, timeout=timeout):
-        return page.WebDriverWait(self.driver, timeout).until(
-            page.ec.element_to_be_clickable(*locator))
+        return base.WebDriverWait(self.driver, timeout).until(
+            base.ec.element_to_be_clickable(*locator))
 
     def wait_for_new_window(self, timeout=timeout):
-        return page.WebDriverWait(self.driver, timeout).until(
-            page.ec.number_of_windows_to_be(2))
+        return base.WebDriverWait(self.driver, timeout).until(
+            base.ec.number_of_windows_to_be(2))
 
     def nav_elem_to_new_win(self, elem):
         """ navigate the link present in element to a new window

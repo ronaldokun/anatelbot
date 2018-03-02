@@ -14,7 +14,7 @@ from page import Page
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.keys import Keys
 
-import functions
+
 
 KEYS = ['processo',
         'tipo',

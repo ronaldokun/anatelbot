@@ -30,11 +30,11 @@ def leave(time):
 
         import web_scraping_sei
 
+        print("Emissão de Bloco efetuada com sucesso")
     except:
 
-        print("Problema na emissão dos bloco")
+        print("Problema na emissão dos blocos")
 
-    print("Emissão de Bloco efetuada com sucesso")
 
     page = init_browser(webdriver=webdriver.Firefox(), login=USER, senha=PASS)
 
@@ -80,14 +80,15 @@ def enter(time):
 
         sleep(60 * random.randint(5, 10))
 
-    #try:
+    try:
 
-    #    import web_scraping_sei
+        import web_scraping_sei
 
-    #except:
+        print("Emissão de Bloco efetuada com sucesso")
 
-    #   pass
+    except:
 
+        print("Problema na emissão dos bloco")
 
     page = init_browser(webdriver=webdriver.Firefox(), login=USER, senha=PASS)
 
@@ -115,9 +116,9 @@ def enter(time):
         print("Entered Except Block in Enter")
 
 
-entra = dt.datetime(2018, 2, 23, 7, 10)
+entra = dt.datetime(2018, 3, 2, 13, 45)
 
-sai = dt.datetime(2018, 2, 22, 19, 30)
+sai = dt.datetime(2018, 3, 2, 12, 45)
 
 leave(sai)
 

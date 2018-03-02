@@ -19,8 +19,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
 from page import Page
-from functions import (Base, Bloco, Envio, Menu, PagBlocos, Login,
-                       Main, Processo, Central)
+
+from helpers import *
 
 
 class LoginPage(Page):
@@ -49,7 +49,6 @@ class LoginPage(Page):
 
 
 class PagInicial(Page):
-
     """
     This class is a subclass of page, this class is a logged page
     """
@@ -104,7 +103,6 @@ class PagInicial(Page):
         pages = [pag.text for pag in contador.options]
 
         for pag in pages:
-
             # One simple repetition to avoid more complex code
             contador = Select(self.wait_for_element(Main.CONT))
             contador.select_by_visible_text(pag)
@@ -115,11 +113,11 @@ class PagInicial(Page):
 
     def go_to_blocos(self):
         self.exibir_menu_lateral()
-        self.wait_for_element(Menu.BL_ASS).click()
+        self.wait_for_element(LatMenu.BL_ASS).click()
 
     def exibir_bloco(self, numero):
 
-        if self.get_title() != PagBlocos.TITLE:
+        if self.get_title() != Blocos.TITLE:
             self.go_to_blocos()
 
         try:
@@ -132,7 +130,6 @@ class PagInicial(Page):
     def armazena_bloco(self, numero):
 
         if self.get_title() != Bloco.TITLE + " " + str(numero):
-
             self.exibir_bloco(numero)
 
         html_bloco = soup(self.driver.page_source, "lxml")
@@ -153,7 +150,6 @@ class PagInicial(Page):
             assert len(chaves) == len(cols), "Verifique as linhas do bloco!"
 
             for k, v in zip(chaves, cols):
-
                 proc[k] = v
 
             proc['checkbox'] = proc['checkbox'].find(
@@ -172,7 +168,6 @@ class PagInicial(Page):
         for p in processos:
 
             if podeExpedir(p):
-
                 proc = p['processo'].a.string
 
                 num_doc = p['documento'].a.string
@@ -186,15 +181,15 @@ class PagInicial(Page):
 
                 chk.click()
 
-                #counter += 1
+                # counter += 1
 
-                #sleep(30*random.randint(1,4))
+                # sleep(30*random.randint(1,4))
 
-        #if counter == len(processos):
+        # if counter == len(processos):
 
-            #concluir_bl = self.wait_for_element_to_click(Bloco)
+        # concluir_bl = self.wait_for_element_to_click(Bloco)
 
-            #ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
+        # ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
 
         # ret.click()
 
@@ -203,7 +198,7 @@ class PagInicial(Page):
     def expedir_oficio(self, proc, num_doc, link):
 
         # Guarda o link para abrir o processo
-        #elem = self.wait_for_element_to_click((By.LINK_TEXT, proc))
+        # elem = self.wait_for_element_to_click((By.LINK_TEXT, proc))
 
         (main_window, proc_window) = navigate_link_to_new_window(self.driver, link)
 
@@ -219,12 +214,11 @@ class PagInicial(Page):
 
         self.driver.switch_to_window(main_window)
 
-        #sleep(60)
+        # sleep(60)
 
     def enviar_processo_sede(self, buttons):
 
         with self.wait_for_page_load():
-
             assert self.get_title() == Processo.TITLE, \
                 "Erro ao navegar para o processo"
 
@@ -238,7 +232,6 @@ class PagInicial(Page):
             self.driver.execute_script(Envio.LUPA)
 
         with self.wait_for_page_load():
-
             # Guarda as janelas do navegador presentes
             windows = self.driver.window_handles
 
@@ -274,8 +267,7 @@ class PagInicial(Page):
         # Atraso no acesso ao checkbox abaixo gerando erro
         sleep(0.5)
 
-        checkbox = self.wait_for_element_to_click(Envio.OPEN)\
-
+        checkbox = self.wait_for_element_to_click(Envio.OPEN)
 
         checkbox.click()
 
@@ -313,7 +305,7 @@ class PagInicial(Page):
 
         buttons = html_frame.find(id="divArvoreAcoes").contents
 
-        #assert len(buttons) == 17, "Erro ao guardar os botões de ação do processo"
+        # assert len(buttons) == 17, "Erro ao guardar os botões de ação do processo"
 
         self.driver.switch_to_default_content()
 
@@ -328,7 +320,6 @@ class PagInicial(Page):
         self.driver.switch_to_frame("ifrArvore")
 
         with self.wait_for_page_load():
-
             html_tree = soup(self.driver.page_source, "lxml")
 
             info = html_tree.find(title=re.compile(num_doc)).string
@@ -365,7 +356,6 @@ class PagInicial(Page):
 
 
 def podeExpedir(p):
-
     t1 = p['processo'].find_all('a', class_="protocoloAberto")
 
     t2 = p['tipo'].find_all(string="Ofício")
@@ -398,18 +388,17 @@ def navigate_elem_to_new_window(driver, elem):
     # Troca o foco do navegador
     driver.switch_to_window(windows[-1])
 
-    return (main_window, windows[-1])
+    return main_window, windows[-1]
 
 
 def navigate_link_to_new_window(driver, link):
-
     # Guarda janela principal
     main_window = driver.current_window_handle
 
     # Abre link no elem em uma nova janela
-    #body = self.driver.find_element_by_tag_name('body')
+    # body = self.driver.find_element_by_tag_name('body')
 
-    #body.send_keys(Keys.CONTROL + 'n')
+    # body.send_keys(Keys.CONTROL + 'n')
 
     driver.execute_script("window.open()")
     # Guarda as janelas do navegador presentes
@@ -420,11 +409,10 @@ def navigate_link_to_new_window(driver, link):
 
     driver.get(link)
 
-    return (main_window, windows[-1])
+    return main_window, windows[-1]
 
 
 def main(bloco):
-
     driver = webdriver.Chrome()
 
     sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
@@ -433,18 +421,14 @@ def main(bloco):
 
     sei.close()
 
+
 if __name__ == 'main':
     main(sys.argv[1])
-
 
 driver = webdriver.Chrome()
 
 sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-sei.expedir_bloco(85288)
-
-sei.expedir_bloco(85800)
-
-sei.expedir_bloco(85928)
+sei.expedir_bloco(86184)
 
 sei.close()

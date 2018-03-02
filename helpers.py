@@ -76,7 +76,6 @@ class Main(object):
 class Blocos(object):
     TITLE = "SEI - Blocos de Assinatura"
 
-
 class Bloco(object):
     TITLE = "SEI - Documentos do Bloco de Assinatura"
 

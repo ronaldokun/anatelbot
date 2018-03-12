@@ -27,6 +27,12 @@ KEYS = ['processo',
         'situacao',
         'interessado']
 
+PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
+            r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$',
+            r'^(P){1}([A-Z]){4}$',
+            r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})']
+
+
 
 def pode_expedir(linha):
     """Verifica algumas condições necessárias para expedição do Ofício no SEI
@@ -245,20 +251,21 @@ def dict_to_df(processos):
     return df
 
 
-def init_browser(webdriver, login, senha):
+def init_browser(webdriver, login, senha, timeout=5):
+
     page = Page(webdriver)
 
     page.driver.get('http://sistemasnet')
 
-    sleep(1)
-
-    alert = page.alert_is_present(timeout=10)
+    alert = page.alert_is_present(timeout=timeout)
 
     try:
+        
+        if alert:
 
-        alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
+            alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
 
-        alert.accept()
+            alert.accept()
 
     except NoAlertPresentException:
 
@@ -267,62 +274,28 @@ def init_browser(webdriver, login, senha):
     return page
 
 
-def check_input(ident, serv, tipo):
-    if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
-        raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
+def check_input(identificador, tipo):
+    if (tipo == 'cpf' or tipo == 'fistel') and len(identificador) != 11:
+        print("O número de dígitos do {0} deve ser 11".format(tipo))
 
-    if tipo == 'cnpj' and len(ident) != 14:
-        raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
+        return False
 
-    ident = str(ident)
+    elif tipo == 'cnpj' and len(identificador) != 14:
+        print("O número de dígitos do {0} deve ser 14".format(tipo))
 
-    tipo = str(tipo)
+        return False
 
-    pattern = None
+    elif tipo == 'indicativo':
 
-    if serv == "cidadao":
+        for pattern in PATTERNS:
 
-        pattern = r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$'
+            if re.match(pattern, identificador, re.I):
+                return True
+        else:
 
-        sis = functions.Scpx
+            return False
 
-    elif serv == 'radioamador':
-
-        pattern = r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$'
-
-        sis = functions.Scra
-
-    elif serv == "aeronautico":
-
-        pattern = r'^(P){1}([A-Z]){4}$'
-
-        sis = functions.Slma
-
-    elif serv == "maritimo":
-
-        pattern = r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})'
-
-        sis = functions.Slmm
-
-    elif serv == "boleto":
-
-        sis = functions.Boleto
-
-    elif serv == "sec":
-
-        sis = functions.Sec
-
-    else:
-
-        raise ValueError("Não foi encontrado o Serviço {}".format(serv))
-
-    if tipo == 'indicativo':
-
-        if not re.match(pattern, ident, re.I):
-            raise ValueError("Indicativo Digitado Inválido")
-
-    return ident, tipo, sis
-
+    return True
 
 def save_page(page, filename):
     with open(filename, 'w') as file:

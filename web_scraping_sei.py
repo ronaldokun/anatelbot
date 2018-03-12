@@ -161,7 +161,7 @@ class PagInicial(Page):
 
     def expedir_bloco(self, numero):
 
-        processos = self.armazena_bloco(numero)
+        processos = self.armazena_bloco(str(numero))
 
         counter = 0
 
@@ -413,11 +413,12 @@ def navigate_link_to_new_window(driver, link):
 
 
 def main(bloco):
+
     driver = webdriver.Chrome()
 
     sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-    sei.expedir_bloco(bloco)
+    sei.expedir_bloco(str(bloco))
 
     sei.close()
 
@@ -425,10 +426,4 @@ def main(bloco):
 if __name__ == 'main':
     main(sys.argv[1])
 
-driver = webdriver.Chrome()
-
-sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
-
-sei.expedir_bloco(86184)
-
-sei.close()
+main('87119')

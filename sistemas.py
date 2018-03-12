@@ -1,25 +1,27 @@
 from time import sleep
 
-from page import Page
+from page import *
 
 import helpers
 import functions
 
 SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
 
+PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
+            r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$',
+            r'^(P){1}([A-Z]){4}$',
+            r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})']
 
-class Sis(Page):
+
+class Scpx(Page):
     """
     Esta subclasse da classe Page define métodos de execução de funções nos sistemas
     interativos da ANATEL
     """
 
-    def __init__(self, driver, login, senha, servico):
+    def __init__(self, driver, login, senha):
 
-        if str.lower(servico) not in SERVICOS:
-            raise ValueError("Serviço Inválido, escolha um dos serviços {}".format(SERVICOS))
-
-        self.servico = servico
+        self.sistema = helpers.Scpx
 
         self.tipo = 'cpf'
 
@@ -28,41 +30,37 @@ class Sis(Page):
         functions.init_browser(self.driver, login, senha)
 
 
-    def _navigate(self, link, ident, id_type):
+    def consulta(self, identificador, tipo='cpf'):
 
-        self.driver.get(link)
+        identificador = str(identificador)
 
-        for id in helpers.Entidade[id_type]:
+        if not functions.check_input(identificador, tipo):
 
-            try:
+            raise ValueError("Identificador inválido: ", identificador)
 
-                elem = self.wait_for_element_to_click(id, timeout=5)
-
-                elem.send_keys(ident + Keys.RETURN)
-
-            except NoSuchElementException:
-
-                print("The html id: {} is not present on this webpage".format(ident))
-
-        else:
-
-            raise ValueError("Não foi encontrado um 'id' html válido nessa página para o identificador {},"
-                  " verifique as htmls id's no arquivo 'locators'".format(ident))
-
-
-    def consulta(self, identificador, tipo=self.tipo):
-
-        identificador, self.tipo, sistema = functions.check_input(identificador, self.servico, tipo)
-
-        self._navigate(sistema.Consulta, identificador, self.tipo)
-
-    def imprime_consulta(self, ident, serv, id_type):
-
-        self.consulta(ident, serv, id_type)
+        self.driver.get(self.sistema.Consulta['link'])
 
         try:
 
-            elem = self.wait_for_element_to_click((By.ID, "botaoFlatEstação"))
+            elem = self.wait_for_element_to_click(self.sistema.Consulta[tipo], timeout=10)
+
+            elem.send_keys(identificador + Keys.RETURN)
+
+        except NoSuchElementException:
+
+            print("The html id: {} is not present on this webpage".format(ident))
+
+
+
+    def imprime_consulta(self, identificador, tipo='cpf', resumida=False):
+
+        with self.wait_for_page_load():
+
+            self.consulta(identificador, tipo)
+
+        try:
+
+            elem = self.wait_for_element_to_click(self.sistema.Consulta['btn_estacao'])
 
             elem.click()
 
@@ -74,10 +72,14 @@ class Sis(Page):
 
         try:
 
-            elem = self.wait_for_element_to_click((By.ID, "botaoFlatVersãoparaImpressão"),
-                                                  timeout=5)
+            if resumida:
 
-            elem.click()
+                self.driver.execute_script("VersaoImpressao('R')")
+
+            else:
+
+                self.driver.execute_script("VersaoImpressao('N')")
+
 
         except:
 
@@ -91,7 +93,7 @@ class Sis(Page):
         field and commands the print of the boleto
         """
 
-        ident, serv, id_type, sis = functions.check_input(ident, 'boleto', id_type)
+        ident, serv, id_type, sis = functions.check_input(ident, id_type)
 
         self.driver.get(sis.URL)
 
@@ -252,38 +254,38 @@ def atualiza_cadastro(page, dados):
     cpf.send_keys(str(dados['CPF']) + Keys.RETURN)
 
     if 'Email' in dados:
-        atualiza_campo(dados['Email'], locatos.En.email)
+        atualiza_campo(dados['Email'], helpers.En.email)
 
-    btn = page.wait_for_element_to_click(locatos.En.bt_dados)
+    btn = page.wait_for_element_to_click(helpers.En.bt_dados)
 
     btn.click()
 
     if 'RG' in dados:
-        atualiza_campo(dados['RG'], locatos.En.rg)
+        atualiza_campo(dados['RG'], helpers.En.rg)
 
     if 'Orgexp' in dados:
-        atualiza_campo(dados['Orgexp'], locatos.En.orgexp)
+        atualiza_campo(dados['Orgexp'], helpers.En.orgexp)
 
     if 'Data de Nascimento' in dados:
         data = dados['Data de Nascimento']
 
         data = data.replace('-', '')
 
-        atualiza_campo(data, locatos.En.nasc)
+        atualiza_campo(data, helpers.En.nasc)
 
-    btn = page.wait_for_element_to_click(locatos.En.bt_fone)
+    btn = page.wait_for_element_to_click(helpers.En.bt_fone)
 
     btn.click()
 
     if 'ddd' in dados:
 
-        atualiza_campo(dados['ddd'], locatos.En.ddd)
+        atualiza_campo(dados['ddd'], helpers.En.ddd)
 
     else:
 
         ddd = '11'
 
-        atualiza_campo(ddd, locatos.En.ddd)
+        atualiza_campo(ddd, helpers.En.ddd)
 
         # if 'Fone' in dados:
 
@@ -295,7 +297,7 @@ def atualiza_cadastro(page, dados):
 
     #  atualiza_campo(fone, Entidade.fone)
 
-    btn = page.wait_for_element_to_click(locatos.En.bt_end)
+    btn = page.wait_for_element_to_click(helpers.En.bt_end)
 
     btn.click()
 
@@ -305,15 +307,15 @@ def atualiza_cadastro(page, dados):
 
         cep = cep.replace('-', '')
 
-        atualiza_campo(cep, locatos.En.cep)
+        atualiza_campo(cep, helpers.En.cep)
 
-        cep = page.wait_for_element_to_click(locatos.En.bt_cep)
+        cep = page.wait_for_element_to_click(helpers.En.bt_cep)
 
         cep.click()
 
         for i in range(30):
 
-            logr = page.wait_for_element(locatos.En.logr)
+            logr = page.wait_for_element(helpers.En.logr)
 
             if logr.get_attribute('value'):
                 break
@@ -324,7 +326,7 @@ def atualiza_cadastro(page, dados):
 
             if 'Logradouro' not in dados:
                 raise ValueError("É Obrigatório informar o logradouro")
-            atualiza_campo(dados['Logradouro'], locatos.En.logr)
+            atualiza_campo(dados['Logradouro'], helpers.En.logr)
 
         if 'Número' not in dados:
 
@@ -333,12 +335,12 @@ def atualiza_cadastro(page, dados):
 
         else:
 
-            atualiza_campo(dados['Número'], locatos.En.num)
+            atualiza_campo(dados['Número'], helpers.En.num)
 
             if 'Complemento' in dados:
-                atualiza_campo(dados['Complemento'], locatos.En.comp)
+                atualiza_campo(dados['Complemento'], helpers.En.comp)
 
-            bairro = page.wait_for_element(locatos.En.bairro)
+            bairro = page.wait_for_element(helpers.En.bairro)
 
             if not bairro.get_attribute('value'):
 
@@ -348,17 +350,18 @@ def atualiza_cadastro(page, dados):
 
             else:
 
-                atualiza_campo(dados['Bairro'], locatos.En.bairro)
+                atualiza_campo(dados['Bairro'], helpers.En.bairro)
 
             # confirmar = page.wait_for_element(Entidade.confirmar)
 
             # confirmar.click()
 
-            page.driver.execute_script(locatos.En.submit)
+            page.driver.execute_script(helpers.En.submit)
 
 
 def imprime_licenca(page, ident, serv, tipo):
-    ident, serv, tipo, sis = check_input(ident, serv, tipo)
+
+    ident, serv, tipo, sis = functions.check_input(ident, serv, tipo)
 
     page.driver.get(sis.Licenca['Imprimir'])
 

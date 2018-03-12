@@ -4,7 +4,7 @@ import re
 import unidecode
 
 from page import Page
-from sei import helpers
+import helpers
 
 SERVICOS = ('Outorga: Rádio do Cidadão',
              'Outorga: Radioamador',

@@ -115,11 +115,11 @@ def enter(time):
         print("Entered Except Block in Enter")
 
 
-# entra = dt.datetime(2018, 2, 23, 7, 10)
+entra = dt.datetime(2018, 3, 13, 9)
 
-sai = dt.datetime(2018, 3, 9, 21, 16)
+# sai = dt.datetime(2018, 3, 12, 21, 16)
 
-leave(sai)
+# leave(sai)
 
-# enter(entra)
+enter(entra)
 

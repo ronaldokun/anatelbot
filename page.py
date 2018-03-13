@@ -13,10 +13,11 @@ import selenium.webdriver as webdriver
 # Utilities
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import *
 from selenium.common.exceptions import *
 # Methods used from selenium submodules
 from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
 
 
 # Exceptions

@@ -255,21 +255,18 @@ def init_browser(webdriver, login, senha, timeout=5):
 
     page = Page(webdriver)
 
-    page.driver.get('http://sistemasnet')
+    with page.wait_for_page_load():
 
-    alert = page.alert_is_present(timeout=timeout)
+        page.driver.get('http://sistemasnet')
 
-    try:
-        
-        if alert:
+        alert = page.alert_is_present(timeout=timeout)
 
-            alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
+    if alert:
 
-            alert.accept()
+        alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
 
-    except NoAlertPresentException:
+        alert.accept()
 
-        return page
 
     return page
 

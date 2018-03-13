@@ -12,6 +12,8 @@ PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
             r'^(P){1}([A-Z]){4}$',
             r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})']
 
+TIPOS_ESTACAO = ["Fixa", "Móvel"]
+
 
 class Scpx(Page):
     """
@@ -29,34 +31,38 @@ class Scpx(Page):
 
         functions.init_browser(self.driver, login, senha)
 
-
-    def consulta(self, identificador, tipo='cpf'):
+    def _navigate(self, identificador, tipo, link, id, go=True):
 
         identificador = str(identificador)
 
         if not functions.check_input(identificador, tipo):
-
             raise ValueError("Identificador inválido: ", identificador)
 
-        self.driver.get(self.sistema.Consulta['link'])
+        with self.wait_for_page_load():
 
-        try:
+            self.driver.get(link)
 
-            elem = self.wait_for_element_to_click(self.sistema.Consulta[tipo], timeout=10)
+        with self.wait_for_page_load():
 
-            elem.send_keys(identificador + Keys.RETURN)
+            try:
 
-        except NoSuchElementException:
+                elem = self.wait_for_element_to_click(id, timeout=10)
 
-            print("The html id: {} is not present on this webpage".format(ident))
+                elem.send_keys(identificador + Keys.RETURN)
 
+            except NoSuchElementException:
+
+                print("The html id: {} is not present on this webpage".format(ident))
+
+
+    def consulta(self, identificador, tipo='cpf'):
+
+        self._navigate(identificador, tipo, self.sistema.Consulta['link'], self.sistema.Consulta[tipo])
 
 
     def imprime_consulta(self, identificador, tipo='cpf', resumida=False):
 
-        with self.wait_for_page_load():
-
-            self.consulta(identificador, tipo)
+        self.consulta(identificador, tipo)
 
         try:
 
@@ -86,6 +92,132 @@ class Scpx(Page):
             print("Não foi possível clicar no Botão 'Versão para Impressão")
 
             return
+
+
+    def incluir_serviço(self, identificador, tipo='cpf'):
+
+        self._navigate(identificador, tipo, self.sistema.Servico['incluir'], self.sistema.Consulta[tipo])
+
+    def incluir_estacao(self, identificador, tipo_estacao, indicativo, sequencial,  tipo='cpf', uf='SP'):
+
+        if tipo_estacao not in TIPOS_ESTACAO:
+            raise ValueError("Os tipos de estação devem ser: ".format(TIPOS_ESTACAO))
+
+        self._navigate(identificador, tipo, self.sistema.Estacao['incluir'], self.sistema.Consulta[tipo])
+
+        button = self.wait_for_element_to_click(self.sistema.Estacao['btn_dados_estacao'])
+
+        button.click()
+
+        estado = Select(self.wait_for_element(self.sistema.Estacao['uf']))
+
+        estado.select_by_value(uf)
+
+        indic= self.wait_for_element(self.sistema.Estacao['indicativo'])
+
+        indic.send_keys(indicativo)
+
+        seq = self.wait_for_element(self.sistema.Estacao["seq"])
+
+        seq.send_keys(sequencial)
+
+        tipo_est = Select(self.wait_for_element(self.sistema.Estacao['tipo']))
+
+        if tipo_estacao == 'Móvel':
+
+            tipo_est.select_by_visible_text("Móvel")
+
+        elif tipo_estacao == "Fixa":
+
+            tipo_est.select_by_visible_text("Fixa")
+
+        else:
+
+            tipo_est.select_by_visible_text("Telecomando")
+
+        confirmar = self.wait_for_element_to_click(self.sistema.Estacao['confirmar'])
+
+        with self.wait_for_page_load(): confirmar.click()
+
+    def aprovar_movimento(self, identificador, origem, tipo='cpf'):
+
+        try:
+            self._navigate(identificador, tipo, self.sistema.Movimento['transferir'], self.sistema.Consulta[tipo], False)
+
+        except UnexpectedAlertPresentException:
+
+            pass
+
+
+        movimento_atual = Select(self.wait_for_element_to_click(self.sistema.Movimento['atual']))
+
+        if origem.lower() == "a":
+
+            movimento_atual.select_by_visible_text("A - Em Análise")
+
+            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['confirmar'])
+
+            with self.wait_for_page_load(): confirmar.click()
+
+            movimento_a_transferir = Select(self.wait_for_element_to_click(self.sistema.Movimento['posterior']))
+
+            movimento_a_transferir.select_by_visible_text("")
+
+
+        elif origem.lower() == "b":
+
+            movimento_atual.select_by_visible_text(("B - Cadastro pela Anatel"))
+
+            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['confirmar'])
+
+            with self.wait_for_page_load(): confirmar.click()
+
+            movimento_a_transferir = Select(self.wait_for_element_to_click(self.sistema.Movimento['posterior']))
+
+            movimento_a_transferir.select_by_visible_text("E - Aprovado / Licença")
+
+            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['confirmar'])
+
+            with self.wait_for_page_load(): confirmar.click()
+
+    def licenciar_estacao(self, identificador, tipo='cpf', ppdess=True):
+
+        if not ppdess:
+
+            self._navigate(identificador, tipo, self.sistema.Estacao['licenciar'], self.sistema.Consulta[tipo], False)
+
+            if tipo == 'cpf':
+
+                cpf = self.wait_for_element_to_click((By.LINK_TEXT, identificador))
+
+                cpf.click()
+
+
+            lista_estacoes = self.wait_for_element_to_click(self.sistema.Estacao['btn_lista_estacoes'])
+
+            lista_estacoes.click()
+
+            self.wait_for_element_to_click(self.sistema.Estacao['btn_licenciar']).click()
+
+            return
+
+        else:
+
+            self._navigate(identificador, tipo, self.sistema.Estacao['licenciar'], self.sistema.Consulta[tipo], False)
+
+            if tipo == 'cpf':
+
+                cpf = self.wait_for_element_to_click((By.LINK_TEXT, identificador))
+
+                cpf.click()
+
+                return
+
+            #alert.accept()
+
+
+
+
 
     def imprime_boleto(self, ident, id_type):
         """ This function receives a webdriver object, navigates it to the
@@ -218,12 +350,6 @@ class Scpx(Page):
         self.driver.switch_to_window(windows[0])
 
         return True
-
-    def incluir_estacao(self, ident, serv, tipo):
-
-        ident, serv, tipo, sis = check_input(ident, serv, tipo)
-
-        self._navigate(sis.Estacao['incluir'], ident, tipo)
 
 
 

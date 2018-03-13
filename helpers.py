@@ -1086,7 +1086,21 @@ class Scpx(object):
     Estacao =  dict(incluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
                     alterar="http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
                     excluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=E",
-                    licenciar="http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp")
+                    licenciar="http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp",
+                    btn_dados_estacao=(By.ID, "botaoFlatDadosdaEstação"),
+                    btn_lista_estacoes=(By.ID, "botaoFlatListadeEstações"),
+                    btn_licenciar=(By.ID, "botaoFlatLicenciar"),
+                    uf=(By.ID, "cmbUF"),
+                    indicativo=(By.ID, "NomeIndicativo"),
+                    seq=(By.ID, "NumSequenciaIndicativo"),
+                    tipo=(By.ID, "cmbTipoEstacao"),
+                    confirmar=(By.ID, "botaoFlatConfirmar"))
+
+    Movimento = dict(transferir="http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
+                     atual=(By.ID, "pMovimento"),
+                     posterior=(By.ID, "CodTipoMovimento"))
+
+    Servico = {'incluir': "http://sistemasnet/scpx/Servico/Tela.asp?Op=I"}
 
     Licenca =  dict(imprimir="http://sistemasnet/scpx/Licenca/Tela.asp",
                     cpf=(By.ID, 'pnumCPFCNPJ'),

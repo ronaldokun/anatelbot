@@ -255,11 +255,9 @@ def init_browser(webdriver, login, senha, timeout=5):
 
     page = Page(webdriver)
 
-    with page.wait_for_page_load():
+    page.driver.get('http://sistemasnet')
 
-        page.driver.get('http://sistemasnet')
-
-        alert = page.alert_is_present(timeout=timeout)
+    alert = page.alert_is_present(timeout=timeout)
 
     if alert:
 

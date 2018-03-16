@@ -7,6 +7,7 @@ Created on Thu Aug 24 23:14:09 2017
 """
 import re
 from time import sleep
+import sys
 
 from bs4 import BeautifulSoup as soup
 # INITIALIZE DRIVER
@@ -423,7 +424,8 @@ def main(bloco):
     sei.close()
 
 
-if __name__ == 'main':
-    main(sys.argv[1])
+if __name__ == '__main__':
 
-main('87208')
+    main(sys.argv[1:])
+
+

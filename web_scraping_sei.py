@@ -6,22 +6,20 @@ Created on Thu Aug 24 23:14:09 2017
 @author: ronaldo
 """
 import re
-from time import sleep
 import sys
 
 from bs4 import BeautifulSoup as soup
 # INITIALIZE DRIVER
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 # METHODS
 from selenium.webdriver.common.keys import Keys
 # WAIT AND CONDITIONS METHODS
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
-from page import Page
-
 from helpers import *
+from page import Page
+from time import sleep
 
 
 class LoginPage(Page):
@@ -121,12 +119,8 @@ class PagInicial(Page):
         if self.get_title() != Blocos.TITLE:
             self.go_to_blocos()
 
-        try:
-            self.wait_for_element((By.LINK_TEXT, str(numero))).click()
+        self.wait_for_element((By.LINK_TEXT, numero)).click()
 
-        except:
-            print("O Bloco de Assinatura informado não existe ou está \
-                  concluído!")
 
     def armazena_bloco(self, numero):
 
@@ -162,7 +156,7 @@ class PagInicial(Page):
 
     def expedir_bloco(self, numero):
 
-        processos = self.armazena_bloco(str(numero))
+        processos = self.armazena_bloco(numero)
 
         counter = 0
 
@@ -211,7 +205,9 @@ class PagInicial(Page):
 
         self.atualiza_andamento(buttons, info)
 
-        self.enviar_processo_sede(buttons)
+        #self.enviar_processo_sede(buttons)
+
+        self.driver.close()
 
         self.driver.switch_to_window(main_window)
 
@@ -219,30 +215,41 @@ class PagInicial(Page):
 
     def enviar_processo_sede(self, buttons):
 
-        with self.wait_for_page_load():
-            assert self.get_title() == Processo.TITLE, \
-                "Erro ao navegar para o processo"
+        assert self.get_title() == Processo.TITLE, \
+            "Erro ao navegar para o processo"
 
-            enviar = buttons[3]
 
-            link = Base.URL + enviar.attrs["href"]
+        enviar = buttons[3]
 
-            (janela_processo, janela_andamento) = navigate_link_to_new_window(
+        link = Base.URL + enviar.attrs["href"]
+
+        (janela_processo, janela_andamento) = navigate_link_to_new_window(
                 self.driver, link)
 
-            self.driver.execute_script(Envio.LUPA)
+        #with self.wait_for_page_load():
 
-        with self.wait_for_page_load():
-            # Guarda as janelas do navegador presentes
-            windows = self.driver.window_handles
+        self.driver.execute_script(Envio.LUPA)
 
-            janela_envio = windows[-1]
+        for handle in self.driver.window_handles:
 
-            # Troca o foco do navegador
-            self.driver.switch_to_window(janela_envio)
+            self.driver.switch_to_window(handle)
 
-        assert self.get_title() == Envio.UNIDS, \
-            "Erro ao navegar para as unidades de tramitação"
+            print(self.get_title())
+
+            if self.get_title() == Envio.UNIDS: break
+
+        else:
+
+            raise ValueError("Não foi encontrada a janela com o título {}".format(Envio.UNIDS))
+
+
+
+        #janela_envio = windows[-1]
+
+        # Troca o foco do navegador
+        #self.driver.switch_to_window(janela_envio)
+
+        assert self.get_title() == Envio.UNIDS, "Erro ao navegar para as unidades de tramitação"
 
         unidade = self.wait_for_element(Envio.IN_SIGLA)
 
@@ -250,10 +257,13 @@ class PagInicial(Page):
 
         unidade.send_keys(Envio.SIGLA + Keys.RETURN)
 
-        sede = self.wait_for_element(Envio.ID_SEDE)
+        sleep(1)
 
-        assert sede.get_attribute("title") == Envio.SEDE, \
-            "Erro ao selecionar a Unidade Protocolo.Sede para envio"
+        sede = self.wait_for_element_to_click(Envio.ID_SEDE)
+
+
+        #assert sede.get_attribute("title") == Envio.SEDE, \
+         #   "Erro ao selecionar a Unidade Protocolo.Sede para envio"
 
         sede.click()
 
@@ -415,17 +425,23 @@ def navigate_link_to_new_window(driver, link):
 
 def main(bloco):
 
-    driver = webdriver.Chrome()
+    driver = webdriver.Firefox()
 
     sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-    sei.expedir_bloco(str(bloco))
+    bloco = str(bloco)
+
+    sei.expedir_bloco(bloco)
 
     sei.close()
 
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    print(sys.argv[1:])
 
+    for bloco in sys.argv[1:]:
 
+        main(bloco)
+
+    #main(88703)

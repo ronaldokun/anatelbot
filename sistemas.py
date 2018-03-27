@@ -1,9 +1,7 @@
-from time import sleep
-
-from page import *
-
-import helpers
 import functions
+import helpers
+from page import *
+from time import sleep
 
 SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
 
@@ -12,7 +10,7 @@ PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
             r'^(P){1}([A-Z]){4}$',
             r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})']
 
-TIPOS_ESTACAO = ["Fixa", "Móvel"]
+ESTAÇÕES_RC = ["Fixa", "Móvel", "Telecomando"]
 
 
 class Scpx(Page):
@@ -21,7 +19,7 @@ class Scpx(Page):
     interativos da ANATEL
     """
 
-    def __init__(self, driver, login, senha):
+    def __init__(self, driver, login="", senha=""):
 
         self.sistema = helpers.Scpx
 
@@ -31,7 +29,11 @@ class Scpx(Page):
 
         functions.init_browser(self.driver, login, senha)
 
-    def _navigate(self, identificador, tipo, link, id, go=True):
+    def _navigate(self, identificador, tipo, link, id=None):
+
+        if not id:
+
+            id = self.sistema.Consulta[tipo]
 
         identificador = str(identificador)
 
@@ -52,15 +54,13 @@ class Scpx(Page):
 
             except NoSuchElementException:
 
-                print("The html id: {} is not present on this webpage".format(ident))
+                print("The html id: {} is not present on this webpage".format(identificador))
 
-
-    def consulta(self, identificador, tipo='cpf'):
+    def consulta(self, identificador, tipo='id_cpf'):
 
         self._navigate(identificador, tipo, self.sistema.Consulta['link'], self.sistema.Consulta[tipo])
 
-
-    def imprime_consulta(self, identificador, tipo='cpf', resumida=False):
+    def imprime_consulta(self, identificador, tipo='id_cpf', resumida=False):
 
         self.consulta(identificador, tipo)
 
@@ -70,7 +70,7 @@ class Scpx(Page):
 
             elem.click()
 
-        except:
+        except NoSuchElementException:
 
             print("Não foi possível clicar no botão 'Estação' na página consulta")
 
@@ -93,35 +93,36 @@ class Scpx(Page):
 
             return
 
-
-    def incluir_serviço(self, identificador, tipo='cpf'):
+    def incluir_serviço(self, identificador, tipo='id_cpf'):
 
         self._navigate(identificador, tipo, self.sistema.Servico['incluir'], self.sistema.Consulta[tipo])
 
-    def incluir_estacao(self, identificador, tipo_estacao, indicativo, sequencial,  tipo='cpf', uf='SP'):
+        # TODO: Finalizar método
 
-        if tipo_estacao not in TIPOS_ESTACAO:
-            raise ValueError("Os tipos de estação devem ser: ".format(TIPOS_ESTACAO))
+    def incluir_estacao(self, identificador, tipo_estacao, indicativo, sequencial,  tipo='id_cpf', uf='SP'):
+
+        if tipo_estacao not in ESTAÇÕES_RC:
+            raise ValueError("Os tipos de estação devem ser: ".format(ESTAÇÕES_RC))
 
         self._navigate(identificador, tipo, self.sistema.Estacao['incluir'], self.sistema.Consulta[tipo])
 
-        button = self.wait_for_element_to_click(self.sistema.Estacao['btn_dados_estacao'])
+        button = self.wait_for_element_to_click(self.sistema.Estacao['id_btn_dados_estacao'])
 
         button.click()
 
-        estado = Select(self.wait_for_element(self.sistema.Estacao['uf']))
+        estado = Select(self.wait_for_element(self.sistema.Estacao['id_uf']))
 
         estado.select_by_value(uf)
 
-        indic= self.wait_for_element(self.sistema.Estacao['indicativo'])
+        indic= self.wait_for_element(self.sistema.Estacao['id_indicativo'])
 
         indic.send_keys(indicativo)
 
-        seq = self.wait_for_element(self.sistema.Estacao["seq"])
+        seq = self.wait_for_element(self.sistema.Estacao["id_seq"])
 
         seq.send_keys(sequencial)
 
-        tipo_est = Select(self.wait_for_element(self.sistema.Estacao['tipo']))
+        tipo_est = Select(self.wait_for_element(self.sistema.Estacao['id_tipo']))
 
         if tipo_estacao == 'Móvel':
 
@@ -132,21 +133,22 @@ class Scpx(Page):
             tipo_est.select_by_visible_text("Fixa")
 
         else:
-
             tipo_est.select_by_visible_text("Telecomando")
 
-        confirmar = self.wait_for_element_to_click(self.sistema.Estacao['confirmar'])
+        confirmar = self.wait_for_element_to_click(self.sistema.Estacao['id_confirmar'])
 
         with self.wait_for_page_load(): confirmar.click()
 
-    def aprovar_movimento(self, identificador, origem, tipo='cpf'):
+    def aprovar_movimento(self, identificador, origem, tipo='id_cpf'):
 
         try:
-            self._navigate(identificador, tipo, self.sistema.Movimento['transferir'], self.sistema.Consulta[tipo], False)
+            self._navigate(identificador, tipo, self.sistema.Movimento['transferir'], self.sistema.Consulta[tipo])
 
         except UnexpectedAlertPresentException:
 
-            pass
+            alert = self.alert_is_present(2)
+
+            if alert: alert.accept()
 
 
         movimento_atual = Select(self.wait_for_element_to_click(self.sistema.Movimento['atual']))
@@ -155,7 +157,7 @@ class Scpx(Page):
 
             movimento_atual.select_by_visible_text("A - Em Análise")
 
-            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['confirmar'])
+            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['id_confirmar'])
 
             with self.wait_for_page_load(): confirmar.click()
 
@@ -168,7 +170,7 @@ class Scpx(Page):
 
             movimento_atual.select_by_visible_text(("B - Cadastro pela Anatel"))
 
-            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['confirmar'])
+            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['id_confirmar'])
 
             with self.wait_for_page_load(): confirmar.click()
 
@@ -176,36 +178,46 @@ class Scpx(Page):
 
             movimento_a_transferir.select_by_visible_text("E - Aprovado / Licença")
 
-            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['confirmar'])
+            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['id_confirmar'])
 
-            with self.wait_for_page_load(): confirmar.click()
+            confirmar.click()
 
-    def licenciar_estacao(self, identificador, tipo='cpf', ppdess=True):
+            try:
 
-        if not ppdess:
+                alert = self.alert_is_present(5)
 
-            self._navigate(identificador, tipo, self.sistema.Estacao['licenciar'], self.sistema.Consulta[tipo], False)
+                if alert:
+                    alert.accept()
 
-            if tipo == 'cpf':
+            except UnexpectedAlertPresentException:
+
+                pass
+
+    def licenciar_estacao(self, identificador, tipo='id_cpf', ppdess=True):
+
+        if ppdess:
+
+            self._navigate(identificador, tipo, self.sistema.Estacao['licenciar'])
+
+            if tipo == 'id_cpf':
 
                 cpf = self.wait_for_element_to_click((By.LINK_TEXT, identificador))
 
                 cpf.click()
 
 
-            lista_estacoes = self.wait_for_element_to_click(self.sistema.Estacao['btn_lista_estacoes'])
+            lista_estacoes = self.wait_for_element_to_click(self.sistema.Estacao['id_btn_lista_estacoes'])
 
             lista_estacoes.click()
 
-            self.wait_for_element_to_click(self.sistema.Estacao['btn_licenciar']).click()
+            self.wait_for_element_to_click(self.sistema.Estacao['id_btn_licenciar']).click()
 
-            return
-
+            
         else:
 
-            self._navigate(identificador, tipo, self.sistema.Estacao['licenciar'], self.sistema.Consulta[tipo], False)
+            self._navigate(identificador, tipo, self.sistema.Estacao['licenciar'])
 
-            if tipo == 'cpf':
+            if tipo == 'id_cpf':
 
                 cpf = self.wait_for_element_to_click((By.LINK_TEXT, identificador))
 
@@ -214,6 +226,32 @@ class Scpx(Page):
                 return
 
             #alert.accept()
+
+    def prorrogar_rf(self, identificador, tipo='id_cpf'):
+
+        self._navigate(identificador,tipo, self.sistema.Servico['prorrogar_rf'], self.sistema.Consulta[tipo])
+
+        button = self.wait_for_element_to_click(self.sistema.Servico['id_btn_dados_estacao'])
+
+        button.click()
+
+        confirmar = self.wait_for_element_to_click(self.sistema.Servico['id_confirmar'])
+
+        confirmar.click()
+
+        alert = self.alert_is_present(5)
+
+        if alert:
+
+            alert.click()
+
+    def prorrogar_estacao(self, identificador, tipo='id_cpf'):
+
+        self._navigate(identificador,tipo, self.sistema.Licenca['prorrogar'])
+
+        button = self.wait_for_element_to_click(self.sistema.Licenca['id_btn_lista_estacoes'])
+
+        button.click()
 
 
 
@@ -375,43 +413,43 @@ def atualiza_cadastro(page, dados):
 
     page.driver.get(helpers.Sec.Ent_Alt)
 
-    cpf = page.wait_for_element_to_click(helpers.Entidade.cpf)
+    cpf = page.wait_for_element_to_click(helpers.Entidade.idade.cpf)
 
     cpf.send_keys(str(dados['CPF']) + Keys.RETURN)
 
     if 'Email' in dados:
-        atualiza_campo(dados['Email'], helpers.En.email)
+        atualiza_campo(dados['Email'], helpers.Entidade.idade.email)
 
-    btn = page.wait_for_element_to_click(helpers.En.bt_dados)
+    btn = page.wait_for_element_to_click(helpers.Entidade.idade.bt_dados)
 
     btn.click()
 
     if 'RG' in dados:
-        atualiza_campo(dados['RG'], helpers.En.rg)
+        atualiza_campo(dados['RG'], helpers.Entidade.idade.rg)
 
     if 'Orgexp' in dados:
-        atualiza_campo(dados['Orgexp'], helpers.En.orgexp)
+        atualiza_campo(dados['Orgexp'], helpers.Entidade.idade.orgexp)
 
     if 'Data de Nascimento' in dados:
         data = dados['Data de Nascimento']
 
         data = data.replace('-', '')
 
-        atualiza_campo(data, helpers.En.nasc)
+        atualiza_campo(data, helpers.Entidade.nasc)
 
-    btn = page.wait_for_element_to_click(helpers.En.bt_fone)
+    btn = page.wait_for_element_to_click(helpers.Entidade.bt_fone)
 
     btn.click()
 
     if 'ddd' in dados:
 
-        atualiza_campo(dados['ddd'], helpers.En.ddd)
+        atualiza_campo(dados['ddd'], helpers.Entidade.ddd)
 
     else:
 
         ddd = '11'
 
-        atualiza_campo(ddd, helpers.En.ddd)
+        atualiza_campo(ddd, helpers.Entidade.ddd)
 
         # if 'Fone' in dados:
 
@@ -423,7 +461,7 @@ def atualiza_cadastro(page, dados):
 
     #  atualiza_campo(fone, Entidade.fone)
 
-    btn = page.wait_for_element_to_click(helpers.En.bt_end)
+    btn = page.wait_for_element_to_click(helpers.Entidade.bt_end)
 
     btn.click()
 
@@ -433,15 +471,15 @@ def atualiza_cadastro(page, dados):
 
         cep = cep.replace('-', '')
 
-        atualiza_campo(cep, helpers.En.cep)
+        atualiza_campo(cep, helpers.Entidade.cep)
 
-        cep = page.wait_for_element_to_click(helpers.En.bt_cep)
+        cep = page.wait_for_element_to_click(helpers.Entidade.bt_cep)
 
         cep.click()
 
         for i in range(30):
 
-            logr = page.wait_for_element(helpers.En.logr)
+            logr = page.wait_for_element(helpers.Entidade.logr)
 
             if logr.get_attribute('value'):
                 break
@@ -452,7 +490,7 @@ def atualiza_cadastro(page, dados):
 
             if 'Logradouro' not in dados:
                 raise ValueError("É Obrigatório informar o logradouro")
-            atualiza_campo(dados['Logradouro'], helpers.En.logr)
+            atualiza_campo(dados['Logradouro'], helpers.Entidade.logr)
 
         if 'Número' not in dados:
 
@@ -461,12 +499,12 @@ def atualiza_cadastro(page, dados):
 
         else:
 
-            atualiza_campo(dados['Número'], helpers.En.num)
+            atualiza_campo(dados['Número'], helpers.Entidade.num)
 
             if 'Complemento' in dados:
-                atualiza_campo(dados['Complemento'], helpers.En.comp)
+                atualiza_campo(dados['Complemento'], helpers.Entidade.comp)
 
-            bairro = page.wait_for_element(helpers.En.bairro)
+            bairro = page.wait_for_element(helpers.Entidade.bairro)
 
             if not bairro.get_attribute('value'):
 
@@ -476,13 +514,13 @@ def atualiza_cadastro(page, dados):
 
             else:
 
-                atualiza_campo(dados['Bairro'], helpers.En.bairro)
+                atualiza_campo(dados['Bairro'], helpers.Entidade.bairro)
 
             # confirmar = page.wait_for_element(Entidade.confirmar)
 
             # confirmar.click()
 
-            page.driver.execute_script(helpers.En.submit)
+            page.driver.execute_script(helpers.Entidade.submit)
 
 
 def imprime_licenca(page, ident, serv, tipo):
@@ -494,7 +532,7 @@ def imprime_licenca(page, ident, serv, tipo):
     navigate(page, ident, sis.Licenca, tipo)
 
 
-def consultaSigec(page, ident, tipo='cpf'):
+def consultaSigec(page, ident, tipo='id_cpf'):
     if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
         raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
 

@@ -7,14 +7,11 @@ Created on Wed Nov  1 16:50:19 2017
 """
 import datetime as dt
 import re
-from time import sleep
-import pandas as pd
-from page import Page
 
-from selenium.common.exceptions import NoAlertPresentException
+import pandas as pd
 from selenium.webdriver.common.keys import Keys
 
-
+from page import Page
 
 KEYS = ['processo',
         'tipo',
@@ -315,6 +312,7 @@ def last_day_of_month():
 
     next_month = any_day.replace(
         day=28) + dt.timedelta(days=4)  # this will never fail
+
     # this will always result in the last day of the month
     date = next_month - dt.timedelta(days=next_month.day)
 

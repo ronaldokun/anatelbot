@@ -211,7 +211,9 @@ class PagInicial(Page):
 
         self.atualiza_andamento(buttons, info)
 
-        self.enviar_processo_sede(buttons)
+        #self.enviar_processo_sede(buttons) #TODO: Fix Bug!
+
+        self.close()
 
         self.driver.switch_to_window(main_window)
 
@@ -415,7 +417,7 @@ def navigate_link_to_new_window(driver, link):
 
 def main(bloco):
 
-    driver = webdriver.Chrome()
+    driver = webdriver.Firefox()
 
     sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
@@ -426,6 +428,6 @@ def main(bloco):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main(sys.argv[1])
 
 

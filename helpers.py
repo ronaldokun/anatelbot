@@ -924,7 +924,6 @@ class Tipos(object):
              'Viagem: Publicação de Boletim'
              }
 
-
 class Contato(object):
     TITLE = 'SEI - Contatos'
 

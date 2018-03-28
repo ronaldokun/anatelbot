@@ -15,17 +15,11 @@ PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
 TIPOS_ESTACAO = ["Fixa", "Móvel"]
 
 
-class Scpx(Page):
-    """
-    Esta subclasse da classe Page define métodos de execução de funções nos sistemas
-    interativos da ANATEL
-    """
+class Base(Page):
 
-    def __init__(self, driver, login, senha):
+    def __init__(self, driver, tipo='cpf', login=None, senha=None):
 
-        self.sistema = helpers.Scpx
-
-        self.tipo = 'cpf'
+        self.tipo = tipo
 
         super().__init__(driver)
 
@@ -53,6 +47,154 @@ class Scpx(Page):
             except NoSuchElementException:
 
                 print("The html id: {} is not present on this webpage".format(ident))
+
+    def imprime_boleto(self, identificador, tipo='cpf'):
+        """ This function receives a webdriver object, navigates it to the
+        loc.Boleto page, inserts the identification 'ident' in the proper
+        field and commands the print of the boleto
+        """
+
+        if not functions.check_input(identificador, tipo):
+            raise ValueError("Identificador inválido: ", identificador)
+
+        self.driver.get(helpers.Boleto.URL)
+
+        if tipo in ('cpf', 'cnpj'):
+
+            elem = self.wait_for_element_to_click(helpers.Boleto.B_CPF)
+
+            elem.click()
+
+            elem = self.wait_for_element_to_click(helpers.Boleto.INPUT_CPF)
+
+        else:
+
+            elem = self.wait_for_element_to_click(helpers.Boleto.B_FISTEL)
+
+            elem.click()
+
+            elem = self.wait_for_element_to_click(helpers.Boleto.INPUT_FISTEL)
+
+        # self._navigate(sis.URL, id, id_type)
+
+        elem.clear()
+
+        elem.send_keys(identificador)
+
+        date = self.wait_for_element_to_click(helpers.Boleto.INPUT_DATA)
+
+        date.clear()
+
+        date.send_keys(functions.last_day_of_month() + Keys.RETURN)
+
+        #
+        # try:
+        #
+        #     marcar = self.wait_for_element_to_click(sis.MRK_TODOS)
+        #
+        #     marcar.click()
+        #
+        #     sleep(5)
+        #
+        # except:
+        #
+        #     print("Não foi possível marcar todos os boletos")
+        #
+        #     return False
+        #
+        # try:
+        #
+        #     imprimir = self.wait_for_element_to_click(sis.PRINT)
+        #
+        #     imprimir.click()
+        #
+        # except:
+        #
+        #     print("Não foi possível imprimir todos os boletos")
+        #
+        #     return False
+
+        try:
+
+            self.wait_for_new_window()
+
+        except:
+
+            print("A espera pela nova janela não funcionou!")
+
+        #
+        # try:
+        #
+        #     windows = page.driver.window_handles
+        #
+        #     main = windows[0]
+        #
+        #     boleto = windows[1]
+        #
+        #     page.driver.switch_to_window(boleto)
+        #
+        #     save_page(page, ident)
+        #
+        #
+        #
+        #     page.close()
+        #
+        #     page.driver.switch_to_window(main)
+        #
+        # except:
+        #
+        #     print("Não foi possível salvar a nova janela")
+        #
+        #
+        #
+        #     return False
+        #
+        # return True
+
+    def save_new_window(self, filename):
+
+        try:
+
+            self.wait_for_new_window(timeout=5)
+
+        except TimeoutError:
+
+            print("Não foi possível identificar a nova Janela para salvar")
+
+            return False
+
+        # Guarda as janelas do navegador presentes
+        windows = self.driver.window_handles
+
+        # Troca o foco do navegador
+        self.driver.switch_to_window(windows[-1])
+
+        with open(filename + '.html', 'w') as file:
+            # html = soup(driver.page_source).prettify()
+
+            # write image
+            file.write(self.driver.page_source)
+
+        self.driver.close()
+
+        self.driver.switch_to_window(windows[0])
+
+        return True
+
+
+class Scpx(Base):
+    """
+    Esta subclasse da classe Page define métodos de execução de funções nos sistemas
+    interativos da ANATEL
+    """
+
+    def __init__(self, driver, login=None, senha=None):
+
+        self.sistema = helpers.Scpx
+
+        self.tipo = 'cpf'
+
+        super().__init__(driver, self.tipo, login, senha)
 
 
     def consulta(self, identificador, tipo='cpf'):
@@ -214,143 +356,6 @@ class Scpx(Page):
                 return
 
             #alert.accept()
-
-
-
-
-
-    def imprime_boleto(self, ident, id_type):
-        """ This function receives a webdriver object, navigates it to the
-        loc.Boleto page, inserts the identification 'ident' in the proper
-        field and commands the print of the boleto
-        """
-
-        ident, serv, id_type, sis = functions.check_input(ident, id_type)
-
-        self.driver.get(sis.URL)
-
-        if id_type in ('cpf', 'cnpj'):
-
-            elem = self.wait_for_element_to_click(sis.B_CPF)
-
-            elem.click()
-
-            elem = self.wait_for_element_to_click(sis.INPUT_CPF)
-
-        else:
-
-            elem = self.wait_for_element_to_click(sis.B_FISTEL)
-
-            elem.click()
-
-            elem = self.wait_for_element_to_click(sis.INPUT_FISTEL)
-
-        # self._navigate(sis.URL, id, id_type)
-
-        elem.clear()
-
-        elem.send_keys(ident)
-
-        date = self.wait_for_element_to_click(sis.INPUT_DATA)
-
-        date.clear()
-
-        date.send_keys(functions.last_day_of_month() + Keys.RETURN)
-
-        #
-        # try:
-        #
-        #     marcar = self.wait_for_element_to_click(sis.MRK_TODOS)
-        #
-        #     marcar.click()
-        #
-        #     sleep(5)
-        #
-        # except:
-        #
-        #     print("Não foi possível marcar todos os boletos")
-        #
-        #     return False
-        #
-        # try:
-        #
-        #     imprimir = self.wait_for_element_to_click(sis.PRINT)
-        #
-        #     imprimir.click()
-        #
-        # except:
-        #
-        #     print("Não foi possível imprimir todos os boletos")
-        #
-        #     return False
-
-        try:
-
-            self.wait_for_new_window()
-
-        except:
-
-            print("A espera pela nova janela não funcionou!")
-
-        #
-        # try:
-        #
-        #     windows = page.driver.window_handles
-        #
-        #     main = windows[0]
-        #
-        #     boleto = windows[1]
-        #
-        #     page.driver.switch_to_window(boleto)
-        #
-        #     save_page(page, ident)
-        #
-        #
-        #
-        #     page.close()
-        #
-        #     page.driver.switch_to_window(main)
-        #
-        # except:
-        #
-        #     print("Não foi possível salvar a nova janela")
-        #
-        #
-        #
-        #     return False
-        #
-        # return True
-
-    def save_new_window(self, filename):
-
-        try:
-
-            self.wait_for_new_window(timeout=5)
-
-        except TimeoutError:
-
-            print("Não foi possível identificar a nova Janela para salvar")
-
-            return False
-
-        # Guarda as janelas do navegador presentes
-        windows = self.driver.window_handles
-
-        # Troca o foco do navegador
-        self.driver.switch_to_window(windows[-1])
-
-        with open(filename + '.html', 'w') as file:
-            # html = soup(driver.page_source).prettify()
-
-            # write image
-            file.write(self.driver.page_source)
-
-        self.driver.close()
-
-        self.driver.switch_to_window(windows[0])
-
-        return True
-
 
 
 

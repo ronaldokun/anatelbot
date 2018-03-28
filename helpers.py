@@ -74,9 +74,11 @@ class Main(object):
 
 
 class Blocos(object):
+
     TITLE = "SEI - Blocos de Assinatura"
 
 class Bloco(object):
+
     TITLE = "SEI - Documentos do Bloco de Assinatura"
 
     RET_BLOCO = ((By.ID, 'btnExcluir'))
@@ -143,6 +145,7 @@ class Central(object):
 
 
 class Envio(object):
+
     TITLE = "SEI - Enviar Processo"
 
     UNIDS = "SEI - Selecionar Unidades"
@@ -174,7 +177,6 @@ class Envio(object):
     UTEIS = (By.ID, "chkSinDiasUteis")
 
     ENVIAR = (By.ID, "sbmEnviar")
-
 
 class Tipos(object):
     EXIBE_ALL = (By.ID, 'imgExibirTiposProcedimento')
@@ -1048,36 +1050,36 @@ class Sec(object):
     submit = "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')"
 
 
-Entidade = {'cpf': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'NumCNPJCPF')],
-            'cnpj': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ')],
-            'fistel':[(By.ID, 'pNumFistel'),(By.ID, 'pnumFistel')],
-            'indicativo':[(By.ID, 'pIndicativo')],
-            'nome':(By.ID, 't_NomeEntidade'),
-            'email':(By.ID, 't_EndEletronico'),
-            'rg':(By.ID, 'pf_NumIdentidade'),
-            'orgexp':(By.ID, 'pf_SiglaOrgaoExp'),
-            'nasc':(By.ID, 'pf_DataNascimento'),
-            'ddd':(By.ID, 'tel_NumCodigoNacional0'),
-            'fone':(By.ID, 'tel_NumTelefone0'),
-            'cep':(By.ID, 'CodCep1'),
-            'bt_cep':(By.ID, 'buscarEndereco'),
-            'logr':(By.ID, 'EndLogradouro1'),
-            'num':(By.ID, 'EndNumero1'),
-            'comp':(By.ID, 'EndComplemento1'),
-            'bairro':(By.ID, 'EndBairro1'),
-            'uf':(By.ID, 'SiglaUf1'),
-            'cidade':(By.ID, 'CodMunicipio1'),
-            'confirmar':(By.ID, 'botaoFlatConfirmar'),
-            'bt_dados':(By.ID, 'botaoFlatDadosComplementares'),
-            'bt_fone':(By.ID, 'botaoFlatTelefones'),
-            'bt_end':(By.ID, 'botaoFlatEndereço')}
+Entidade = dict(cpf=[(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'NumCNPJCPF')],
+                cnpj=[(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ')],
+                fistel=[(By.ID, 'pNumFistel'), (By.ID, 'pnumFistel')],
+                indicativo=[(By.ID, 'pIndicativo')],
+                nome=(By.ID, 't_NomeEntidade'),
+                email=(By.ID, 't_EndEletronico'),
+                rg=(By.ID, 'pf_NumIdentidade'),
+                orgexp=(By.ID, 'pf_SiglaOrgaoExp'),
+                nasc=(By.ID, 'pf_DataNascimento'),
+                ddd=(By.ID, 'tel_NumCodigoNacional0'),
+                fone=(By.ID, 'tel_NumTelefone0'),
+                cep=(By.ID, 'CodCep1'),
+                bt_cep=(By.ID, 'buscarEndereco'),
+                logr=(By.ID, 'EndLogradouro1'),
+                num=(By.ID, 'EndNumero1'),
+                comp=(By.ID, 'EndComplemento1'),
+                bairro=(By.ID, 'EndBairro1'),
+                uf=(By.ID, 'SiglaUf1'),
+                cidade=(By.ID, 'CodMunicipio1'),
+                confirmar=(By.ID, 'botaoFlatConfirmar'),
+                bt_dados=(By.ID, 'botaoFlatDadosComplementares'),
+                bt_fone=(By.ID, 'botaoFlatTelefones'),
+                bt_end=(By.ID, 'botaoFlatEndereço'))
 
 
 class Scpx(object):
 
-    Consulta = {'link':'http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714',
-                'cpf': (By.ID, 'pNumCnpjCpf'),
-                'btn_estacao': (By.ID, "botaoFlatEstação")}
+    Consulta = dict(link='http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714',
+                    id_cpf=(By.ID, 'pNumCnpjCpf'),
+                    id_btn_estacao=(By.ID, "botaoFlatEstação"))
 
     Ent =      dict(alterar_situacao="http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
                     incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I")
@@ -1086,25 +1088,30 @@ class Scpx(object):
                     alterar="http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
                     excluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=E",
                     licenciar="http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp",
-                    btn_dados_estacao=(By.ID, "botaoFlatDadosdaEstação"),
-                    btn_lista_estacoes=(By.ID, "botaoFlatListadeEstações"),
-                    btn_licenciar=(By.ID, "botaoFlatLicenciar"),
-                    uf=(By.ID, "cmbUF"),
-                    indicativo=(By.ID, "NomeIndicativo"),
-                    seq=(By.ID, "NumSequenciaIndicativo"),
-                    tipo=(By.ID, "cmbTipoEstacao"),
-                    confirmar=(By.ID, "botaoFlatConfirmar"))
+                    id_btn_dados_estacao=(By.ID, "botaoFlatDadosdaEstação"),
+                    id_btn_lista_estacoes=(By.ID, "botaoFlatListadeEstações"),
+                    id_btn_licenciar=(By.ID, "botaoFlatLicenciar"),
+                    id_uf=(By.ID, "cmbUF"),
+                    id_indicativo=(By.ID, "NomeIndicativo"),
+                    id_seq=(By.ID, "NumSequenciaIndicativo"),
+                    id_tipo=(By.ID, "cmbTipoEstacao"),
+                    id_confirmar=(By.ID, "botaoFlatConfirmar"))
 
     Movimento = dict(transferir="http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
                      atual=(By.ID, "pMovimento"),
                      posterior=(By.ID, "CodTipoMovimento"))
 
-    Servico = {'incluir': "http://sistemasnet/scpx/Servico/Tela.asp?Op=I"}
+    Servico = dict(incluir="http://sistemasnet/scpx/Servico/Tela.asp?Op=I",
+                   prorrogar_rf="http://sistemasnet/scpx/ServicoProrrogar/Tela.asp",
+                   id_btn_dados_estacao=(By.ID, "botaoFlatEstação"),
+                   id_confirmar=Estacao['id_confirmar'])
 
     Licenca =  dict(imprimir="http://sistemasnet/scpx/Licenca/Tela.asp",
                     cpf=(By.ID, 'pnumCPFCNPJ'),
                     fistel=(By.ID, 'pnumFistel'),
-                    indicativo=Entidade['indicativo'])
+                    indicativo=Entidade['indicativo'],
+                    prorrogar="http://sistemasnet/scpx/LicencaProrrogar/Tela.asp",
+                    id_btn_lista_estacoes=Estacao['id_btn_lista_estacoes'])
 
 class Scra(object):
 

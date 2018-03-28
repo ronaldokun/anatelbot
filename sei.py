@@ -2,14 +2,31 @@
 import re
 
 import unidecode
+from bs4 import BeautifulSoup as Soup
 
-from page import *
+import functions
 import helpers
+from page import *
 
 SERVICOS = ('Outorga: Rádio do Cidadão',
              'Outorga: Radioamador',
              'Outorga: Limitado Móvel Aeronáutico',
              'Outorga: Limitado Móvel Marítimo')
+
+TRANSLATION = {".":"", "/":"", "-":""}
+
+class make_xlat:
+    def __init__(self, *args, **kwds):
+        self.adict = dict(*args, **kwds)
+        self.rx = self.make_rx( )
+    def make_rx(self):
+        return re.compile('|'.join(map(re.escape, self.adict)))
+    def one_xlat(self, match):
+        return self.adict[match.group(0)]
+    def __call__(self, text):
+        return self.rx.sub(self.one_xlat, text)
+
+strip_processo = make_xlat(TRANSLATION)
 
 
 def login_sei(driver, usr, pwd):
@@ -39,6 +56,7 @@ def login_sei(driver, usr, pwd):
     return Sei(browser.driver)
 
 
+
 class Sei(Page):
     """
     Esta subclasse da classe Page define métodos de execução de ações na
@@ -61,13 +79,30 @@ class Sei(Page):
         return self._processos
 
     def _set_processos(self, processos):
-        self._processos = {p['numero']: p for p in processos}
 
-    def filter_processos(self, processos, servicos=SERVICOS):
-        self._processos = {k: v for k, v in processos.items() if v.get('tipo') in servicos}
+        numero = strip_processo(p['numero'])
 
-    def create_processo(self, num, tags=None):
-        return Processo(self.driver, num, tags)
+        self._processos = {numero : p for p in processos}
+
+    def filter_processos(self, **kwargs):
+
+        processos = {}
+
+        for k,v in kwargs:
+
+            processos = {p : q for p, q in self._processos.items() if p.get(k) == v}
+
+        return processos
+
+    def go_to_processo(self, num, tags=None):
+
+        striped = strip_processo(num)
+
+        if striped not in self._processos.keys():
+
+            raise ValueError("O processo atual não existe ou não está aberto no SEI")
+
+        return Processo(self.driver, striped, tags)
 
     def see_detailed(self):
         """
@@ -149,7 +184,7 @@ class Sei(Page):
             html_sei = Soup(self.driver.page_source, "lxml")
             processos += html_sei("tr", {"class": 'infraTrClara'})
 
-        processos = [helpers.armazena_tags(
+        processos = [functions.armazena_tags(
             [tag for tag in line.contents if tag != '\n'])
             for line in processos]
 
@@ -289,6 +324,7 @@ class Sei(Page):
             espec.send_keys(desc)
 
         if inter:
+
             self.cadastrar_interessado(inter)
             self.consultar_contato(inter)
 
@@ -380,6 +416,7 @@ class Processo(Sei):
         self.driver.switch_to_window(proc_window)
 
     def send_proc_to_sede(self, buttons):
+
         with self.wait_for_page_load():
             assert self.get_title() == helpers.Processo.TITLE, \
                 "Erro na função 'send_proc_to_sede"
@@ -530,6 +567,7 @@ def expedir_bloco(Sei, numero):
     for p in processos:
 
         if pode_expedir(p):
+
             proc = p['processo'].a.string
 
             num_doc = p['documento'].a.string

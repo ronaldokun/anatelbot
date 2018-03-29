@@ -110,11 +110,34 @@ class Scpx(Page):
 
         button.click()
 
-        estado = Select(self.wait_for_element(self.sistema.Estacao['id_uf']))
+        try:
 
-        estado.select_by_value(uf)
+            estado = Select(self.wait_for_element(self.sistema.Estacao['id_uf']))
+
+            estado.select_by_value(uf)
+
+        except UnexpectedAlertPresentException as e:
+
+            alert = self.alert_is_present(5)
+
+            if alert:
+
+                alert.dismiss()
+
 
         indic= self.wait_for_element(self.sistema.Estacao['id_indicativo'])
+
+        try:
+
+            indic.send_keys(indicativo)
+
+        except UnexpectedAlertPresentException as e:
+
+            alert = self.alert_is_present(2)
+
+            if alert:
+
+                alert.dismiss()
 
         indic.send_keys(indicativo)
 
@@ -137,7 +160,17 @@ class Scpx(Page):
 
         confirmar = self.wait_for_element_to_click(self.sistema.Estacao['id_confirmar'])
 
-        with self.wait_for_page_load(): confirmar.click()
+        try:
+
+            confirmar.click()
+
+        except UnexpectedAlertPresentException as e:
+
+            alert = self.alert_is_present(2)
+
+            if alert:
+
+                alert.dismiss()
 
     def aprovar_movimento(self, identificador, origem, tipo='id_cpf'):
 
@@ -243,7 +276,7 @@ class Scpx(Page):
 
         if alert:
 
-            alert.click()
+            alert.accept()
 
     def prorrogar_estacao(self, identificador, tipo='id_cpf'):
 

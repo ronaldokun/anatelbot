@@ -17,6 +17,7 @@ from selenium.webdriver.common.keys import Keys
 # Methods used from selenium submodules
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import *
+from selenium.webdriver.common.by import By
 
 
 # Exceptions

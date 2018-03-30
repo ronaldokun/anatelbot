@@ -27,8 +27,6 @@ class Scpx(Page):
 
         super().__init__(driver)
 
-        functions.init_browser(self.driver, login, senha)
-
     def _navigate(self, identificador, tipo, link, id=None):
 
         if not id:
@@ -238,12 +236,17 @@ class Scpx(Page):
 
                 cpf.click()
 
+            try:
 
-            lista_estacoes = self.wait_for_element_to_click(self.sistema.Estacao['id_btn_lista_estacoes'])
+                lista_estacoes = self.wait_for_element_to_click(self.sistema.Estacao['id_btn_lista_estacoes'])
 
-            lista_estacoes.click()
+                lista_estacoes.click()
 
-            self.wait_for_element_to_click(self.sistema.Estacao['id_btn_licenciar']).click()
+                self.wait_for_element_to_click(self.sistema.Estacao['id_btn_licenciar']).click()
+
+            except UnexpectedAlertPresentException as e:
+
+                pass
 
             
         else:
@@ -285,6 +288,12 @@ class Scpx(Page):
         button = self.wait_for_element_to_click(self.sistema.Licenca['id_btn_lista_estacoes'])
 
         button.click()
+
+    def imprimir_licenca(self, identificador, tipo="id_cpf"):
+
+        self._navigate(identificador, tipo=tipo, link=self.sistema.Licenca["imprimir"], id=self.sistema.Licenca['cpf'])
+
+
 
 
 

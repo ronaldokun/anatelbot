@@ -10,6 +10,31 @@ from selenium.webdriver.common.by import By
 
 SISTEMASNET = 'http://sistemasnet/'
 
+class Sapiens(object):
+
+    URL = "https://sapiens.agu.gov.br/"
+
+    TITLE = "SAPIENS"
+
+    LOGIN = (By.ID, "cpffield-1017-inputEl")
+
+    SENHA = (By.ID, "textfield-1018-inputEl")
+
+
+class Rf_Sapiens(object):
+
+    URL = "https://sapiens.agu.gov.br/receitafederal"
+
+    IDINPUTCPF = (By.ID, "textfield-1014-inputEl")
+
+    RESULTADO = (By.CLASS_NAME, "x-grid-cell-inner")
+
+    CPF = (By.ID, "textfield-1014-inputEl")
+
+    NAME = (By.ID, "textfield-1015-inputE1")
+
+    QUADRO1 = (By.CLASS_NAME, "x-grid-cell-inner")
+
 
 class Login(object):
     URL = "https://sei.anatel.gov.br"

@@ -295,10 +295,6 @@ class Scpx(Page):
 
 
 
-
-
-
-
     def imprime_boleto(self, ident, id_type):
         """ This function receives a webdriver object, navigates it to the
         loc.Boleto page, inserts the identification 'ident' in the proper

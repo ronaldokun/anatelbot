@@ -8,7 +8,9 @@ Created on Wed Nov  1 16:50:19 2017
 import datetime as dt
 import re
 
+import gspread
 import pandas as pd
+from oauth2client.service_account import ServiceAccountCredentials
 from selenium.webdriver.common.keys import Keys
 
 from page import Page
@@ -319,3 +321,12 @@ def last_day_of_month():
     date = date.strftime("%d%m%y")
 
     return date
+
+def authenticate_google(path_to_file):
+
+    scope = ['https://spreadsheets.google.com/feeds',
+             'https://www.googleapis.com/auth/drive']
+
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(path_to_file, scope)
+
+    return gspread.authorize(credentials)

@@ -377,6 +377,7 @@ class Processo(Sei):
             return info
 
     def actions_oficio(self):
+
         assert self.get_title() == helpers.Processo.TITLE, \
             "Erro ao navegar para o processo"
 

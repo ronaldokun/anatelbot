@@ -176,13 +176,18 @@ class PagInicial(Page):
 
                 chk.click()
 
-                # counter += 1
+                counter += 1
 
-                # sleep(30*random.randint(1,4))
 
-        # if counter == len(processos):
+        if counter == len(processos):
 
-        # concluir_bl = self.wait_for_element_to_click(Bloco)
+            concluir_bl = self.wait_for_element_to_click(Bloco)
+
+            concluir_bl.click()
+
+            alert = self.alert_is_present(5)
+
+            alert.accept()
 
         # ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
 
@@ -205,9 +210,7 @@ class PagInicial(Page):
 
         self.atualiza_andamento(buttons, info)
 
-        #self.enviar_processo_sede(buttons)
-
-        self.driver.close()
+        self.enviar_processo_sede(buttons)
 
         self.driver.switch_to_window(main_window)
 
@@ -225,8 +228,6 @@ class PagInicial(Page):
 
         (janela_processo, janela_andamento) = navigate_link_to_new_window(
                 self.driver, link)
-
-        #with self.wait_for_page_load():
 
         self.driver.execute_script(Envio.LUPA)
 
@@ -248,8 +249,6 @@ class PagInicial(Page):
 
         # Troca o foco do navegador
         #self.driver.switch_to_window(janela_envio)
-
-        assert self.get_title() == Envio.UNIDS, "Erro ao navegar para as unidades de tramitação"
 
         unidade = self.wait_for_element(Envio.IN_SIGLA)
 
@@ -444,4 +443,4 @@ if __name__ == '__main__':
 
         main(bloco)
 
-    #main(88703)
+

@@ -293,8 +293,6 @@ class Scpx(Page):
 
         self._navigate(identificador, tipo=tipo, link=self.sistema.Licenca["imprimir"], id=self.sistema.Licenca['cpf'])
 
-
-
     def imprime_boleto(self, ident, id_type):
         """ This function receives a webdriver object, navigates it to the
         loc.Boleto page, inserts the identification 'ident' in the proper

@@ -49,18 +49,20 @@ def cria_dict_dados(registros):
     if len(registros) >= 2:
         endereco = registros[-2].split(',')
 
-    if len(endereco) == 6:
+        items_end = []
 
-        items_end = ['Logradouro', 'Número', 'Complemento', 'Bairro', 'Cidade',
-                     'Cep']
-    elif len(endereco) == 5:
+        if len(endereco) == 6:
 
-        items_end = ['Logradouro', 'Número', 'Bairro', 'Cidade', 'Cep']
+            items_end = ['Logradouro', 'Número', 'Complemento', 'Bairro', 'Cidade',
+                         'Cep']
+        elif len(endereco) == 5:
 
-    if items_end:
+            items_end = ['Logradouro', 'Número', 'Bairro', 'Cidade', 'Cep']
 
-        for k, v in zip(items_end, endereco):
-            dados[k] = v.lstrip(' ')
+        if items_end:
+
+            for k, v in zip(items_end, endereco):
+                dados[k] = v.lstrip(' ')
 
     # corrige CEP
     if 'Cep' in dados:
@@ -104,7 +106,7 @@ class Page_sapiens(Page):
 
         key, value = registro
 
-        if key not in self.registros or self.get_registro[key] is None:
+        if key not in self.registros.keys() or self.get_registro[key] is None:
             self.registros[key] = value
 
     def get_registro(self, cpf):
@@ -174,5 +176,6 @@ class Page_sapiens(Page):
             resultado = cria_dict_dados(resultado)
 
             self.add_registro((cpf, resultado))
+
 
 

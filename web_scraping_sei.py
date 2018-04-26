@@ -179,15 +179,15 @@ class PagInicial(Page):
                 counter += 1
 
 
-        if counter == len(processos):
+        #if counter == len(processos):
 
-            concluir_bl = self.wait_for_element_to_click(Bloco)
+            #concluir_bl = self.wait_for_element_to_click(Bloco)
 
-            concluir_bl.click()
+            #concluir_bl.click()
 
-            alert = self.alert_is_present(5)
+            #alert = self.alert_is_present(5)
 
-            alert.accept()
+            #alert.accept()
 
         # ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
 
@@ -210,7 +210,7 @@ class PagInicial(Page):
 
         self.atualiza_andamento(buttons, info)
 
-        self.enviar_processo_sede(buttons)
+        #self.enviar_processo_sede(buttons)
 
         self.driver.switch_to_window(main_window)
 
@@ -231,24 +231,23 @@ class PagInicial(Page):
 
         self.driver.execute_script(Envio.LUPA)
 
-        for handle in self.driver.window_handles:
+        #for handle in self.driver.window_handles:
 
-            self.driver.switch_to_window(handle)
-
-            print(self.get_title())
-
-            if self.get_title() == Envio.UNIDS: break
-
-        else:
-
-            raise ValueError("Não foi encontrada a janela com o título {}".format(Envio.UNIDS))
+         #   self.driver.switch_to_window(handle)
 
 
+          #  if self.get_title() == Envio.UNIDS: break
 
-        #janela_envio = windows[-1]
+        #else:
+
+         #   raise ValueError("Não foi encontrada a janela com o título {}".format(Envio.UNIDS))
+
+        windows = self.driver.window_handles
+
+        janela_envio = windows[-1]
 
         # Troca o foco do navegador
-        #self.driver.switch_to_window(janela_envio)
+        self.driver.switch_to_window(janela_envio)
 
         unidade = self.wait_for_element(Envio.IN_SIGLA)
 
@@ -256,7 +255,7 @@ class PagInicial(Page):
 
         unidade.send_keys(Envio.SIGLA + Keys.RETURN)
 
-        sleep(1)
+        sleep(2)
 
         sede = self.wait_for_element_to_click(Envio.ID_SEDE)
 
@@ -275,7 +274,7 @@ class PagInicial(Page):
         self.driver.switch_to_window(janela_andamento)
 
         # Atraso no acesso ao checkbox abaixo gerando erro
-        sleep(0.5)
+        sleep(1)
 
         checkbox = self.wait_for_element_to_click(Envio.OPEN)
 
@@ -437,10 +436,8 @@ def main(bloco):
 
 if __name__ == '__main__':
 
-    print(sys.argv[1:])
+    print("Blocos a expedir: {}".format(sys.argv[1:]))
 
     for bloco in sys.argv[1:]:
 
         main(bloco)
-
-

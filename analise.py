@@ -23,7 +23,6 @@ def inicia_analise():
 
         return BROWSER
 
-
 @xw.func
 def hello(name):
     return "hello {0}".format(name)

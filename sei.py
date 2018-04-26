@@ -80,9 +80,7 @@ class Sei(Page):
 
     def _set_processos(self, processos):
 
-        numero = strip_processo(p['numero'])
-
-        self._processos = {numero : p for p in processos}
+        self._processos = {strip_processo(p['numero']) : p for p in processos}
 
     def filter_processos(self, **kwargs):
 

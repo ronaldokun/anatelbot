@@ -1,0 +1,1051 @@
+1524261200968	geckodriver	INFO	geckodriver 0.19.1
+1524261201134	geckodriver	INFO	Listening on 127.0.0.1:52342
+1524261202080	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.vnTeIw7NiRLF"
+1524261203904	Marionette	INFO	Enabled via --marionette
+1524261206494	Marionette	INFO	Listening on port 52348
+1524261207088	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 8444, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12916, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 8444, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13120, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 1188, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 14088, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\UUnable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 13976, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 2624, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 2624, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 7472, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 7472, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 8580, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 792, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1524263169945	geckodriver	INFO	geckodriver 0.19.1
+1524263170096	geckodriver	INFO	Listening on 127.0.0.1:53381
+1524263170865	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.rB5qWEwfyOR8"
+1524263171764	Marionette	INFO	Enabled via --marionette
+1524263173534	Marionette	INFO	Listening on port 53387
+1524263173980	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+[Child 13084, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13084, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 14760, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 14760, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 4600, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 14852, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+1524263623266	geckodriver::marionette	ERROR	Failed to kill browser process
+	INFO	Listening on 127.0.0.1:53830
+1524263607815	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.M9yvC2ESYJni"
+1524263608614	Marionette	INFO	Enabled via --marionette
+1524263610398	Marionette	INFO	Listening on port 53836
+1524263610430	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13060, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 4612, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 6496, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+1524263701442	geckodriver	INFO	geckodriver 0.19.1
+1524263701577	geckodriver	INFO	Listening on 127.0.0.1:53923
+1524263702317	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.xtPTgAi6XCi6"
+1524263703060	Marionette	INFO	Enabled via --marionette
+1524263704862	Marionette	INFO	Listening on port 53930
+1524263704984	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript error: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: ReferenceError: Actions is not defined
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 12144, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 14396, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 14396, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13596, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13596, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 14104, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 14104, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 6140, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524501889443	geckodriver	INFO	geckodriver 0.19.1
+1524501889536	geckodriver	INFO	Listening on 127.0.0.1:51899
+1524501890441	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.FD37WeN5yBfB"
+1524501891296	Marionette	INFO	Enabled via --marionette
+1524501893686	Marionette	INFO	Listening on port 51905
+1524501894754	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=2940037&id_documento_assinado=3057426&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=461bed6c12102ca3678a1309268ba6eaddd7423192fdb4789784e0199e6ed794, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=2927880&id_documento_assinado=3057493&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=0044c3ece4bc73919a16788d623e8094ada254c211188f6b25feabf12a07e07c, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=2953963&id_documento_assinado=3057648&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=196e49d6c091779618a9e27ab26f2f3cd32025ce4be582875e4a26047c8602ee, line 470: TypeError: parent.document.getElementById(...) is null
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 6404, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 6404, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 6324, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 6324, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12380, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12380, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 9788, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524502039659	geckodriver	INFO	geckodriver 0.19.1
+1524502039809	geckodriver	INFO	Listening on 127.0.0.1:52425
+1524502040540	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.cID3ulLij6nn"
+1524502041238	Marionette	INFO	Enabled via --marionette
+1524502042932	Marionette	INFO	Listening on port 52431
+1524502043184	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=2972193&id_documento_assinado=3057765&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=262625d184e189c86c3d7e2753ca270906887a5568631f644d2d9dcac9c14aa5, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=2972115&id_documento_assinado=3057836&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=a83515645307440259de91cc653b438e20ebd260df63154a6f9c62969e59d0c9, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=1892023&id_documento_assinado=3057970&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=36abc90276ef7011506a0a105d566548daebb2a1d7b1f8640f09bbc913727897, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=2884909&id_documento_assinado=3058243&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=5275f530bd801edef7b04bc1db38c1a080f5c3d6e35353c37ff78babc67fcebb, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3053672&id_documento_assinado=3059070&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=638a9eb8c75f8b0574089bf93613b2b01a6aecfee84c4e835c5ec627f4b171e2, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/infra_js/InfraAjax.js?3.0.10-1.459, line 159: NetworkError: A network error occurred.
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 3968, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 9788, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 9788, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10348, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11564, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 12428, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524502139510	geckodriver	INFO	geckodriver 0.19.1
+1524502139650	geckodriver	INFO	Listening on 127.0.0.1:53080
+1524502140385	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.AehatBiVAn5H"
+1524502141110	Marionette	INFO	Enabled via --marionette
+1524502142838	Marionette	INFO	Listening on port 53085
+1524502143048	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3053648&id_documento_assinado=3059160&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=3b085bbe6640d09c3fddf0ce8c2a254437ab75cd059cbcaf0405ca5fa1749212, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3053627&id_documento_assinado=3059251&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=8fb8059522f0a93f7a8b76562e353d5890d968f41d2a729d3541e2debb4a9958, line 470: TypeError: parent.document.getElementById(...) is null
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 13448, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 14156, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10844, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10844, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13548, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13548, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 11188, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1524511369321	geckodriver	INFO	geckodriver 0.19.1
+1524511369794	geckodriver	INFO	Listening on 127.0.0.1:59240
+1524511370640	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.0EowEQ3j0OVY"
+1524511371924	Marionette	INFO	Enabled via --marionette
+1524511377070	Marionette	INFO	Listening on port 59246
+1524511377176	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 12308, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 12308, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 14368, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 14044, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 14044, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 12308, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13100, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13100, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524514214124	geckodriver	INFO	geckodriver 0.19.1
+1524514214280	geckodriver	INFO	Listening on 127.0.0.1:61712
+1524514214981	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.8A7lhjBWiMAl"
+1524514215734	Marionette	INFO	Enabled via --marionette
+1524514217426	Marionette	INFO	Listening on port 61718
+1524514217642	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 14736, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 14736, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13640, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13640, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12008, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12008, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 3120, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 3120, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 12492, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1524518789328	geckodriver	INFO	geckodriver 0.19.1
+1524518789470	geckodriver	INFO	Listening on 127.0.0.1:49736
+1524518790273	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.84FDpMY0O1ux"
+1524518791208	Marionette	INFO	Enabled via --marionette
+1524518793924	Marionette	INFO	Listening on port 49741
+1524518794484	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3053734&id_documento_assinado=3060256&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=0249040a0266068abe7ce81db2b73227dca5ff711c9cbddbf8dd35d268639da8, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3057211&id_documento_assinado=3060285&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=2e5fd50f4bc6bb46d45eee5d6216492aa8799243ead1bbcf5e7f89fec604e36d, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3053850&id_documento_assinado=3060349&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=11525e286bfe3ae6810550e1f279fd3cc31066873a7ce0597abdff7e62d43067, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3054034&id_documento_assinado=3060387&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=72ad7beb5141756737e4b7f355a05ef731b61a443c30878857b1ac77a689afd5, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=2980202&id_documento_assinado=3060765&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=57c4c5bb6b2316c36eb24f32e9ecdff67e44788f78e5d2f77b4572ff10c96ebc, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3035307&id_documento_assinado=3061158&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=5e62e4c9d209575baa27339125af97c15cebf1eaa1d396250d3d6904fe4859dc, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3053616&id_documento_assinado=3059309&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=fd668d2d02a11faaadff06f15c69faca8ad4d56fa9c2c9888e152fb70251ae9b, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3052994&id_documento_assinado=3059445&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=3a78ee209be07b8c779dd949d8d95520d9365adc2f476e3762c9f54b77214dad, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=2910117&id_documento_assinado=3064027&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=0b6d3bdce4a343ded4afd305a69878d7851624a6614ad03c7e2a8885dd6f1124, line 470: TypeError: parent.document.getElementById(...) is null
+1524571256276	geckodriver	INFO	geckodriver 0.19.1
+1524571256479	geckodriver	INFO	Listening on 127.0.0.1:57231
+1524571257166	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.GL4PGE1dEIV0"
+1524571258678	Marionette	INFO	Enabled via --marionette
+1524571261218	Marionette	INFO	Listening on port 57237
+1524571261568	Marionette	WARN	TLS certificate errors will be ignored for this session
+1524591673231	geckodriver	INFO	geckodriver 0.19.1
+1524591673391	geckodriver	INFO	Listening on 127.0.0.1:50942
+1524591674546	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.YfcpYqTmZw4L"
+1524591675352	Marionette	INFO	Enabled via --marionette
+1524591677488	Marionette	INFO	Listening on port 50948
+1524591677666	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3055568&id_documento_assinado=3065716&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=05acd0cf7bb8930223a2654f91bc99dbcc49fda33ca3c2e753d004f8ffd4007c, line 470: TypeError: parent.document.getElementById(...) is null
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3054413&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=83f94757a199c9b176bb8657d01c95d9d8dc14c5e298190949efb02f7d8e0f87, line 470: TypeError: parent.document.getElementById(...) is null
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 14256, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12552, Chrome_ChildThread] WARNING: 1524592407284	Marionette	INFO	Listening on port 51956
+1524592407358	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 15672, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 15672, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 6252, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 6252, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 12208, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+1524593396562	geckodriver	INFO	geckodriver 0.19.1
+1524593396702	geckodriver	INFO	Listening on 127.0.0.1:49759
+1524593397716	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.UNJvZyUxMBdw"
+1524593398938	Marionette	INFO	Enabled via --marionette
+1524593401394	Marionette	INFO	Listening on port 49765
+1524593401970	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: https://sei.anatel.gov.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=procedimento_enviar&atualizar_arvore=1&arvore=1&id_procedimento=3054087&id_documento_assinado=3065844&infra_sistema=100000100&infra_unidade_atual=110001005&infra_hash=8c09a9df1d813f8bc4b206db975918a5d3cc94048a8b9e24517d8f0a3257b1d7, line 470: TypeError: parent.document.getElementById(...) is null
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 11632, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 7048, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12480, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12480, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11348, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11348, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 2920, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524593575543	geckodriver	INFO	geckodriver 0.19.1
+1524593575714	geckodriver	INFO	Listening on 127.0.0.1:50360
+1524593576494	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.ko8YDSbaeyxP"
+1524593577424	Marionette	INFO	Enabled via --marionette
+1524593579542	Marionette	INFO	Listening on port 50365
+1524593579742	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12980, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12980, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 4048, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 1636, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 7252, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 12724, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524596647143	geckodriver	INFO	geckodriver 0.19.1
+1524596647283	geckodriver	INFO	Listening on 127.0.0.1:52351
+1524596648077	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.byFyzeFMC0wu"
+1524596649494	Marionette	INFO	Enabled via --marionette
+1524596651484	Marionette	INFO	Listening on port 52356
+1524596652354	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13476, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13476, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 3112, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11076, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11076, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 780, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+1524598479039	geckodriver	INFO	geckodriver 0.19.1
+1524598479182	geckodriver	INFO	Listening on 127.0.0.1:53309
+1524598479947	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.tsMUzhdoAZ1Q"
+1524598480772	Marionette	INFO	Enabled via --marionette
+1524598482650	Marionette	INFO	Listening on port 53315
+1524598483122	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13412, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13412, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 12524, Gecko_IOThread] WARNINUnable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: https://sei.anatel.gov.br/infra_js/InfraUtil.js?3.0.10-1.459, line 985: TypeError: objInfraPaginaAtual is null
+JavaScript error: https://sei.anatel.gov.br/infra_js/InfraUtil.js?3.0.10-1.459, line 985: TypeError: objInfraPaginaAtual is null
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 14088, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 14088, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10224, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10224, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11884, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11884, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 11168, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+tps://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+[Parent 11668, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 11668, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 11668, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524600328640	geckodriver	INFO	geckodriver 0.19.1
+1524600328755	geckodriver	INFO	Listening on 127.0.0.1:55517
+1524600329525	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.oqIjJL3QiOb8"
+1524600330542	Marionette	INFO	Enabled via --marionette
+1524600332474	Marionette	INFO	Listening on port 55522
+1524600332722	Marionette	WARN	TLS certificate errors will be ignored for this session
+1524602718930	geckodriver	INFO	geckodriver 0.19.1
+1524602719117	geckodriver	INFO	Listening on 127.0.0.1:56964
+1524602719898	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.YAVatuOOSKto"
+1524602720842	Marionette	INFO	Enabled via --marionette
+1524602723326	Marionette	INFO	Listening on port 56971
+1524602724186	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 5156, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 5156, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 10060, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10060, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11604, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11604, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 14796, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+1524658078794	geckodriver	INFO	geckodriver 0.19.1
+1524658078934	geckodriver	INFO	Listening on 127.0.0.1:56151
+1524658079887	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.KpYoI8zwfXGS"
+1524658080938	Marionette	INFO	Enabled via --marionette
+1524658083506	Marionette	INFO	Listening on port 56157
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/omni.ja!/components/nsUrlClassifierListManager.js, line 69: NS_ERROR_XPC_GS_RETURNED_FAILURE: Component returned failure code: 0x80570016 (NS_ERROR_XPC_GS_RETURNED_FAILURE) [nsIJSCID.getService]
+JavaScript error: jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/omni.ja!/components/nsUrlClassifierListManager.js, line 69: NS_ERROR_XPC_GS_RETURNED_FAILURE: Component returned failure code: 0x80570016 (NS_ERROR_XPC_GS_RETURNED_FAILURE) [nsIJSCID.getService]
+1524658084524	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+[Parent 3508, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 2028, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 3508, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13356, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13356, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 3508, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 9384, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 9384, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524678304993	geckodriver	INFO	geckodriver 0.19.1
+1524678305133	geckodriver	INFO	Listening on 127.0.0.1:53333
+1524678305951	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.ZCN1B2lsal7H"
+1524678307776	Marionette	INFO	Enabled via --marionette
+1524678309924	Marionette	INFO	Listening on port 53338
+1524678310254	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11996, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11996, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12796, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Parent][MessageChannel] Error: (msgtype=0x15008D,name=PBrowser::Msg_UpdateNativeWindowHandle) Closed channel: cannot send/recv
+
+
+###!!! [Parent][MessageChannel] Error: (msgtype=0x150080,name=PBrowser::Msg_Destroy) Closed channel: cannot send/recv
+
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x150001,name=PBrowser::Msg_AsyncMessage) Closed channel: cannot send/recv
+
+JavaScript error: chrome://browser/content/tab-content.js, line 316: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsIMessageSender.sendAsyncMessage]
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x150001,name=PBrowser::Msg_AsyncMessage) Closed channel: cannot send/recv
+
+JavaScript error: chrome://browser/content/content.js, line 700: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsIMessageSender.sendAsyncMessage]
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x15002B,name=PBrowser::Msg_SetInputContext) Closed channel: cannot send/recv
+
+1524751092540	geckodriver	INFO	geckodriver 0.19.1
+1524751092633	geckodriver	INFO	Listening on 127.0.0.1:50990
+1524751093695	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.piMOqb8HsHmH"
+1524751095146	Marionette	INFO	Enabled via --marionette
+1524751098028	Marionette	INFO	Listening on port 50995
+1524751098090	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: resource://gre/modules/BrowserUtils.jsm, line 475: TypeError: docShell is null
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: resource://gre/modules/CertUtils.jsm, line 169: NS_ERROR_ABORT: Certificate issuer is not built-in.
+1524751295966	addons.productaddons	ERROR	Request failed certificate checks: [Exception... "Certificate checks failed. See previous errors for details."  nsresult: "0x80070057 (NS_ERROR_ILLEGAL_VALUE)"  location: "JS frame :: resource://gre/modules/CertUtils.jsm :: validateCert :: line 113"  data: no]U[Parent 9296, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 5752, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 9504, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, liUnable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13880, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13880, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 6256, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 6256, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 3328, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1524751611316	geckodriver	INFO	geckodriver 0.19.1
+1524751611457	geckodriver	INFO	Listening on 127.0.0.1:55821
+1524751612409	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.Z6umvCF5O4tW"
+1524751613204	Marionette	INFO	Enabled via --marionette
+1524751615298	Marionette	INFO	Listening on port 55826
+1524751615650	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 9256, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 9256, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13796, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13796, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12956, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 13956, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+1524751707817	geckodriver	INFO	geckodriver 0.19.1
+1524751707957	geckodriver	INFO	Listening on 127.0.0.1:56271
+1524751708893	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.iAIowXWKAYFj"
+1524751709632	Marionette	INFO	Enabled via --marionette
+1524751711422	Marionette	INFO	Listening on port 56284
+1524751711540	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: resource://gre/modules/CertUtils.jsm, line 169: NS_ERROR_ABORT: Certificate issuer is not built-in.
+1524751866756	addons.productaddons	ERROR	Request failed certificate checks: [Exception... "Certificate checks failed. See previous errors for details."  nsresult: "0x80070057 (NS_ERROR_ILLEGAL_VALUE)"  location: "JS frame :: resource://gre/modules/CertUtils.jsm :: validateCert :: line 113"  data: no]
+[Parent 14100, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12984, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12984, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 14100, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 6400, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 6400, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 9544, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 14100, Gecko_IOThread] WARNING: pipe error: 232: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 513
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1524753157185	geckodriver	INFO	geckodriver 0.19.1
+1524753157330	geckodriver	INFO	Listening on 127.0.0.1:49698
+1524753158245	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.LGBeS2KE7NjX"
+1524753159174	Marionette	INFO	Enabled via --marionette
+1524753161028	Marionette	INFO	Listening on port 49703
+1524753161436	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 12796, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13820, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 12796, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 8152, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 8152, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 6848, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+ll-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/omni.ja!/components/nsAsyncShutdown.js, line 119: Error: We have already registered a distinct blocker with the same name: Crash Reporter: blocking on minidumpgeneration.
+[Parent 1164, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11200, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11200, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 1164, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 14304, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+WARNING: At least one completion condition is taking too long to complete. Conditions: [{"name":"Places Connection shutdown","state":{"progress":{}},"filename":"z:/build/build/src/toolkit/components/places/Database.cpp","lineNumber":523,"stack":["jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/omni.ja!/components/nsAsyncShutdown.js:addBlocker:159","resource://gre/modules/XPCOMUtils.jsm:XPCU_serviceLambda:266","resource://gre/modules/XPCOMUtils.jsm:get:199","resource://gre/modules/PlacesUtils.jsm:get:1978","resource://gre/modules/PlacesUtils.jsm:get toolbarFolderId:1216","jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/browser/omni.ja!/components/nsBrowserGlue.js:getToolbarFolderCount:1762","jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/browser/omni.ja!/components/nsBrowserGlue.js:_maybeToggleBookmarkToolbarVisibility:1768","jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/browser/omni.ja!/components/nsBrowserGlue.js:BG__migrateUI:1790","jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/browser/omni.ja!/components/nsBrowserGlue.js:BG__beforeUIStartup:642","jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/browser/omni.ja!/components/nsBrowserGlue.js:BG_observe:341"]}] Barrier: profile-before-change
+A content process crashed and MOZ_CRASHREPORTER_SHUTDOWN is set, shutting down
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1524767615016	geckodriver::marionette	ERROR	Failed to kill browser process
+1524767736477	geckodriver	INFO	geckodriver 0.19.1
+1524767736633	geckodriver	INFO	Listening on 127.0.0.1:58874
+1524767737465	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.H5RprPNbFgwq"
+1524767739020	Marionette	INFO	Enabled via --marionette
+1524767742122	Marionette	INFO	Listening on port 58879
+1524767742290	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/omni.ja!/components/nsUrlClassifierListManager.js, line 69: NS_ERROR_XPC_GS_RETURNED_FAILURE: Component returned failure code: 0x80570016 (NS_ERROR_XPC_GS_RETURNED_FAILURE) [nsIJSCID.getService]
+JavaScript error: jar:file:///C:/Program%20Files%20(x86)/Mozilla%20Firefox/omni.ja!/components/nsUrlClassifierListManager.js, line 69: NS_ERROR_XPC_GS_RETURNED_FAILURE: Component returned failure code: 0x80570016 (NS_ERROR_XPC_GS_RETURNED_FAILURE) [nsIJSCID.getService]
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+[Child 3916, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 3916, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13528, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13528, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 13072, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524768116301	geckodriver	INFO	geckodriver 0.19.1
+1524768116491	geckodriver	INFO	Listening on 127.0.0.1:59545
+1524768117250	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.jH5zVxwdGCy5"
+1524768118920	Marionette	INFO	Enabled via --marionette
+1524768121116	Marionette	INFO	Listening on port 59550
+1524768121584	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+1524768581798	geckodriver	INFO	geckodriver 0.19.1
+1524768581939	geckodriver	INFO	Listening on 127.0.0.1:61950
+1524768582844	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.zBjK5fXaMTTi"
+1524768584060	Marionette	INFO	Enabled via --marionette
+1524768585902	Marionette	INFO	Listening on port 61955
+1524768586032	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+1524769073321	geckodriver	INFO	geckodriver 0.19.1
+1524769073560	geckodriver	INFO	Listening on 127.0.0.1:49960
+1524769074190	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.jEJMjS0FE9RU"
+1524769075258	Marionette	INFO	Enabled via --marionette
+1524769077038	Marionette	INFO	Listening on port 49965
+1524769077400	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13592, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 8652, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 8652, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 1352, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 13324, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+ttps://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 8820, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 8668, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 8668, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 15332, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 15332, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 13768, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+d/all-classes-131r04.js, line 1: unreachable code after return statement
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 9960, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 2704, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 14508, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 14508, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 3676, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1524770601912	geckodriver::marionette	ERROR	Failed to kill browser process
+1524770613498	geckodriver	INFO	geckodriver 0.19.1
+1524770613623	geckodriver	INFO	Listening on 127.0.0.1:50962
+1524770614343	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.1VA5mRfldCSg"
+1524770615096	Marionette	INFO	Enabled via --marionette
+1524770616788	Marionette	INFO	Listening on port 50967
+1524770617032	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+1524771295921	geckodriver	INFO	geckodriver 0.19.1
+1524771296031	geckodriver	INFO	Listening on 127.0.0.1:53310
+1524771296805	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.qFHzt0OW9Whj"
+1524771297638	Marionette	INFO	Enabled via --marionette
+1524771299418	Marionette	INFO	Listening on port 53315
+1524771299438	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 15676, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 4496, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 4496, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 16172, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 16172, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12868, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12868, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 6708, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1524771733705	geckodriver	INFO	geckodriver 0.19.1
+1524771733877	geckodriver	INFO	Listening on 127.0.0.1:53520
+1524771734647	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.nZtTxTh2UsKP"
+1524771736318	Marionette	INFO	Enabled via --marionette
+1524771738532	Marionette	INFO	Listening on port 53525
+1524771738986	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+1524772907594	geckodriver	INFO	geckodriver 0.19.1
+1524772907756	geckodriver	INFO	Listening on 127.0.0.1:57204
+1524772908606	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.CCqcFzA0aRzJ"
+1524772909868	Marionette	INFO	Enabled via --marionette
+1524772911610	Marionette	INFO	Listening on port 57209
+1524772912202	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+1524773373516	geckodriver	INFO	geckodriver 0.19.1
+1524773373688	geckodriver	INFO	Listening on 127.0.0.1:59665
+1524773374502	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.teAFiq5SL6PG"
+1524773375248	Marionette	INFO	Enabled via --marionette
+1524773377304	Marionette	INFO	Listening on port 59670
+1524773377680	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+1524773975368	geckodriver	INFO	geckodriver 0.19.1
+1524773975503	geckodriver	INFO	Listening on 127.0.0.1:64545
+1524773976348	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.HmJ8cA92KB5J"
+1524773977478	Marionette	INFO	Enabled via --marionette
+1524773979702	Marionette	INFO	Listening on port 64550
+1524773980660	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+1524774182911	geckodriver	INFO	geckodriver 0.19.1
+1524774183063	geckodriver	INFO	Listening on 127.0.0.1:49422
+1524774184034	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.jvXwQIELqH2g"
+1524774184846	Marionette	INFO	Enabled via --marionette
+1524774186672	Marionette	INFO	Listening on port 49427
+1524774186714	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+1524774611308	geckodriver	INFO	geckodriver 0.19.1
+1524774611495	geckodriver	INFO	Listening on 127.0.0.1:51721
+1524774612223	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.RI5pGKqzuord"
+1524774613416	Marionette	INFO	Enabled via --marionette
+1524774615778	Marionette	INFO	Listening on port 51728
+1524774616486	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript error: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: ReferenceError: Actions is not defined
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+1524777566404	geckodriver	INFO	geckodriver 0.19.1
+1524777566528	geckodriver	INFO	Listening on 127.0.0.1:55690
+1524777567461	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\rsilva\\AppData\\Local\\Temp\\rust_mozprofile.1k2ub7yQgxip"
+1524777569190	Marionette	INFO	Enabled via --marionette
+1524777571620	Marionette	INFO	Listening on port 55695
+1524777571768	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\rsilva\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/login/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/administrativo/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement
+JavaScript warning: https://sapiens.agu.gov.br/js/receitafederal/build/all-classes-131r04.js, line 1: unreachable code after return statement

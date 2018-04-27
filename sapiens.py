@@ -93,14 +93,21 @@ class LoginPage(Page):
         # Hit Enter
         senha.send_keys(Keys.RETURN)
 
-        return Page_sapiens(self.driver)
+        return self.driver
 
 
 class Page_sapiens(Page):
 
-    def __init__(self, driver):
+    def __init__(self, driver, registros):
         self.driver = driver
-        self.registros = {}
+        self.registros = registros
+
+    def reset_driver(self, driver):
+
+        del self.driver
+
+        self.driver = driver
+
 
     def add_registro(self, registro):
 
@@ -119,29 +126,6 @@ class Page_sapiens(Page):
     def go_to_RF(self):
         self.driver.get(Rf_Sapiens.URL)
 
-    def pesquisa_obito(self, cpf):
-
-        if self.get_url != Rf_Sapiens.URL:
-            with self.wait_for_page_load():
-                self.go_to_RF()
-
-        entidade = self.wait_for_element((By.ID, "textfield-1014-inputEl"))
-        entidade.clear()
-
-        entidade.send_keys(str(cpf) + Keys.RETURN)
-
-        try:
-
-            elem = self.elem_is_visible((By.CLASS_NAME, "x-grid-cell-inner"))
-
-            if "Óbito" in str(elem.text):
-                return "OBITO"
-            else:
-                return "ATIVO"
-
-        except:
-            print("Problema ao resgatar o elemento da busca")
-            return ""
 
     def pesquisa_dados(self, cpf):
 
@@ -149,7 +133,28 @@ class Page_sapiens(Page):
             with self.wait_for_page_load():
                 self.go_to_RF()
 
-        entidade = self.wait_for_element(Rf_Sapiens.IDINPUTCPF)
+        if len(cpf) == 11:
+
+            btn_pf = self.wait_for_element_to_click(Rf_Sapiens.BTN_PF)
+
+            btn_pf.click()
+
+            id_input = Rf_Sapiens.ID_INPUT_CPF
+
+        elif len(cpf) == 14:
+
+            btn_pj = self.wait_for_element_to_click(Rf_Sapiens.BTN_PJ)
+
+            btn_pj.click()
+
+            id_input = Rf_Sapiens.ID_INPUT_CNPJ
+
+        else:
+
+            raise ValueError("Número identificador inválido {}".format(cpf))
+
+
+        entidade = self.wait_for_element(id_input)
         entidade.clear()
 
         entidade.send_keys(str(cpf) + Keys.RETURN)
@@ -169,7 +174,7 @@ class Page_sapiens(Page):
 
             resultado = None
 
-        if resultado is not None:
+        if resultado:
 
             resultado = tags_to_string(resultado)
 

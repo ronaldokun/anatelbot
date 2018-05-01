@@ -20,12 +20,17 @@ class Sapiens(object):
 
     SENHA = (By.ID, "textfield-1018-inputEl")
 
-
 class Rf_Sapiens(object):
 
     URL = "https://sapiens.agu.gov.br/receitafederal"
 
-    IDINPUTCPF = (By.ID, "textfield-1014-inputEl")
+    BTN_PF = (By.ID, "tab-1083-btnInnerE1")
+
+    BTN_PJ = (By.ID, "tab-1084-btnInnertE1")
+
+    ID_INPUT_CPF = (By.ID, "textfield-1014-inputEl")
+
+    ID_INPUT_CNPJ = (By.ID, "textfield-1051-inputEl")
 
     RESULTADO = (By.CLASS_NAME, "x-grid-cell-inner")
 
@@ -33,10 +38,8 @@ class Rf_Sapiens(object):
 
     NAME = (By.ID, "textfield-1015-inputE1")
 
-    QUADRO1 = (By.CLASS_NAME, "x-grid-cell-inner")
-
-
 class Login(object):
+
     URL = "https://sei.anatel.gov.br"
 
     TITLE = "SEI / ANATEL"
@@ -45,14 +48,13 @@ class Login(object):
 
     PWD = (By.ID, "pwdSenha")
 
-
 class Base(object):
+
     INIT = (By.ID, "lnkControleProcessos")
 
     MENU = (By.ID, "lnkInfraMenuSistema")
 
     URL = "https://sei.anatel.gov.br/sei/"
-
 
 class LatMenu(object):
     CLT_PROC = (By.LINK_TEXT, "Controle de Processos")
@@ -87,7 +89,6 @@ class LatMenu(object):
 
     PT_CTRL = (By.LINK_TEXT, "Pontos de Controle")
 
-
 class Main(object):
     TITLE = 'SEI - Controle de Processos'
 
@@ -96,7 +97,6 @@ class Main(object):
     VISUAL = (By.ID, "ancTipoVisualizacao")
 
     CONT = (By.ID, "selInfraPaginacaoSuperior")
-
 
 class Blocos(object):
 
@@ -107,7 +107,6 @@ class Bloco(object):
     TITLE = "SEI - Documentos do Bloco de Assinatura"
 
     RET_BLOCO = ((By.ID, 'btnExcluir'))
-
 
 class Processo(object):
     TITLE = "SEI - Processo"
@@ -150,15 +149,19 @@ class Processo(object):
             'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)'
             ]
 
-
 class Central(object):
+
     ACOES = (By.ID, "divArvoreAcoes")
 
-    IN_AND = (By.ID, "txaDescricao")
-
-    IN_POSTIT = (By.ID, "txaDescicao")
+    IN_POSTIT = (By.ID, "txaDescricao")
 
     BT_POSTIT = (By.NAME, "sbmRegistrarAnotacao")
+
+    CHK_PRIOR = (By.ID, "chkSinPrioridade")
+
+    OPT_MARCADORES = (By.CLASS_NAME, "dd-pointer dd-pointer-down")
+
+    LISTA_MARCADORES = (By.CLASS_NAME, "dd-options dd-click-off-close")
 
     SV_AND = (By.ID, "sbmSalvar")
 
@@ -167,7 +170,6 @@ class Central(object):
     AND_MID = " ( SEI nº "
 
     AND_POS = "por meio de correspondência simples com aviso de recebimento."
-
 
 class Envio(object):
 
@@ -203,7 +205,8 @@ class Envio(object):
 
     ENVIAR = (By.ID, "sbmEnviar")
 
-class Tipos(object):
+class Criar_Processo(object):
+
     EXIBE_ALL = (By.ID, 'imgExibirTiposProcedimento')
 
     FILTRO = (By.ID, 'txtFiltro')
@@ -951,8 +954,342 @@ class Tipos(object):
              'Viagem: Publicação de Boletim'
              }
 
+class Gerar_Doc(object):
+
+    TIPOS = ["Externo",
+             "Ofício",
+             "Informe"]
+
+    ID_TXT_PADRAO = (By.ID, "optTextoPadrao")
+
+    ID_MODELOS_OF = (By.ID, "selTextoPadrao")
+
+    TEXTOS_PADRAO = ['Arquivamento de processo no SEI',
+                     'Arquivamento de processo no SEI',
+                     'Ato de Cassação - Radioamador',
+                     'Ato de Cassação - Radioamador',
+                     'ATO DE CASSAÇÃO DO SLP-019',
+                     'ATO DE CASSAÇÃO DO SLP-019',
+                     'ATO DE CASSAÇÃO DO SLP-028',
+                     'ATO DE CASSAÇÃO DO SLP-028',
+                     'Ato_RD_GRs_autorizacao_tx',
+                     'Ato_RD_GRs_autorizacao_tx',
+                     'Ato_RD_GRs_consolidacaotecnica',
+                     'Ato_RD_GRs_consolidacaotecnica',
+                     'Ato_RD_GRs_enquadramento_pb',
+                     'Ato_RD_GRs_enquadramento_pb',
+                     'Ato_RD_GRs_homologacao_estudio',
+                     'Ato_RD_GRs_homologacao_estudio',
+                     'DESPACHO DE ARQUIVAMENTO',
+                     'DESPACHO DE ARQUIVAMENTO',
+                     'E-mail_(TFI, PPDUR, etc)',
+                     'E-mail_(TFI, PPDUR, etc)',
+                     'E-Mail_Cancelamento de Serviço',
+                     'E-Mail_Cancelamento de Serviço',
+                     'E-mail_Exigência',
+                     'E-mail_Exigência',
+                     'E-mail_Licença/Coer',
+                     'E-mail_Licença/Coer',
+                     'E-mail_PPDESS',
+                     'E-mail_PPDESS',
+                     'Edital SLP licenças a vencer',
+                     'Edital SLP licenças a vencer',
+                     'E_mail_Atualização_Cadastral',
+                     'E_mail_Atualização_Cadastral',
+                     'Informe de Cassação RA',
+                     'Informe de Cassação RA',
+                     'Informe de Cassação RC',
+                     'Informe de Cassação RC',
+                     'Informe de cassação SLP 019',
+                     'Informe de cassação SLP 019',
+                     'Informe de cassação SLP 028',
+                     'Informe de cassação SLP 028',
+                     'Informe_Cancelamento_de_PPDESS',
+                     'Informe_Cancelamento_de_PPDESS',
+                     'Informe_Cancelamento_por_óbito_coletivo',
+                     'Informe_Cancelamento_por_óbito_coletivo',
+                     'Informe_prescrição_modelo_sede',
+                     'Informe_prescrição_modelo_sede',
+                     'MA_Boletos_Emissão_Licença',
+                     'MA_Boletos_Emissão_Licença',
+                     'MA_Cancelamento_Serviço',
+                     'MA_Cancelamento_Serviço',
+                     'MA_Envio_de_Licença',
+                     'MA_Envio_de_Licença',
+                     'MA_Exigência',
+                     'MA_Exigência',
+                     'MA_PPDESS',
+                     'MA_PPDESS',
+                     'MM_Boletos_Emissão_Licença',
+                     'MM_Boletos_Emissão_Licença',
+                     'MM_Cancelamento_Serviço',
+                     'MM_Cancelamento_Serviço',
+                     'MM_Envio_de_Licença',
+                     'MM_Envio_de_Licença',
+                     'MM_Exigência',
+                     'MM_Exigência',
+                     'MM_PPDESS',
+                     'MM_PPDESS',
+                     'OF. DE NOT. CASSAÇÃO SLP028',
+                     'OF. DE NOT. CASSAÇÃO SLP028',
+                     'OF. DE NOT. RF A VENCER 019',
+                     'OF. DE NOT. RF A VENCER 019',
+                     'Of. Not. Val. Vencida RA',
+                     'Of. Not. Val. Vencida RA',
+                     'Oficio cancelamento serviço SLP sem RF',
+                     'Oficio cancelamento serviço SLP sem RF',
+                     'Oficio de interesse',
+                     'Oficio de interesse',
+                     'Ofício decisão do Ato 019',
+                     'Ofício decisão do Ato 019',
+                     'ofício decisão do ato 028',
+                     'ofício decisão do ato 028',
+                     'Oficio_sócio indébito',
+                     'Oficio_sócio indébito',
+                     'Of_GERAL_Boletos por Email',
+                     'Of_GERAL_Boletos por Email',
+                     'Of_GERAL_Envio_Licença_Email',
+                     'Of_GERAL_Envio_Licença_Email',
+                     'Of_GERAL_PPDESS_Email',
+                     'Of_GERAL_PPDESS_Email',
+                     'Of_Impugnacao_Debitos',
+                     'Of_Impugnacao_Debitos',
+                     'Of_Justiça',
+                     'Of_Justiça',
+                     'Of_Modelo_1',
+                     'Of_Modelo_1',
+                     'Of_SLP_Exigência_CCadastro',
+                     'Of_SLP_Exigência_CCadastro',
+                     'RA_Boletos_Emissão_Licença',
+                     'RA_Boletos_Emissão_Licença',
+                     'RA_Cancelamento_Serviço',
+                     'RA_Cancelamento_Serviço',
+                     'RA_Declínio de Responsável pela estação',
+                     'RA_Declínio de Responsável pela estação',
+                     'RA_Envio_COER',
+                     'RA_Envio_COER',
+                     'RA_Envio_Licença',
+                     'RA_Envio_Licença',
+                     'RA_Envio_Licença_COER',
+                     'RA_Envio_Licença_COER',
+                     'RA_Esclarecimento_Classe_D',
+                     'RA_Esclarecimento_Classe_D',
+                     'RA_Estação Repetidora_PF',
+                     'RA_Estação Repetidora_PF',
+                     'RA_Exigência',
+                     'RA_Exigência',
+                     'RA_Exigencia_Prova',
+                     'RA_Exigencia_Prova',
+                     'RA_PPDESS',
+                     'RA_PPDESS',
+                     'RA_Repetidora Abaixo 200 km',
+                     'RA_Repetidora Abaixo 200 km',
+                     'RA_Repetidora Indef._PF',
+                     'RA_Repetidora Indef._PF',
+                     'RC_Oficio de Cassação',
+                     'RC_OF_Boletos_Emissão_Licença',
+                     'RC_OF_Boletos_Emissão_Licença',
+                     'RC_OF_Cancelamento_Serviço',
+                     'RC_OF_Cancelamento_Serviço',
+                     'RC_OF_Envio_Licença',
+                     'RC_OF_Envio_Licença',
+                     'RC_OF_Exigência',
+                     'RC_OF_Exigência',
+                     'RC_OF_PPDESS',
+                     'RC_OF_PPDESS',
+                     'RD Checklist Licenciamento',
+                     'RD Checklist Licenciamento',
+                     'RD_CheckList_Alt_Téc_FM',
+                     'RD_CheckList_Alt_Téc_FM',
+                     'RD_CheckList_Alt_Téc_OM',
+                     'RD_CheckList_Alt_Téc_OM',
+                     'RD_CheckList_Alt_Téc_TV-RTV',
+                     'RD_CheckList_Alt_Téc_TV-RTV',
+                     'RD_CheckList_Alt_Téc_TVD-RTVD',
+                     'RD_CheckList_Alt_Téc_TVD-RTVD',
+                     'RD_Checklist_Documentação',
+                     'RD_Checklist_Documentação',
+                     'RD_Despacho_Decisório_alterações',
+                     'RD_Despacho_Decisório_alterações',
+                     'RD_e-mail_Aprovação_de_Projeto_no_Mosaico',
+                     'RD_e-mail_Aprovação_de_Projeto_no_Mosaico',
+                     'RD_e-mail_Libera_Autocadastramento_no_Mosaico',
+                     'RD_e-mail_Libera_Autocadastramento_no_Mosaico',
+                     'RD_Email_Despacho-Alteracao_Tecnica',
+                     'RD_Email_Despacho-Alteracao_Tecnica',
+                     'RD_Email_Informa_Processo-Concluido_Autocad',
+                     'RD_Email_Informa_Processo-Concluido_Autocad',
+                     'RD_Email_Situacao_AR-Devolvido',
+                     'RD_Email_Situacao_AR-Devolvido',
+                     'RD_Memo Redução ERP PB.',
+                     'RD_Memo Redução ERP PB.',
+                     'RD_Memo_Ato_RF',
+                     'RD_Memo_Ato_RF',
+                     'RD_Memo_AUTOCADASTRAMENTO',
+                     'RD_Memo_AUTOCADASTRAMENTO',
+                     'RD_Memo_Retransm_Aux_Digital',
+                     'RD_Memo_Retransm_Aux_Digital',
+                     'RD_Of_Autocad_Processo_Unico',
+                     'RD_Of_Autocad_Processo_Unico',
+                     'RD_Of_Autocad_Varios_Processos',
+                     'RD_Of_Autocad_Varios_Processos',
+                     'RD_Of_Despacho_Decisorio',
+                     'RD_Of_Despacho_Decisorio',
+                     'RD_Of_Despacho_TFI',
+                     'RD_Of_Despacho_TFI',
+                     'RD_Of_ERAD',
+                     'RD_Of_ERAD',
+                     'RD_Of_Exigência',
+                     'RD_Of_Exigência',
+                     'RD_Of_Exigência_2',
+                     'RD_Of_Exigência_2',
+                     'RD_Of_Exigência_Alt_Tec_Mosaico',
+                     'RD_Of_Exigência_Alt_Tec_Mosaico',
+                     'RD_Of_Exigência_MC_ORLE',
+                     'RD_Of_Exigência_MC_ORLE',
+                     'RD_Of_Exig_Autocad_Ato_RF',
+                     'RD_Of_Exig_Autocad_Ato_RF',
+                     'RD_Of_Exig_Libera_Autocad',
+                     'RD_Of_Exig_Libera_Autocad',
+                     'RD_Of_Exig_Proj_Aba_Solicitações',
+                     'RD_Of_Exig_Proj_Aba_Solicitações',
+                     'RD_Of_Informa_AC_Liberado_Proc_Único',
+                     'RD_Of_Informa_AC_Liberado_Proc_Único',
+                     'RD_Of_Informa_AC_Liberado_Vários_Procs',
+                     'RD_Of_Informa_AC_Liberado_Vários_Procs',
+                     'RD_Of_Informa_Autocad_Customizado',
+                     'RD_Of_Informa_Autocad_Customizado',
+                     'RD_Of_Informa_Licenciamento_via_Mosaico',
+                     'RD_Of_Informa_Licenciamento_via_Mosaico',
+                     'RD_Of_Licença',
+                     'RD_Of_Licença',
+                     'RD_Of_MCTIC',
+                     'RD_Of_MCTIC',
+                     'RD_Of_MCTIC_Devolve_canal_adaptacao_OM_FM',
+                     'RD_Of_MCTIC_Devolve_canal_adaptacao_OM_FM',
+                     'RD_Of_MCTIC_Envio_de_Processo_a_pedido',
+                     'RD_Of_MCTIC_Envio_de_Processo_a_pedido',
+                     'RD_Of_MCTIC_RADCOM',
+                     'RD_Of_MCTIC_RADCOM',
+                     'RD_Of_Não_Outorgadas',
+                     'RD_Of_Não_Outorgadas',
+                     'RD_Of_pedido_e_eng_liberado',
+                     'RD_Of_pedido_e_eng_liberado',
+                     'RD_Of_Renovação_Entidade_Liberada',
+                     'RD_Of_Renovação_Entidade_Liberada',
+                     'RD_Of_Renovação_MCTIC',
+                     'RD_Of_Renovação_MCTIC',
+                     'SARC/SLP_Despacho Ordinatório de Arquivamento',
+                     'SARC/SLP_Despacho Ordinatório de Arquivamento',
+                     'SARC/SLP_Memorando Fiscalização_Com Autorização',
+                     'SARC/SLP_Memorando Fiscalização_Com Autorização',
+                     'SARC/SLP_Memorando Fiscalização_Sem Autorização',
+                     'SARC/SLP_Memorando Fiscalização_Sem Autorização',
+                     'SARC_Ato Revogação_Com Fiscalização',
+                     'SARC_Ato Revogação_Com Fiscalização',
+                     'SARC_Ato Revogação_Sem Fiscalização',
+                     'SARC_Ato Revogação_Sem Fiscalização',
+                     'SARC_Indeferimento',
+                     'SARC_Indeferimento',
+                     'SARC_Reiteração',
+                     'SARC_Reiteração',
+                     'SLMM/SLMA - Autocadastramento - Razão Social (CNPJ',
+                     'SLMM/SLMA - Autocadastramento - Razão Social (CNPJ',
+                     'SLP _ Check List de Análise',
+                     'SLP _ Check List de Análise',
+                     'SLP_Ato Revogaçãop_Com Fiscalização',
+                     'SLP_Ato Revogaçãop_Com Fiscalização',
+                     'SLP_Ato Revogação_Cassação.',
+                     'SLP_Ato Revogação_Cassação.',
+                     'SLP_Ato Revogação_Sem Fiscalização',
+                     'SLP_Ato Revogação_Sem Fiscalização',
+                     'SLP_Exigência_Documentação Complementar',
+                     'SLP_Exigência_Documentação Complementar',
+                     'SLP_Indeferimento',
+                     'SLP_Indeferimento',
+                     'SLP_Indeferimento Autocadastramento_corresp. elet.',
+                     'SLP_Indeferimento Autocadastramento_corresp. elet.',
+                     'SLP_Indeferimento Prorrogação',
+                     'SLP_Indeferimento Prorrogação',
+                     'SLP_Informe_Exclusão Serviço',
+                     'SLP_Informe_Exclusão Serviço',
+                     'SLP_Ofício Cancelamento Autorização_Com Débito',
+                     'SLP_Ofício Cancelamento Autorização_Com Débito',
+                     'SLP_Ofício Cancelamento Autorização_Sem Débito',
+                     'SLP_Ofício Cancelamento Autorização_Sem Débito',
+                     'Termo de Desanexação',
+                     'Termo de Desanexação',
+                     'Todas variáveis',
+                     'Todas variáveis',
+                     'vaznetto_RD_Of_Informa_Autocad',
+                     'vaznetto_RD_Of_Informa_Autocad']
+
+    ID_DEST = (By.ID, "txtDestinatario")
+
+    ID_PUB = (By.ID, "optPublico")
+
+    ID_RES = (By.ID, "optRestrito")
+
+    ID_HIP = (By.ID, "selHipoteseLegal")
+
+    HIPOTESES = [' ',
+                'Controle Interno (Art. 26, § 3º, da Lei nº 10.180/2001)',
+                'Controle Interno (Art. 26, § 3º, da Lei nº 10.180/2001)',
+                'Direito Autoral (Art. 24, III, da Lei nº 9.610/1998)',
+                'Direito Autoral (Art. 24, III, da Lei nº 9.610/1998)',
+                'Documento Preparatório (Art. 7º, § 3º, da Lei nº 12.527/2011)',
+                'Documento Preparatório (Art. 7º, § 3º, da Lei nº 12.527/2011)',
+                'Fiscalização / Investigação da Anatel (Art. 174 da Lei nº 9.472/1997)',
+                'Fiscalização / Investigação da Anatel (Art. 174 da Lei nº 9.472/1997)',
+                'Informação Pessoal (Art. 31 da Lei nº 12.527/2011)',
+                'Informação Pessoal (Art. 31 da Lei nº 12.527/2011)',
+                'Informações Contábeis de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+                'Informações Contábeis de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+                'Informações Econômico-Financeiras de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+                'Informações Econômico-Financeiras de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+                'Informações Operacionais de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+                'Informações Operacionais de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+                'Informações Privilegiadas de Sociedades Anônimas (Art. 155, § 2º, da Lei nº 6.404/1976)',
+                'Informações Privilegiadas de Sociedades Anônimas (Art. 155, § 2º, da Lei nº 6.404/1976)',
+                'Informações Técnicas de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+                'Informações Técnicas de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
+                'Interceptação de Comunicações Telefônicas (Art. 8º, caput, da Lei nº 9.296/1996)',
+                'Interceptação de Comunicações Telefônicas (Art. 8º, caput, da Lei nº 9.296/1996)',
+                'Investigação de Responsabilidade de Servidor (Art. 150 da Lei nº 8.112/1990)',
+                'Investigação de Responsabilidade de Servidor (Art. 150 da Lei nº 8.112/1990)',
+                'Livros e Registros Contábeis Empresariais (Art. 1.190 do Código Civil)',
+                'Livros e Registros Contábeis Empresariais (Art. 1.190 do Código Civil)',
+                'Operações Bancárias (Art. 1º da Lei Complementar nº 105/2001)',
+                'Operações Bancárias (Art. 1º da Lei Complementar nº 105/2001)',
+                'Proteção da Propriedade Intelectual de Software (Art. 2º da Lei nº 9.609/1998)',
+                'Proteção da Propriedade Intelectual de Software (Art. 2º da Lei nº 9.609/1998)',
+                'Protocolo -Pendente Análise de Restrição de Acesso (Art. 6º, III, da Lei nº 12.527/2011)',
+                'Protocolo -Pendente Análise de Restrição de Acesso (Art. 6º, III, da Lei nº 12.527/2011)',
+                'Segredo de Justiça no Processo Civil (Art. 189 do Código de Processo Civil)',
+                'Segredo de Justiça no Processo Civil (Art. 189 do Código de Processo Civil)',
+                'Segredo de Justiça no Processo Penal (Art. 201, § 6º, do Código de Processo Penal)',
+                'Segredo de Justiça no Processo Penal (Art. 201, § 6º, do Código de Processo Penal)',
+                'Segredo Industrial (Art. 195, XIV, Lei nº 9.279/1996)',
+                'Segredo Industrial (Art. 195, XIV, Lei nº 9.279/1996)',
+                'Sigilo das Comunicações (Art. 3º, V, da Lei nº 9.472/1997)',
+                'Sigilo das Comunicações (Art. 3º, V, da Lei nº 9.472/1997)',
+                'Sigilo de Empresa em Situação Falimentar (Art. 169 da Lei nº 11.101/2005)',
+                'Sigilo de Empresa em Situação Falimentar (Art. 169 da Lei nº 11.101/2005)',
+                'Sigilo do Inquérito Policial (Art. 20 do Código de Processo Penal)',
+                'Sigilo do Inquérito Policial (Art. 20 do Código de Processo Penal)',
+                'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)',
+                'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)']
+
+    CONFIRMAR = (By.ID, "btnSalvar")
+
+class Pesq_contato(object):
+
+    ID_SEARCH = (By.ID, "txtPalavrasPesquisaContatos")
+
+    TITLE = "SEI - Contatos"
 
 class Contato(object):
+
     TITLE = 'SEI - Contatos'
 
     TIPO = (By.ID, 'selTipocontato')

@@ -17,7 +17,6 @@ from selenium.webdriver.common.keys import Keys
 # Methods used from selenium submodules
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import *
-from selenium.webdriver.common.by import By
 
 
 # Exceptions
@@ -35,6 +34,17 @@ class Page(object):
 
     def __init__(self, driver):
         """ Initializes the webdriver and the timeout"""
+        try:
+
+            self.driver = driver
+
+        except TypeError:
+
+            print("The object {0} must be of type{1}".format(driver, type(webdriver)))
+
+
+    def reset_driver(self, driver):
+        """ Reinitializes the webdriver and the timeout"""
         try:
 
             self.driver = driver

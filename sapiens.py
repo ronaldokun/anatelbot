@@ -1,6 +1,5 @@
 
 from bs4 import BeautifulSoup as soup
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from helpers import Sapiens, Rf_Sapiens
@@ -10,6 +9,8 @@ KEYS = ['CPF', 'Nome', 'Mãe', 'Data de Nascimento', 'Sexo',
         'Ano do Óbito','Nacionalidade','Título de Eleitor',
         'Situação Cadastral','Fone', 'Logradouro', 'Número',
         'Complemento', 'Bairro', 'Cidade','Cep']
+
+ACOES = ['incluir_doc', 'ini']
 
 
 def tags_to_string(lista_tags):
@@ -104,7 +105,7 @@ class Page_sapiens(Page):
 
     def reset_driver(self, driver):
 
-        del self.driver
+        self.close()
 
         self.driver = driver
 
@@ -135,17 +136,29 @@ class Page_sapiens(Page):
 
         if len(cpf) == 11:
 
-            btn_pf = self.wait_for_element_to_click(Rf_Sapiens.BTN_PF)
 
-            btn_pf.click()
+            try: #TODO: Verify this properly
+
+                btn_pf = self.wait_for_element_to_click(Rf_Sapiens.BTN_PF, timeout=0.5)
+
+                btn_pf.click()
+
+            except:
+                pass
 
             id_input = Rf_Sapiens.ID_INPUT_CPF
 
         elif len(cpf) == 14:
 
-            btn_pj = self.wait_for_element_to_click(Rf_Sapiens.BTN_PJ)
+            try:
 
-            btn_pj.click()
+
+                btn_pj = self.wait_for_element_to_click(Rf_Sapiens.BTN_PJ, timeout=5)
+
+                btn_pj.click()
+
+            except:
+                pass
 
             id_input = Rf_Sapiens.ID_INPUT_CNPJ
 

@@ -15,6 +15,8 @@ from selenium.webdriver.common.keys import Keys
 
 from page import Page
 
+URL = "https://sei.anatel.gov.br/sei/"
+
 KEYS = ['processo',
         'tipo',
         'atribuicao',
@@ -71,6 +73,24 @@ def tag_mouseover(tag, tipo):
 
         raise ValueError("O tipo de tag repassado não é válido: {}".format(tipo))
 
+def cria_dict_acoes(acoes):
+    """Recebe uma lista de html tags 'a' e retorna um dicionário dessas tags"""
+
+    dict_tags = {}
+
+    for tag in acoes:
+
+        key = tag.contents[0].attrs['title']
+
+        if tag.attrs['href'] != '#':
+
+            dict_tags[key] = URL + tag.attrs['href']
+
+        else:
+
+            dict_tags[key] = tag.attrs['onclick']
+
+    return dict_tags
 
 def armazena_tags(lista_tags):
     """ Recebe uma lista de tags de cada linha do processo  da página inicial
@@ -97,19 +117,21 @@ def armazena_tags(lista_tags):
 
             dict_tags['anotacao'] = tag_mouseover(tag_a, 'anotacao')
 
-            dict_tags['anotacao_link'] = tag_a.attrs['href']
+            dict_tags['anotacao_link'] = URL + tag_a.attrs['href']
+
+
 
         elif 'imagens/sei_situacao' in img:
 
             dict_tags['situacao'] = tag_mouseover(tag_a, 'situacao')
 
-            dict_tags['situacao_link'] = tag_a.attrs['href']
+            dict_tags['situacao_link'] = URL + tag_a.attrs['href']
 
         elif 'imagens/marcador' in img:
 
             dict_tags['marcador'] = tag_mouseover(tag_a, 'marcador')
 
-            dict_tags['marcador_link'] = tag_a.attrs['href']
+            dict_tags['marcador_link'] = URL + tag_a.attrs['href']
 
         elif 'imagens/exclamacao' in img:
 
@@ -129,7 +151,7 @@ def armazena_tags(lista_tags):
 
     processo = lista_tags[2].find('a')
 
-    dict_tags['link'] = processo.attrs['href']
+    dict_tags['link'] = URL + processo.attrs['href']
 
     dict_tags['numero'] = processo.string
 
@@ -147,14 +169,13 @@ def armazena_tags(lista_tags):
 
     return dict_tags
 
-
 def tag_controle(tag):
     key, value = "", ""
 
     img = str(tag.img['src'])
 
     # TODO: change to tag.attrs.get(onmouseover)
-    pattern = re.search('\((.*)\)', tag.attrs['onmouseover'])
+    pattern = re.search('\((.*)\)', tag.attrs.get('onmouseover'))
 
     if 'imagens/sei_anotacao' in img:
 
@@ -182,7 +203,6 @@ def tag_controle(tag):
         value = True
 
     return key, value
-
 
 def cria_dict_tags(lista_tags):
     """ Recebe uma lista de tags de cada linha do processo  da página inicial
@@ -249,7 +269,6 @@ def dict_to_df(processos):
 
     return df
 
-
 def init_browser(webdriver, login, senha, timeout=5):
 
     page = Page(webdriver)
@@ -266,7 +285,6 @@ def init_browser(webdriver, login, senha, timeout=5):
 
 
     return page
-
 
 def check_input(identificador, tipo):
     if (tipo == 'cpf' or tipo == 'fistel') and len(identificador) != 11:

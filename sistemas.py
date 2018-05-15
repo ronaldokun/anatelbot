@@ -425,9 +425,6 @@ class Scpx(Page):
 
         return True
 
-
-
-
 def atualiza_cadastro(page, dados):
     if 'CPF' not in dados:
         raise ValueError("É Obrigatório informar o CPF")
@@ -558,7 +555,6 @@ def atualiza_cadastro(page, dados):
 
             page.driver.execute_script(helpers.Entidade.submit)
 
-
 def imprime_licenca(page, ident, serv, tipo):
 
     ident, serv, tipo, sis = functions.check_input(ident, serv, tipo)
@@ -566,7 +562,6 @@ def imprime_licenca(page, ident, serv, tipo):
     page.driver.get(sis.Licenca['Imprimir'])
 
     navigate(page, ident, sis.Licenca, tipo)
-
 
 def consultaSigec(page, ident, tipo='id_cpf'):
     if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
@@ -592,3 +587,55 @@ def consultaSigec(page, ident, tipo='id_cpf'):
     page.wait_for_page_load()
 
     # TODO: implement other elements
+
+
+
+for data in datas:
+    for hora in horas:
+        sec.driver.get(Sec.Agenda_Incl)
+        elem = sec.wait_for_element_to_click((By.ID, "DataAgenda"))
+        elem.send_keys(data)
+        elem = sec.wait_for_element_to_click((By.ID, "HoraInicial"))
+        elem.send_keys(hora)
+        elem = sec.wait_for_element_to_click((By.ID, "NumCpfAvaliador"))
+        elem.send_keys("31888916877")
+        elem = sec.wait_for_element_to_click((By.ID, "TxtLocalProva"))
+        elem.send_keys("ANATEL SP. Proibido Bermuda e Regata")
+        elem = sec.wait_for_element_to_click((By.ID, "NumCodigoNacional"))
+        elem.send_keys("11")
+        elem = sec.wait_for_element_to_click((By.ID, "NumTelefone"))
+        elem.send_keys(u"Somente pelo Fale Conosco em www.anatel.gov.br")
+        elem = sec.wait_for_element_to_click((By.ID, "NomeResponsavel"))
+        elem.send_keys("Ronaldo S.A. Batista")
+        elem = sec.wait_for_element_to_click((By.ID, "NumVagas"))
+        elem.send_keys("4")
+        elem = sec.wait_for_element_to_click((By.ID, "IndMorse1"))
+        elem.click()
+        elem = sec.wait_for_element_to_click((By.ID, "IndProvaAnatel1"))
+        elem.click()
+        elem = sec.wait_for_element_to_click((By.ID, "NumDiasFimInscricao"))
+        elem.send_keys("1")
+        elem = sec.wait_for_element_to_click((By.ID, "botaoFlatEndereço"))
+        elem.click()
+        sleep(1)
+        elem = sec.wait_for_element_to_click((By.ID, "CodCep1"))
+        elem.send_keys("04101300")
+        elem = sec.wait_for_element_to_click((By.ID, "buscarEndereco"))
+        elem.click()
+        sleep(5)
+        elem = sec.wait_for_element_to_click((By.ID, "EndNumero1"))
+        elem.send_keys("3073")
+        elem = sec.wait_for_element_to_click((By.ID, "botaoFlatCertificado"))
+        elem.click()
+        sleep(1)
+        elem = Select(sec.wait_for_element_to_click((By.ID, "pc_cmbCodCertificado000")))
+        elem.select_by_visible_text("Certificado de Operador de Estação de Radioamador-Classe A")
+        sec.driver.execute_script("AdicionarCertificado('');")
+        sleep(1)
+        elem = Select(sec.wait_for_element_to_click((By.ID, "pc_cmbCodCertificado001")))
+        elem.select_by_visible_text("Certificado de Operador de Estação de Radioamador-Classe C")
+        elem = sec.wait_for_element_to_click((By.ID, "botaoFlatConfirmar"))
+        elem.click()
+        sleep(5)
+
+        # handle Alert

@@ -56,7 +56,8 @@ class Base(object):
 
     URL = "https://sei.anatel.gov.br/sei/"
 
-class LatMenu(object):
+class Menu_lateral(object):
+
     CLT_PROC = (By.LINK_TEXT, "Controle de Processos")
 
     INIT_PROC = (By.LINK_TEXT, "Iniciar Processo")
@@ -89,7 +90,8 @@ class LatMenu(object):
 
     PT_CTRL = (By.LINK_TEXT, "Pontos de Controle")
 
-class Main(object):
+class Sei_Inicial(object):
+
     TITLE = 'SEI - Controle de Processos'
 
     ATR = (By.ID, "ancVisualizacao1")
@@ -109,6 +111,7 @@ class Bloco(object):
     RET_BLOCO = ((By.ID, 'btnExcluir'))
 
 class Processo(object):
+
     TITLE = "SEI - Processo"
 
     ESPEC = (By.ID, 'txtDescricao')
@@ -149,6 +152,18 @@ class Processo(object):
             'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)'
             ]
 
+class Oficio(object):
+
+    EDITOR = (By.ID, "frmEditor")
+
+    TOP_FRAME = (By.ID, "cke_4_top")
+
+    IFRAMES = (By.CLASS_NAME, "cke_wysiwyg_frame cke_reset")
+
+    BTN_SALVAR = (By.ID, "cke_129")
+
+    #BTN_SALVAR = (By.CLASS_NAME, "cke_button cke_button__save cke_button_disabled")
+
 class Central(object):
 
     ACOES = (By.ID, "divArvoreAcoes")
@@ -159,9 +174,7 @@ class Central(object):
 
     CHK_PRIOR = (By.ID, "chkSinPrioridade")
 
-    OPT_MARCADORES = (By.CLASS_NAME, "dd-pointer dd-pointer-down")
-
-    LISTA_MARCADORES = (By.CLASS_NAME, "dd-options dd-click-off-close")
+    #OPT_MARCADORES = (By.CLASS_NAME, "dd-pointer dd-pointer-down")
 
     SV_AND = (By.ID, "sbmSalvar")
 
@@ -170,6 +183,16 @@ class Central(object):
     AND_MID = " ( SEI nº "
 
     AND_POS = "por meio de correspondência simples com aviso de recebimento."
+
+class Marcador(object):
+
+    SELECT_MARCADOR = (By.ID, "selMarcador")
+
+    LISTA_MARCADORES = (By.CLASS_NAME, "dd-options dd-click-off-close")
+
+    TXT_MARCADOR = (By.ID, "txaTexto")
+
+    SALVAR = (By.NAME, "sbmGerenciarMarcador")
 
 class Envio(object):
 

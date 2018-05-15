@@ -100,12 +100,6 @@ class Page(object):
 
         return True
 
-    def find_element(self, *locator):
-        return self.find_element(*locator)
-
-    def find_elements(self, *locator):
-        return self.driver.find_elements(*locator)
-
     def get_title(self):
         return self.driver.title
 
@@ -136,9 +130,9 @@ class Page(object):
         return WebDriverWait(self.driver, timeout).until(
             ec.element_to_be_clickable(*locator))
 
-    def wait_for_new_window(self, timeout=timeout):
+    def wait_for_new_window(self, windows, timeout=timeout):
         return WebDriverWait(self.driver, timeout).until(
-            ec.number_of_windows_to_be(2))
+            ec.new_window_is_opened(windows))
 
     def nav_elem_to_new_win(self, elem):
         """ navigate the link present in element to a new window

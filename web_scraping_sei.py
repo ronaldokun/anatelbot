@@ -57,7 +57,7 @@ class PagInicial(Page):
 
         try:
             ver_todos_processos = self.wait_for_element_to_click(
-                Main.ATR)
+                Sei_Inicial.ATR)
 
             if ver_todos_processos.text == 'Ver todos os processos':
                 ver_todos_processos.click()
@@ -68,7 +68,7 @@ class PagInicial(Page):
         # Verifica se está na visualização detalhada senão muda para ela
         try:
             visualizacao_detalhada = self.wait_for_element_to_click(
-                Main.VISUAL)
+                Sei_Inicial.VISUAL)
 
             if visualizacao_detalhada.text == 'Visualização detalhada':
                 visualizacao_detalhada.click()
@@ -97,13 +97,13 @@ class PagInicial(Page):
         if not self.isPaginaInicial():
             self.go_to_initial_page()
 
-        contador = Select(self.wait_for_element(Main.CONT))
+        contador = Select(self.wait_for_element(Sei_Inicial.CONT))
 
         pages = [pag.text for pag in contador.options]
 
         for pag in pages:
             # One simple repetition to avoid more complex code
-            contador = Select(self.wait_for_element(Main.CONT))
+            contador = Select(self.wait_for_element(Sei_Inicial.CONT))
             contador.select_by_visible_text(pag)
             html_sei = soup(self.driver.page_source, "lxml")
             processos += html_sei("tr", {"class": 'infraTrClara'})
@@ -112,7 +112,7 @@ class PagInicial(Page):
 
     def go_to_blocos(self):
         self.exibir_menu_lateral()
-        self.wait_for_element(LatMenu.BL_ASS).click()
+        self.wait_for_element(Menu_lateral.BL_ASS).click()
 
     def exibir_bloco(self, numero):
 
@@ -120,7 +120,6 @@ class PagInicial(Page):
             self.go_to_blocos()
 
         self.wait_for_element((By.LINK_TEXT, numero)).click()
-
 
     def armazena_bloco(self, numero):
 
@@ -163,6 +162,7 @@ class PagInicial(Page):
         for p in processos:
 
             if podeExpedir(p):
+
                 proc = p['processo'].a.string
 
                 num_doc = p['documento'].a.string
@@ -212,9 +212,9 @@ class PagInicial(Page):
 
         #self.enviar_processo_sede(buttons)
 
-        self.driver.switch_to_window(main_window)
+        self.close()
 
-        # sleep(60)
+        self.driver.switch_to_window(main_window)
 
     def enviar_processo_sede(self, buttons):
 
@@ -231,16 +231,7 @@ class PagInicial(Page):
 
         self.driver.execute_script(Envio.LUPA)
 
-        #for handle in self.driver.window_handles:
-
-         #   self.driver.switch_to_window(handle)
-
-
-          #  if self.get_title() == Envio.UNIDS: break
-
-        #else:
-
-         #   raise ValueError("Não foi encontrada a janela com o título {}".format(Envio.UNIDS))
+        sleep(1)
 
         windows = self.driver.window_handles
 
@@ -249,32 +240,29 @@ class PagInicial(Page):
         # Troca o foco do navegador
         self.driver.switch_to_window(janela_envio)
 
-        unidade = self.wait_for_element(Envio.IN_SIGLA)
+        unidade = self.wait_for_element_to_be_visible(Envio.IN_SIGLA)
 
         unidade.clear()
 
         unidade.send_keys(Envio.SIGLA + Keys.RETURN)
 
-        sleep(2)
+        sleep(1)
 
-        sede = self.wait_for_element_to_click(Envio.ID_SEDE)
-
-
-        #assert sede.get_attribute("title") == Envio.SEDE, \
-         #   "Erro ao selecionar a Unidade Protocolo.Sede para envio"
+        sede = self.wait_for_element_to_be_visible(Envio.ID_SEDE)
 
         sede.click()
+
+        sleep(1)
 
         self.wait_for_element_to_click(Envio.B_TRSP).click()
 
         # Fecha a janela_envio
         self.driver.close()
 
+        sleep(1)
+
         # Troca o foco do navegador
         self.driver.switch_to_window(janela_andamento)
-
-        # Atraso no acesso ao checkbox abaixo gerando erro
-        sleep(1)
 
         checkbox = self.wait_for_element_to_click(Envio.OPEN)
 
@@ -421,15 +409,18 @@ def navigate_link_to_new_window(driver, link):
     return main_window, windows[-1]
 
 
-def main(bloco):
+def main(blocos):
 
     driver = webdriver.Firefox()
 
     sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
 
-    bloco = str(bloco)
+    for bloco in blocos:
 
-    sei.expedir_bloco(bloco)
+        bloco = str(bloco)
+
+        sei.expedir_bloco(bloco)
+
 
     sei.close()
 
@@ -438,6 +429,5 @@ if __name__ == '__main__':
 
     print("Blocos a expedir: {}".format(sys.argv[1:]))
 
-    for bloco in sys.argv[1:]:
+    main(sys.argv[1:])
 
-        main(bloco)

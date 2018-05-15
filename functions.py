@@ -34,7 +34,6 @@ PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
             r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})']
 
 
-
 def pode_expedir(linha):
     """Verifica algumas condições necessárias para expedição do Ofício no SEI
     Args:
@@ -53,7 +52,6 @@ def pode_expedir(linha):
     t4 = linha['assinatura'].find_all(string=re.compile("Gerente"))
 
     return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
-
 
 def tag_mouseover(tag, tipo):
     tag_split = tag.attrs['onmouseover'].split("'")
@@ -97,11 +95,11 @@ def armazena_tags(lista_tags):
     do Sei, retorna um dicionário dessas tags
     """
 
+    assert len(lista_tags) == 6, "Verifique o nº de tags de cada linha do \
+        processo: {}. O valor diferente de 6".format(len(lista_tags))
+
     dict_tags = {}
 
-    if len(lista_tags) != 6:
-        raise ValueError("Verifique o nº de tags de cada linha do \
-        processo: {}. O valor diferente de 6".format(len(lista_tags)))
 
     dict_tags['checkbox'] = lista_tags[0].find('input', class_='infraCheckbox')
 
@@ -247,7 +245,6 @@ def cria_dict_tags(lista_tags):
         dict_tags['interessado'] = interessado.string
 
     return dict_tags
-
 
 def dict_to_df(processos):
     """Recebe a lista processos contendo um dicionário das tags de cada

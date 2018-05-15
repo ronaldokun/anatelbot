@@ -9,6 +9,10 @@ import helpers
 from page import *
 from time import sleep
 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+
+
 SERVICOS = ('Outorga: Rádio do Cidadão',
              'Outorga: Radioamador',
              'Outorga: Limitado Móvel Aeronáutico',
@@ -32,9 +36,9 @@ strip_processo = make_xlat(TRANSLATION)
 
 def login_sei(driver, usr, pwd):
     """
-    Esta função recebe um objeto Webdrive e as credenciais  
-    do usuário, loga no SEI - ANATEL e retorna uma instância da classe  
-    SEI. 
+    Esta função recebe um objeto Webdrive e as credenciais
+    do usuário, loga no SEI - ANATEL e retorna uma instância da classe
+    SEI.
     """
 
     browser = Page(driver)
@@ -55,7 +59,6 @@ def login_sei(driver, usr, pwd):
     senha.send_keys(Keys.RETURN)
 
     return browser.driver
-
 
 
 class Sei(Page):
@@ -108,7 +111,7 @@ class Sei(Page):
         Expands the visualization from the main page in SEI
         """
         try:
-            ver_todos = self.wait_for_element_to_click(helpers.Main.ATR)
+            ver_todos = self.wait_for_element_to_click(helpers.Sei_Inicial.ATR)
 
             if ver_todos.text == "Ver todos os processos":
                 ver_todos.click()
@@ -121,7 +124,7 @@ class Sei(Page):
         try:
 
             visual_detalhado = self.wait_for_element_to_click(
-                helpers.Main.VISUAL)
+                helpers.Sei_Inicial.VISUAL)
 
             if visual_detalhado.text == "Visualização detalhada":
                 visual_detalhado.click()
@@ -134,7 +137,7 @@ class Sei(Page):
     def is_init_page(self):
         """Retorna True se a página estiver na página inicial do SEI, False
         caso contrário"""
-        return self.get_title() == helpers.Main.TITLE
+        return self.get_title() == helpers.Sei_Inicial.TITLE
 
     def go_to_init_page(self):
         """
@@ -179,26 +182,39 @@ class Sei(Page):
 
         try:
 
-            contador = Select(self.wait_for_element(helpers.Main.CONT))
+            contador = Select(self.wait_for_element(helpers.Sei_Inicial.CONT))
 
-            paginas = [pag.text for pag in contador.options]
-
-            for pag in paginas:
-                # One simple repetition to avoid more complex code
-                contador = Select(self.wait_for_element(helpers.Main.CONT))
-                contador.select_by_visible_text(pag)
-                html_sei = Soup(self.driver.page_source, "lxml")
-                processos += html_sei("tr", {"class": 'infraTrClara'})
 
         except TimeoutException:
 
             print("Só há uma página de processos")
 
-        processos = [functions.armazena_tags(
-            [tag for tag in line.contents if tag != '\n'])
-            for line in processos]
+            contador = None
 
-        self._set_processos(processos)
+
+        if contador is not None:
+
+            paginas = [pag.text for pag in contador.options]
+
+            for pag in paginas[1:]:
+                # One simple repetition to avoid more complex code
+                contador = Select(self.wait_for_element(helpers.Sei_Inicial.CONT))
+                contador.select_by_visible_text(pag)
+                html_sei = Soup(self.driver.page_source, "lxml")
+                processos += html_sei("tr", {"class": 'infraTrClara'})
+
+
+        processos_abertos = []
+
+        for line in processos:
+
+            tags = line("td")
+
+            if len(tags) == 6:
+
+                processos_abertos.append(functions.armazena_tags(tags))
+
+        self._set_processos(processos_abertos)
 
     def update_elem(self, elem_id, dado):
 
@@ -368,17 +384,15 @@ class Sei(Page):
 
         nivel.click()
 
-
 class Processo(Sei):
 
-    def __init__(self, driver, numero, tags=None):
+    def __init__(self, driver, numero, tags={}):
         super().__init__(driver)
         self.driver = driver
         self.numero = numero
         self.tags = tags
         self.acoes = {}
         self.tree = {}
-
 
     def get_tags(self):
         return self.tags
@@ -395,13 +409,15 @@ class Processo(Sei):
         self.driver.close()
 
     def info_oficio(self, num_doc):
+
         assert self.get_title() == helpers.Processo.TITLE, \
             "Erro ao navegar para o processo"
 
         # Switch to tree frame
-        self.driver.switch_to_frame("ifrArvore")
+        self.driver.switch_to.frame("ifrArvore")
 
         with self.wait_for_page_load():
+
             html_tree = Soup(self.driver.page_source, "lxml")
 
             info = html_tree.find(title=re.compile(num_doc)).string
@@ -535,7 +551,7 @@ class Processo(Sei):
 
     def go_to_postit(self):
 
-        link = self.get_acoes()['Anotações']
+        link = self.get_acoes().get('Anotações')
 
         (main, new) = self.nav_link_to_new_win(link)
 
@@ -549,33 +565,98 @@ class Processo(Sei):
 
         postit.clear()
 
-        postit.send_keys(content)
+        if content != '':
+            postit.send_keys(content)
 
-        prioridade = self.wait_for_element_to_click(helpers.Central.CHK_PRIOR)
+        chk_prioridade = self.wait_for_element_to_click(helpers.Central.CHK_PRIOR)
 
         if prioridade:
 
-            if not prioridade.is_selected():
+            if not chk_prioridade.is_selected():
 
-                prioridade.click()
+                chk_prioridade.click()
 
         else:
 
-            if prioridade.is_selected():
+            if chk_prioridade.is_selected():
 
-                prioridade.click()
+                chk_prioridade.click()
 
         btn = self.wait_for_element_to_click(helpers.Central.BT_POSTIT)
 
         btn.click()
 
-        self.close()
+        #self.close()
 
         self.driver.switch_to_window(main)
 
         self.tags['anotacao'] = content
 
         self.tags['anotacao_link'] = ''
+
+    def go_to_marcador(self):
+
+        link = self.get_acoes().get("Gerenciar Marcador")
+
+        main, new = self.nav_link_to_new_win(link)
+
+        return (main, new)
+
+    def edita_marcador(self, tipo="", content=''):
+
+        (main, new) = self.go_to_marcador()
+
+        self.wait_for_element_to_click(helpers.Marcador.SELECT_MARCADOR).click()
+
+        if tipo != "":
+
+            try:
+
+                self.wait_for_element_to_be_visible(helpers.Marcador.LISTA_MARCADORES).click()
+
+
+            except TimeoutException:
+
+                print("Erro ao tentar clicar na lista de marcadores")
+
+            try:
+
+                    marcador = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
+
+                    marcador.click()
+
+            except TimeoutException:
+
+                print("Erro ao clinar no marcador selecionado")
+
+
+        try:
+
+            texto_marcador = self.wait_for_element(helpers.Marcador.TXT_MARCADOR)
+
+            texto_marcador.clear()
+
+            if content != '':
+
+                texto_marcador.send_keys(content)
+
+        except TimeoutException:
+
+            print("Erro ao tentar modificar o texto do marcador")
+
+
+        try:
+
+            self.wait_for_element_to_click(helpers.Marcador.SALVAR).click()
+
+        except TimeoutException:
+
+            print("Erro ao salvar o marcador")
+
+
+        self.close()
+
+        self.driver.switch_to_window(main)
 
     def _incluir_documento(self, tipo):
 
@@ -591,9 +672,12 @@ class Processo(Sei):
 
                 self.go(link)
 
+
+                #self.go(link)
+
             try:
 
-                link = self.wait_for_element_to_click((By.LINK_TEXT, tipo), timeout=5)
+                link = self.wait_for_element_to_be_visible((By.LINK_TEXT, tipo), timeout=5)
 
             except TimeoutException:
 
@@ -609,13 +693,11 @@ class Processo(Sei):
 
             raise ValueError("Problema com o link de ações do processo: 'Incluir Documento'")
 
-    def incluir_oficio(self, tipo, dados, acesso='publico', hipotese=None):
+    def incluir_oficio(self, tipo, dados={}, acesso='publico', hipotese=None):
 
         if tipo not in helpers.Gerar_Doc.TEXTOS_PADRAO:
 
             raise ValueError("Tipo de Ofício inválido: {}".format(tipo))
-
-        #main, new = self._incluir_documento("Ofício")
 
         self._incluir_documento("Ofício")
 
@@ -653,9 +735,11 @@ class Processo(Sei):
 
         confirmar = self.wait_for_element_to_click(helpers.Gerar_Doc.CONFIRMAR)
 
+        windows =  self.driver.window_handles
+
         confirmar.click()
 
-        self.wait_for_new_window(5)
+        self.wait_for_new_window(windows)
 
         windows =  self.driver.window_handles
 
@@ -663,29 +747,81 @@ class Processo(Sei):
 
         self.go(self.get_tags().get('link'))
 
-        self.driver.switch_to_window(janela_oficio)
+        if dados:
 
-        self.editar_oficio(dados)
+            self.driver.switch_to_window(janela_oficio)
 
-        self.close()
+            self.editar_oficio(dados)
+
+            #self.close()
 
         self.driver.switch_to_window(janela_processo)
 
     def editar_oficio(self, dados, existing=False):
 
+        self.wait_for_element_to_be_visible(helpers.Oficio.EDITOR)
+
+        frames = self.driver.find_elements_by_tag_name("iframe")
+
+        #assert len(frames) >=3, "O Número de Frames da página de edição do Ofício é {}".format(len(frames))
+
+        while len(frames) < 3:
+
+            sleep(2)
+
+            frames = self.driver.find_elements_by_tag_name("iframe")
+
+        self.driver.switch_to.frame(frames[2]) # text frame
+
+        # TODO: make this more general
         for tag, value in dados.items():
 
-            try:
+            element = self.wait_for_element((By.XPATH, "//p[@class='Texto_Alinhado_Esquerda' and contains(text(), '{0}')]".format(tag)))
 
-                element = self.wait_for_element((By.LINK_TEXT, tag))
+            action = ActionChains(self.driver)
 
-                self.execute_script("arguments[0].innerText = " + value, element)
+            action.move_to_element_with_offset(element, 5, 5)
 
-            except:
+            action.click()
 
-                print("Não foi possível editar o elemento: {}".format(tag))
+            action.perform()
 
-                next
+            sleep(2)
+
+            action.key_down(Keys.DELETE)
+
+            action.perform()
+
+            sleep(2)
+
+            script = "arguments[0].innerHTML = `{}`;".format(value)
+
+            self.driver.execute_script(script, element)
+
+            sleep(2)
+
+            #actions = ActionChains(self.driver)
+
+            #actions.click().send_keys(Keys.RETURN)
+
+            #actions.perform()
+
+        self.driver.switch_to.parent_frame()
+
+        sleep(2)
+
+        salvar = self.wait_for_element_to_click(helpers.Oficio.BTN_SALVAR)
+
+        # Necessary steps to save
+        #self.driver.execute_script('arguments[0].removeAttribute("aria-disabled")', salvar)
+
+        #self.driver.execute_script('arguments[0].class = "cke_button cke_button__save cke_button_off"', salvar)
+
+        salvar.click()
+
+        sleep(5)
+
+        self.close()
 
 
 

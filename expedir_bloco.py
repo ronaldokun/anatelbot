@@ -210,9 +210,7 @@ class PagInicial(Page):
 
         self.atualiza_andamento(buttons, info)
 
-        #self.enviar_processo_sede(buttons)
-
-        self.close()
+        self.enviar_processo_sede(buttons)
 
         self.driver.switch_to_window(main_window)
 
@@ -231,7 +229,7 @@ class PagInicial(Page):
 
         self.driver.execute_script(Envio.LUPA)
 
-        sleep(1)
+        sleep(5)
 
         windows = self.driver.window_handles
 

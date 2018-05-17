@@ -75,6 +75,12 @@ class Sei(Page):
         """ Simplifies the navigation of href pages on sei.anatel.gov.br
         by pre-appending the required prefix NAV_URL       """
 
+        prefix = helpers.Base.URL
+
+        if prefix not in link:
+
+            link = prefix + link
+
         self.driver.get(link)
 
     def get_processos(self):
@@ -182,26 +188,25 @@ class Sei(Page):
 
         try:
 
-            contador = Select(self.wait_for_element(helpers.Sei_Inicial.CONT))
-
+            contador = self.wait_for_element(helpers.Sei_Inicial.CONT, timeout=30)
 
         except TimeoutException:
 
-            print("Só há uma página de processos")
+            print("A página demorou muito tempo para carregar ou há somente 1 página de Processos")
 
-            contador = None
+            return
+
+        contador = Select(contador)
 
 
-        if contador is not None:
+        paginas = [pag.text for pag in contador.options]
 
-            paginas = [pag.text for pag in contador.options]
-
-            for pag in paginas[1:]:
-                # One simple repetition to avoid more complex code
-                contador = Select(self.wait_for_element(helpers.Sei_Inicial.CONT))
-                contador.select_by_visible_text(pag)
-                html_sei = Soup(self.driver.page_source, "lxml")
-                processos += html_sei("tr", {"class": 'infraTrClara'})
+        for pag in paginas[1:]:
+            # One simple repetition to avoid more complex code
+            contador = Select(self.wait_for_element(helpers.Sei_Inicial.CONT))
+            contador.select_by_visible_text(pag)
+            html_sei = Soup(self.driver.page_source, "lxml")
+            processos += html_sei("tr", {"class": 'infraTrClara'})
 
 
         processos_abertos = []
@@ -223,7 +228,6 @@ class Sei(Page):
         elem.clear()
 
         elem.send_keys(dado)
-
     # noinspection PyProtectedMember
     def see_contacts(self, nome):
 
@@ -232,23 +236,29 @@ class Sei(Page):
         if self.get_title() != helpers.Contato.TITLE:
             self.vai_para_pag_contato()
 
-        contato = self.wait_for_element_to_click(helpers.Criar_Processo.CONTATO)
+
+        try:
+
+            contato = self.wait_for_element_to_click(helpers.Criar_Processo.CONTATO, timeout=5)
+
+        except TimeoutException:
+            print("Elemento não encontrado")
+
+            return (0,None)
 
         contato.clear()
 
         contato.send_keys(nome + Keys.RETURN)
 
-        sleep(5)
-
         # if not self.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
 
-        self.wait_for_element_to_be_visible((By.XPATH, "//*[contains(text(), nome)]"))
+        #self.wait_for_element_to_be_visible((By.PARTIAL_LINK_TEXT, "//*[contains(text(), {}]".format(nome)), timeout=10)
 
         html = Soup(self.driver.page_source, 'lxml')
 
         tags = html.find_all('tr', class_='infraTrClara')
 
-        return (len(tags), tags) if tags else (0, None)
+        return tags if tags else []
 
     def update_contacts(self, link, dados):
 
@@ -260,47 +270,47 @@ class Sei(Page):
 
         self.wait_for_element_to_click(helpers.Contato.PF).click()
 
-        self.update_elem(helpers.Contato.SIGLA, dados['CPF'])
+        self.update_elem(helpers.Contato.SIGLA, dados.get('Cpf', ''))
 
-        if dados['SEXO'] == 'MASCULINO':
-
-            self.wait_for_element_to_click(helpers.Contato.MASCULINO).click()
-
-        elif dados['SEXO'] == 'FEMININO':
+        if dados.get('Sexo', "") == 'FEMININO':
 
             self.wait_for_element_to_click(helpers.Contato.FEMININO).click()
 
-        self.update_elem(helpers.Contato.NOME, dados['NOME'])
+        else:
 
-        self.update_elem(helpers.Contato.END, dados['ENDERECO'] + ' ' + dados['NUM'])
+            self.wait_for_element_to_click(helpers.Contato.MASCULINO).click()
 
-        self.update_elem(helpers.Contato.COMP, dados['COMP'])
+        self.update_elem(helpers.Contato.NOME, dados.get('Nome', ''))
 
-        self.update_elem(helpers.Contato.BAIRRO, dados['BAIRRO'])
+        self.update_elem(helpers.Contato.END, dados.get('Logradouro', '') + ' ' + dados.get('Num', ''))
+
+        self.update_elem(helpers.Contato.COMP, dados.get('Complemento', ''))
+
+        self.update_elem(helpers.Contato.BAIRRO, dados.get('Bairro', ''))
 
         uf = Select(self.wait_for_element(helpers.Contato.UF))
 
-        uf.select_by_visible_text(dados['UF'])
+        uf.select_by_visible_text(dados.get('UF', ''))
 
         cidade = Select(self.wait_for_element_to_be_visible(helpers.Contato.CIDADE))
 
-        cidade.select_by_visible_text(dados["CIDADE"])
+        cidade.select_by_visible_text(dados.get("Cidade", ''))
 
-        self.update_elem(helpers.Contato.CEP, dados['CEP'])
+        self.update_elem(helpers.Contato.CEP, dados.get('Cep', ''))
 
-        self.update_elem(helpers.Contato.CPF, dados['CPF'])
+        self.update_elem(helpers.Contato.CPF, dados.get('Cpf', ''))
 
-        self.update_elem(helpers.Contato.RG, dados['RG'])
+        self.update_elem(helpers.Contato.RG, dados.get('Rg', ''))
 
-        self.update_elem(helpers.Contato.ORG, dados['ORG'])
+        self.update_elem(helpers.Contato.ORG, dados.get('Org',''))
 
-        self.update_elem(helpers.Contato.NASC, dados['NASC'])
+        self.update_elem(helpers.Contato.NASC, dados.get('Nasc', ''))
 
-        self.update_elem(helpers.Contato.FONE, dados['FONE'])
+        self.update_elem(helpers.Contato.FONE, dados.get('Fone', ''))
 
-        self.update_elem(helpers.Contato.CEL, dados['CEL'])
+        self.update_elem(helpers.Contato.CEL, dados.get('Cel', ''))
 
-        self.update_elem(helpers.Contato.EMAIL, dados['EMAIL'])
+        self.update_elem(helpers.Contato.EMAIL, dados.get('Email', ''))
 
         self.wait_for_element_to_click(helpers.Contato.SALVAR).click()
 
@@ -598,65 +608,73 @@ class Processo(Sei):
 
         link = self.get_acoes().get("Gerenciar Marcador")
 
-        main, new = self.nav_link_to_new_win(link)
+        if link is not None:
 
-        return (main, new)
+            main, new = self.nav_link_to_new_win(link)
+
+            return (main, new)
+
+        else:
+
+            (None, None)
 
     def edita_marcador(self, tipo="", content=''):
 
         (main, new) = self.go_to_marcador()
 
-        self.wait_for_element_to_click(helpers.Marcador.SELECT_MARCADOR).click()
+        if new is not None:
 
-        if tipo != "":
+            self.wait_for_element_to_click(helpers.Marcador.SELECT_MARCADOR).click()
+
+            if tipo != "":
+
+                try:
+
+                    self.wait_for_element_to_be_visible(helpers.Marcador.LISTA_MARCADORES).click()
+
+
+                except TimeoutException:
+
+                    print("Erro ao tentar clicar na lista de marcadores")
+
+                try:
+
+                        marcador = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
+
+                        marcador.click()
+
+                except TimeoutException:
+
+                    print("Erro ao clinar no marcador selecionado")
+
 
             try:
 
-                self.wait_for_element_to_be_visible(helpers.Marcador.LISTA_MARCADORES).click()
+                texto_marcador = self.wait_for_element(helpers.Marcador.TXT_MARCADOR)
 
+                texto_marcador.clear()
+
+                if content != '':
+
+                    texto_marcador.send_keys(content)
 
             except TimeoutException:
 
-                print("Erro ao tentar clicar na lista de marcadores")
+                print("Erro ao tentar modificar o texto do marcador")
+
 
             try:
 
-                    marcador = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
-
-                    marcador.click()
+                self.wait_for_element_to_click(helpers.Marcador.SALVAR).click()
 
             except TimeoutException:
 
-                print("Erro ao clinar no marcador selecionado")
+                print("Erro ao salvar o marcador")
 
 
-        try:
+            self.close()
 
-            texto_marcador = self.wait_for_element(helpers.Marcador.TXT_MARCADOR)
-
-            texto_marcador.clear()
-
-            if content != '':
-
-                texto_marcador.send_keys(content)
-
-        except TimeoutException:
-
-            print("Erro ao tentar modificar o texto do marcador")
-
-
-        try:
-
-            self.wait_for_element_to_click(helpers.Marcador.SALVAR).click()
-
-        except TimeoutException:
-
-            print("Erro ao salvar o marcador")
-
-
-        self.close()
-
-        self.driver.switch_to_window(main)
+            self.driver.switch_to_window(main)
 
     def _incluir_documento(self, tipo):
 
@@ -666,7 +684,7 @@ class Processo(Sei):
 
         link = self.get_acoes().get('Incluir Documento')
 
-        if link:
+        if link is not None:
 
             with self.wait_for_page_load():
 

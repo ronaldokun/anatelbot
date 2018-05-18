@@ -229,17 +229,19 @@ class Sei(Page):
 
         elem.send_keys(dado)
     # noinspection PyProtectedMember
-    def see_contacts(self, nome):
+    def check_contact(self, nome):
 
         nome = unidecode._unidecode(nome)
 
         if self.get_title() != helpers.Contato.TITLE:
-            self.vai_para_pag_contato()
+
+            with self.wait_for_page_load():
+                self.vai_para_pag_contato()
 
 
         try:
 
-            contato = self.wait_for_element_to_click(helpers.Criar_Processo.CONTATO, timeout=5)
+            contato = self.wait_for_element_to_click(helpers.Pesq_contato.ID_SEARCH, timeout=5)
 
         except TimeoutException:
             print("Elemento não encontrado")
@@ -248,29 +250,88 @@ class Sei(Page):
 
         contato.clear()
 
-        contato.send_keys(nome + Keys.RETURN)
+        contato.send_keys(nome)
+
+        self.wait_for_element_to_click(helpers.Contato.BTN_PESQUISAR).click()
+
+        sleep(2)
 
         # if not self.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
 
-        #self.wait_for_element_to_be_visible((By.PARTIAL_LINK_TEXT, "//*[contains(text(), {}]".format(nome)), timeout=10)
+        # self.wait_for_element_to_be_visible((By.PARTIAL_LINK_TEXT, "//*[contains(text(), {}]".format(nome)), timeout=10)
 
         html = Soup(self.driver.page_source, 'lxml')
 
         tags = html.find_all('tr', class_='infraTrClara')
 
-        return tags if tags else []
+        for tag in tags:
 
-    def update_contacts(self, link, dados):
+            for children in tag.children:
 
-        self.go(link)
+                if hasattr(children, 'text'):
 
-        tipo = Select(self.wait_for_element_to_be_visible(helpers.Contato.TIPO))
+                    if nome.lower() in  str(children.text).lower():
+
+                        return tag.find_all('a')
+
+        else:
+
+            return None
+
+
+    def cria_contato(self, dados):
+
+        novo_contato = self.wait_for_element_to_click(helpers.Contato.BTN_NOVO)
+
+        with self.wait_for_page_load():
+
+            novo_contato.click()
+
+        self.mudar_dados_contato(dados, novo=True)
+
+    def atualizar_contato(self, nome, dados):
+
+        tag_contact = self.check_contact(nome)
+
+        if not tag_contact:
+
+            self.cria_contato(dados)
+
+        for tag in tag_contact:
+
+            for child in tag.children:
+
+                if hasattr(child, 'attrs'):
+
+                    if child.get('title') == "Alterar Contato":
+
+                        link  = tag.get('href')
+
+                        if link:
+
+                            with self.wait_for_page_load():
+
+                                self.go(link)
+
+                            self.mudar_dados_contato(dados)
+
+                            return
+
+
+
+    def mudar_dados_contato(self, dados, novo=False):
+
+        dados = {k:str(v).upper() for k,v in dados.items() if k is not 'UF'}
+
+        tipo = self.wait_for_element_to_be_visible(helpers.Contato.TIPO)
+
+        tipo = Select(tipo)
 
         tipo.select_by_visible_text("Pessoa Física")
 
         self.wait_for_element_to_click(helpers.Contato.PF).click()
 
-        self.update_elem(helpers.Contato.SIGLA, dados.get('Cpf', ''))
+        self.update_elem(helpers.Contato.SIGLA, dados.get('Cpf_RF', ''))
 
         if dados.get('Sexo', "") == 'FEMININO':
 
@@ -288,17 +349,21 @@ class Sei(Page):
 
         self.update_elem(helpers.Contato.BAIRRO, dados.get('Bairro', ''))
 
-        uf = Select(self.wait_for_element(helpers.Contato.UF))
+        pais = self.wait_for_element(helpers.Contato.PAIS)
+
+        pais = Select(pais)
+
+        pais.select_by_visible_text("Brasil")
+
+        uf  = self.wait_for_element(helpers.Contato.UF)
+
+        uf = Select(uf)
 
         uf.select_by_visible_text(dados.get('UF', ''))
 
-        cidade = Select(self.wait_for_element_to_be_visible(helpers.Contato.CIDADE))
-
-        cidade.select_by_visible_text(dados.get("Cidade", ''))
-
         self.update_elem(helpers.Contato.CEP, dados.get('Cep', ''))
 
-        self.update_elem(helpers.Contato.CPF, dados.get('Cpf', ''))
+        self.update_elem(helpers.Contato.CPF, dados.get('Cpf_RF', ''))
 
         self.update_elem(helpers.Contato.RG, dados.get('Rg', ''))
 
@@ -312,7 +377,56 @@ class Sei(Page):
 
         self.update_elem(helpers.Contato.EMAIL, dados.get('Email', ''))
 
-        self.wait_for_element_to_click(helpers.Contato.SALVAR).click()
+        # Cidade por último para dar Tempo de Carregamento
+
+        cidade = Select(self.wait_for_element_to_be_visible(helpers.Contato.CIDADE))
+
+        for option in cidade.options:
+
+            ascii_option =  unidecode._unidecode(option.text).lower()
+
+            if dados.get("Cidade", '').lower() == ascii_option:
+
+                cidade. select_by_visible_text(option.text)
+
+                break
+
+
+        if not novo:
+
+            try:
+
+                salvar = self.wait_for_element_to_click(helpers.Contato.SALVAR)
+
+            except TimeoutException:
+
+                print("Não foi possível salvar o Contato")
+
+                return
+
+        else:
+
+
+            try:
+
+                salvar = self.wait_for_element_to_click(helpers.Contato.SALVAR_NOVO, timeout=5)
+
+            except TimeoutException:
+                print("Não foi possível salvar o Contato")
+
+                return
+
+        with self.wait_for_page_load():
+
+            salvar.click()
+
+
+
+
+
+
+
+
 
     def vai_para_pag_contato(self):
 

@@ -236,8 +236,6 @@ class Criar_Processo(object):
 
     SL_TIP_PROC = (By.ID, "selTipoProcedimento")
 
-    CONTATO = (By.ID, "txtPalavrasPesquisaContatos")
-
     PROCS = {'',
              'Acesso à Informação: Demanda do e-SIC',
              'Acompanhamento Competição: Monitoramento Mercados',
@@ -1315,7 +1313,11 @@ class Contato(object):
 
     TITLE = 'SEI - Contatos'
 
-    TIPO = (By.ID, 'selTipocontato')
+    BTN_NOVO = (By.ID, 'btnNovo')
+
+    BTN_PESQUISAR = (By.ID, "btnPesquisar")
+
+    TIPO = (By.ID, 'selTipoContato')
 
     SIGLA = (By.ID, 'txtSigla')
 
@@ -1329,7 +1331,9 @@ class Contato(object):
 
     BAIRRO = (By.ID, 'txtBairro')
 
-    UF = (By.ID, 'selUF')
+    PAIS = (By.ID, "selPais")
+
+    UF = (By.ID, 'selUf')
 
     CIDADE = (By.ID, 'selCidade')
 
@@ -1354,6 +1358,8 @@ class Contato(object):
     EMAIL = (By.ID, 'txtEmail')
 
     SALVAR = (By.NAME, 'sbmAlterarContato')
+
+    SALVAR_NOVO = (By.NAME, 'sbmCadastrarContato')
 
     OBS = (By.ID, 'txtaObservacao')
 
@@ -1536,6 +1542,7 @@ class Sigec(object):
     cpf = (By.ID, "NumCNPJCPF")
 
     fistel = (By.ID, 'NumFistel')
+
 
 
 

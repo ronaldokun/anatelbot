@@ -280,7 +280,6 @@ def init_browser(webdriver, login, senha, timeout=5):
 
         alert.accept()
 
-
     return page
 
 def check_input(identificador, tipo):
@@ -318,7 +317,6 @@ def save_page(page, filename):
         # TODO; autoit
 
     # driver.close()
-
 
 def last_day_of_month():
     """ Use datetime module and manipulation to return the last day

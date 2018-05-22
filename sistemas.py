@@ -13,50 +13,85 @@ PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
 ESTAÇÕES_RC = ["Fixa", "Móvel", "Telecomando"]
 
 
-class Scpx(Page):
-    """
-    Esta subclasse da classe Page define métodos de execução de funções nos sistemas
-    interativos da ANATEL
-    """
+class Sistema(Page):
 
-    def __init__(self, driver, login="", senha=""):
-
-        self.sistema = helpers.Scpx
-
-        self.tipo = 'cpf'
+    def __init__(self, driver, login="", senha="", timeout=5):
 
         super().__init__(driver)
 
-    def _navigate(self, identificador, tipo, link, id=None):
+        self.driver.get('http://sistemasnet')
 
-        if not id:
+        alert = self.alert_is_present(timeout=timeout)
 
-            id = self.sistema.Consulta[tipo]
+        if alert:
 
-        identificador = str(identificador)
+            alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
 
-        if not functions.check_input(identificador, tipo):
-            raise ValueError("Identificador inválido: ", identificador)
+            alert.accept()
+
+        return self
+
+    def _navigate(self, id: str, tipo_id: str, page_id: tuple):
+        """ Check id and tipo_id consistency and navigate to link
+
+        :param id: identificador, e.g. cpf: 11 digits, cnpj: 14 digits, indicativo: 4 to 6 characters
+        :param tipo_id: cpf, cnpj or indicativo
+        :param page_id: tuple (link to page, element id to fill, submit button)
+        :return: None
+        """
+        if not functions.check_input(identificador=id, tipo=tipo_id):
+            raise ValueError("Identificador deve ser do tipo cpf, cnpj ou indicativo: " % identificador)
 
         with self.wait_for_page_load():
 
-            self.driver.get(link)
+            self.driver.get(page_id[0])
 
         with self.wait_for_page_load():
 
             try:
 
-                elem = self.wait_for_element_to_click(id, timeout=10)
+                elem = self.wait_for_element_to_click(page_id[1], timeout=10)
 
-                elem.send_keys(identificador + Keys.RETURN)
+                elem.send_keys(id) # + Keys.RETURN)
 
             except NoSuchElementException:
 
-                print("The html id: {} is not present on this webpage".format(identificador))
+                print("The html id: {} is not present on this webpage".format(id))
 
-    def consulta(self, identificador, tipo='id_cpf'):
 
-        self._navigate(identificador, tipo, self.sistema.Consulta['link'], self.sistema.Consulta[tipo])
+            try:
+
+                submit = self.wait_for_element_to_click(page_id[2], timeout=2)
+
+                submit.click()
+
+            except (NoSuchElementException, TimeoutException):
+
+                print("Não foi possível clicar no Botão Confirmar")
+
+
+
+class Scpx(Sistema):
+    """
+    Esta subclasse da classe Page define métodos de execução de funções nos sistemas
+    interativos da ANATEL
+    """
+
+    def __init__(self, driver, login="", senha="", timeout=5):
+
+        super().__init__(driver, login, senha, timeout)
+
+        self.sistema = helpers.Scpx
+
+    def consulta(self, id, tipo_id='id_cpf'):
+
+        link = self.sistema.Consulta.get('link')
+
+        element = self.sistema.Consulta.get(tipo_id)
+
+        submit = self.sistema.Consulta.get('submit')
+
+        self._navigate(id, tipo_id, (link, element, submit))
 
     def imprime_consulta(self, identificador, tipo='id_cpf', resumida=False):
 
@@ -64,7 +99,7 @@ class Scpx(Page):
 
         try:
 
-            elem = self.wait_for_element_to_click(self.sistema.Consulta['btn_estacao'])
+            elem = self.wait_for_element_to_click(self.sistema.Consulta['id_btn_estacao'])
 
             elem.click()
 
@@ -78,18 +113,48 @@ class Scpx(Page):
 
             if resumida:
 
-                self.driver.execute_script("VersaoImpressao('R')")
+                # self.driver.execute_script("VersaoImpressao('R')")
+                btn = self.wait_for_element_to_click(self.sistema.Consulta.get('impressao_resumida'))
+
 
             else:
 
-                self.driver.execute_script("VersaoImpressao('N')")
-
+                # self.driver.execute_script("VersaoImpressao('N')")
+                btn = self.wait_for_element_to_click(self.sistema.Consulta.get('impressao_completa'))
 
         except:
 
             print("Não foi possível clicar no Botão 'Versão para Impressão")
 
             return
+
+
+        main = self.driver.current_window_handle
+
+        btn.click()
+
+        self.wait_for_new_window(main)
+
+        windows = self.driver.window_handles
+
+        self.driver.switch_to_window(windows[-1])
+
+        try:
+
+            imprimir = self.wait_for_element_to_be_visible(self.sistema.Consulta.get('imprimir'))
+
+            imprimir.click()
+
+        except (NoSuchElementException, TimeoutException):
+
+            print("Não foi possível imprimir a página de consulta")
+
+        finally:
+
+            #self.close()
+
+            self.driver.switch_to_window(main)
+
 
     def incluir_serviço(self, identificador, tipo='id_cpf'):
 
@@ -425,6 +490,8 @@ class Scpx(Page):
 
         return True
 
+
+
 def atualiza_cadastro(page, dados):
     if 'CPF' not in dados:
         raise ValueError("É Obrigatório informar o CPF")
@@ -588,54 +655,85 @@ def consultaSigec(page, ident, tipo='id_cpf'):
 
     # TODO: implement other elements
 
+def abrir_agenda_prova(sec, datas):
 
+    for data in datas:
+        sec.driver.get(helpers.Sec.Agenda_Incl)
 
-for data in datas:
-    for hora in horas:
-        sec.driver.get(Sec.Agenda_Incl)
-        elem = sec.wait_for_element_to_click((By.ID, "DataAgenda"))
-        elem.send_keys(data)
-        elem = sec.wait_for_element_to_click((By.ID, "HoraInicial"))
-        elem.send_keys(hora)
-        elem = sec.wait_for_element_to_click((By.ID, "NumCpfAvaliador"))
+        elem = sec.wait_for_element_to_click(helpers.Agenda.data)
+        elem.send_keys(data[0])
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.hora)
+        elem.send_keys(data[1])
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.avaliador)
         elem.send_keys("31888916877")
-        elem = sec.wait_for_element_to_click((By.ID, "TxtLocalProva"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.local)
         elem.send_keys("ANATEL SP. Proibido Bermuda e Regata")
-        elem = sec.wait_for_element_to_click((By.ID, "NumCodigoNacional"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.ddd)
         elem.send_keys("11")
-        elem = sec.wait_for_element_to_click((By.ID, "NumTelefone"))
-        elem.send_keys(u"Somente pelo Fale Conosco em www.anatel.gov.br")
-        elem = sec.wait_for_element_to_click((By.ID, "NomeResponsavel"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.fone)
+        elem.send_keys("Somente pelo Fale Conosco em www.anatel.gov.br")
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.responsavel)
         elem.send_keys("Ronaldo S.A. Batista")
-        elem = sec.wait_for_element_to_click((By.ID, "NumVagas"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.vagas)
         elem.send_keys("4")
-        elem = sec.wait_for_element_to_click((By.ID, "IndMorse1"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.morse)
         elem.click()
-        elem = sec.wait_for_element_to_click((By.ID, "IndProvaAnatel1"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.pc)
         elem.click()
-        elem = sec.wait_for_element_to_click((By.ID, "NumDiasFimInscricao"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.dias)
         elem.send_keys("1")
-        elem = sec.wait_for_element_to_click((By.ID, "botaoFlatEndereço"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.btn_endereco)
         elem.click()
+
         sleep(1)
-        elem = sec.wait_for_element_to_click((By.ID, "CodCep1"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.cep)
         elem.send_keys("04101300")
-        elem = sec.wait_for_element_to_click((By.ID, "buscarEndereco"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.btn_buscar_end)
         elem.click()
+
         sleep(5)
-        elem = sec.wait_for_element_to_click((By.ID, "EndNumero1"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.numero)
         elem.send_keys("3073")
-        elem = sec.wait_for_element_to_click((By.ID, "botaoFlatCertificado"))
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.btn_certificado)
         elem.click()
+
         sleep(1)
-        elem = Select(sec.wait_for_element_to_click((By.ID, "pc_cmbCodCertificado000")))
+
+        elem = Select(sec.wait_for_element_to_click(helpers.Agenda.select_cert_1))
         elem.select_by_visible_text("Certificado de Operador de Estação de Radioamador-Classe A")
+
         sec.driver.execute_script("AdicionarCertificado('');")
         sleep(1)
-        elem = Select(sec.wait_for_element_to_click((By.ID, "pc_cmbCodCertificado001")))
-        elem.select_by_visible_text("Certificado de Operador de Estação de Radioamador-Classe C")
-        elem = sec.wait_for_element_to_click((By.ID, "botaoFlatConfirmar"))
-        elem.click()
-        sleep(5)
 
-        # handle Alert
+        elem = Select(sec.wait_for_element_to_click(helpers.Agenda.select_cert_2))
+        elem.select_by_visible_text("Certificado de Operador de Estação de Radioamador-Classe C")
+
+        elem = sec.wait_for_element_to_click(helpers.Agenda.btn_confirmar)
+        elem.click()
+
+        try:
+
+            alert = sec.alert_is_present(5)
+
+            sleep(2)
+
+            alert.accept()
+
+        except TimeoutException:
+
+            print("Não foi possível aceitar o alerta")

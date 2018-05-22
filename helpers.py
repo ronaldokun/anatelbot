@@ -5,6 +5,7 @@ Created on Mon Aug 28 20:19:59 2017
 
 @author: ronaldo
 """
+from typing import Dict, Any, Union, Tuple
 
 from selenium.webdriver.common.by import By
 
@@ -1441,6 +1442,48 @@ class Sec(object):
 
     submit = "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')"
 
+class Agenda(object):
+
+    data = (By.ID, "DataAgenda")
+
+    hora = (By.ID, "HoraInicial")
+
+    avaliador = (By.ID, "NumCpfAvaliador")
+
+    local = (By.ID, "TxtLocalProva")
+
+    ddd = (By.ID, "NumCodigoNacional")
+
+    fone = (By.ID, "NumTelefone")
+
+    responsavel = (By.ID, "NomeResponsavel")
+
+    vagas = (By.ID, "NumVagas")
+
+    morse = (By.ID, "IndMorse1")
+
+    pc = (By.ID, "IndProvaAnatel1")
+
+    dias = (By.ID, "NumDiasFimInscricao")
+
+    btn_endereco = (By.ID, "botaoFlatEndereço")
+
+    cep = (By.ID, "CodCep1")
+
+    btn_buscar_end = (By.ID, "buscarEndereco")
+
+    numero = (By.ID, "EndNumero1")
+
+    btn_certificado = (By.ID, "botaoFlatCertificado")
+
+    select_cert_1 = (By.ID, "pc_cmbCodCertificado000")
+
+    select_cert_2 = (By.ID, "pc_cmbCodCertificado001")
+
+    btn_confirmar = (By.ID, "botaoFlatConfirmar")
+
+
+
 
 Entidade = dict(cpf=[(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'NumCNPJCPF')],
                 cnpj=[(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ')],
@@ -1469,25 +1512,33 @@ Entidade = dict(cpf=[(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'Nu
 
 class Scpx(object):
 
-    Consulta = dict(link='http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714',
-                    id_cpf=(By.ID, 'pNumCnpjCpf'),
-                    id_btn_estacao=(By.ID, "botaoFlatEstação"))
+    Consulta = {'link': 'http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714',
+                'id_cpf': (By.ID, 'pNumCnpjCpf'),
+                'id_fistel': (By.ID, 'pNumFistel'),
+                'id_indicativo': (By.ID, 'pIndicativo'),
+                'id_btn_estacao': (By.ID, "botaoFlatEstação"),
+                'submit': (By.ID, "botaoFlatConfirmar"),
+                'impressao_completa': (By.ID, 'botaoFlatVersãoparaImpressão'),
+                'impressao_resumida': (By.ID, 'botaoFlatVersãoResumida'),
+                'imprimir': (By.ID, 'botaoFlatCLIQUEAQUIPARAIMPRIMIR')}
 
-    Ent =      dict(alterar_situacao="http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
-                    incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I")
 
-    Estacao =  dict(incluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
-                    alterar="http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
-                    excluir="http://sistemasnet/scpx/Estacao/Tela.asp?OP=E",
-                    licenciar="http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp",
-                    id_btn_dados_estacao=(By.ID, "botaoFlatDadosdaEstação"),
-                    id_btn_lista_estacoes=(By.ID, "botaoFlatListadeEstações"),
-                    id_btn_licenciar=(By.ID, "botaoFlatLicenciar"),
-                    id_uf=(By.ID, "cmbUF"),
-                    id_indicativo=(By.ID, "NomeIndicativo"),
-                    id_seq=(By.ID, "NumSequenciaIndicativo"),
-                    id_tipo=(By.ID, "cmbTipoEstacao"),
-                    id_confirmar=(By.ID, "botaoFlatConfirmar"))
+
+    Ent = {'alterar_situacao': "http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
+           'incluir': "http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I"}
+
+    Estacao = {'incluir': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
+               'alterar': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
+               'excluir': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=E",
+               'licenciar': "http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp",
+               'id_btn_dados_estacao': (By.ID, "botaoFlatDadosdaEstação"),
+               'id_btn_lista_estacoes': (By.ID, "botaoFlatListadeEstações"),
+               'id_btn_licenciar': (By.ID, "botaoFlatLicenciar"),
+               'id_uf': (By.ID, "cmbUF"),
+               'id_indicativo': (By.ID, "NomeIndicativo"),
+               'id_seq': (By.ID, "NumSequenciaIndicativo"),
+               'id_tipo': (By.ID, "cmbTipoEstacao"),
+               'id_confirmar': (By.ID, "botaoFlatConfirmar")}
 
     Movimento = dict(transferir="http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
                      atual=(By.ID, "pMovimento"),

@@ -238,7 +238,6 @@ class Sei(Page):
             with self.wait_for_page_load():
                 self.vai_para_pag_contato()
 
-
         try:
 
             contato = self.wait_for_element_to_click(helpers.Pesq_contato.ID_SEARCH, timeout=5)
@@ -278,7 +277,6 @@ class Sei(Page):
 
             return None
 
-
     def cria_contato(self, dados):
 
         novo_contato = self.wait_for_element_to_click(helpers.Contato.BTN_NOVO)
@@ -297,31 +295,33 @@ class Sei(Page):
 
             self.cria_contato(dados)
 
-        for tag in tag_contact:
+        else:
 
-            for child in tag.children:
+            for tag in tag_contact:
 
-                if hasattr(child, 'attrs'):
+                for child in tag.children:
 
-                    if child.get('title') == "Alterar Contato":
+                    if hasattr(child, 'attrs'):
 
-                        link  = tag.get('href')
+                        if child.get('title') == "Alterar Contato":
 
-                        if link:
+                            link  = tag.get('href')
 
-                            with self.wait_for_page_load():
+                            if link:
 
-                                self.go(link)
+                                with self.wait_for_page_load():
 
-                            self.mudar_dados_contato(dados)
+                                    self.go(link)
 
-                            return
+                                self.mudar_dados_contato(dados)
 
-
+                                return
 
     def mudar_dados_contato(self, dados, novo=False):
 
-        dados = {k:str(v).upper() for k,v in dados.items() if k is not 'UF'}
+        dados = {k:str(v).title() for k,v in dados.items() if k is not 'UF'}
+
+        dados['UF'] = dados["UF"].upper()
 
         tipo = self.wait_for_element_to_be_visible(helpers.Contato.TIPO)
 
@@ -419,14 +419,6 @@ class Sei(Page):
         with self.wait_for_page_load():
 
             salvar.click()
-
-
-
-
-
-
-
-
 
     def vai_para_pag_contato(self):
 
@@ -804,9 +796,6 @@ class Processo(Sei):
 
                 self.go(link)
 
-
-                #self.go(link)
-
             try:
 
                 link = self.wait_for_element_to_be_visible((By.LINK_TEXT, tipo), timeout=5)
@@ -888,6 +877,9 @@ class Processo(Sei):
             #self.close()
 
         self.driver.switch_to_window(janela_processo)
+
+    def incluir_informe(self, ):
+        pass
 
     def editar_oficio(self, dados, existing=False):
 

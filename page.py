@@ -34,24 +34,17 @@ class Page(object):
 
     def __init__(self, driver):
         """ Initializes the webdriver and the timeout"""
-        try:
+        #if not isinstance(type(driver), type(webdriver.)):
 
-            self.driver = driver
+         #   raise ValueError("The object {0} must be of type{1}".format(type(driver), type(webdriver)))
 
-        except TypeError:
-
-            print("The object {0} must be of type{1}".format(driver, type(webdriver)))
+        self.driver = driver
 
 
     def reset_driver(self, driver):
         """ Reinitializes the webdriver and the timeout"""
-        try:
 
-            self.driver = driver
-
-        except TypeError:
-
-            print("The object {0} must be of type{1}".format(driver, type(webdriver)))
+        self.__init__(driver)
 
     def __enter__(self):
         """ Implementation class """

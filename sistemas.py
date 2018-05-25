@@ -3,6 +3,8 @@ import helpers
 from page import *
 from time import sleep
 
+from selenium.webdriver.common.desired_capabilities import  DesiredCapabilities
+
 SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
 
 PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
@@ -31,7 +33,23 @@ class Sistema(Page):
 
         return self
 
-    def _navigate(self, id: str, tipo_id: str, page_id: tuple):
+    def get_dados_navegacao(dict_acao, tipo):
+
+        if not link:
+
+            link = dict_acao.get('link')
+
+        if not id_:
+
+            id_ = dict_acao.get(tipo)
+
+        if not submit:
+
+            submit = dict_acao.get('id_confirmar')
+
+        return (link, id_, submit)
+
+    def _navigate(self, identificador: str, tipo_id: str, acoes):
         """ Check id and tipo_id consistency and navigate to link
 
         :param id: identificador, e.g. cpf: 11 digits, cnpj: 14 digits, indicativo: 4 to 6 characters
@@ -39,36 +57,36 @@ class Sistema(Page):
         :param page_id: tuple (link to page, element id to fill, submit button)
         :return: None
         """
-        if not functions.check_input(identificador=id, tipo=tipo_id):
+        if not functions.check_input(identificador=identificador, tipo=tipo_id):
             raise ValueError("Identificador deve ser do tipo cpf, cnpj ou indicativo: " % identificador)
+
+        link, id_, submit = acoes
 
         with self.wait_for_page_load():
 
-            self.driver.get(page_id[0])
+            self.driver.get(link)
 
         with self.wait_for_page_load():
 
             try:
 
-                elem = self.wait_for_element_to_click(page_id[1], timeout=10)
+                elem = self.wait_for_element_to_click(id_, timeout=10)
 
-                elem.send_keys(id) # + Keys.RETURN)
+                elem.send_keys(identificador) # + Keys.RETURN)
 
             except NoSuchElementException:
 
-                print("The html id: {} is not present on this webpage".format(id))
-
+                print("The html id: {} is not present on this webpage".format(identificador))
 
             try:
 
-                submit = self.wait_for_element_to_click(page_id[2], timeout=2)
+                submit = self.wait_for_element_to_click(submit, timeout=2)
 
                 submit.click()
 
             except (NoSuchElementException, TimeoutException):
 
                 print("Não foi possível clicar no Botão Confirmar")
-
 
 
 class Scpx(Sistema):
@@ -85,13 +103,7 @@ class Scpx(Sistema):
 
     def consulta(self, id, tipo_id='id_cpf'):
 
-        link = self.sistema.Consulta.get('link')
-
-        element = self.sistema.Consulta.get(tipo_id)
-
-        submit = self.sistema.Consulta.get('submit')
-
-        self._navigate(id, tipo_id, (link, element, submit))
+        self._navigate(id, tipo_id, self.sistema.Consulta)
 
     def imprime_consulta(self, identificador, tipo='id_cpf', resumida=False):
 
@@ -128,54 +140,66 @@ class Scpx(Sistema):
 
             return
 
+        #windows = self.driver.window_handles
 
-        main = self.driver.current_window_handle
+        #main = windows[-1]
 
         btn.click()
 
-        self.wait_for_new_window(main)
+        #self.wait_for_new_window(windows)
 
-        windows = self.driver.window_handles
-
-        self.driver.switch_to_window(windows[-1])
-
-        try:
-
-            imprimir = self.wait_for_element_to_be_visible(self.sistema.Consulta.get('imprimir'))
-
-            imprimir.click()
-
-        except (NoSuchElementException, TimeoutException):
-
-            print("Não foi possível imprimir a página de consulta")
-
-        finally:
-
-            #self.close()
-
-            self.driver.switch_to_window(main)
-
+        # windows = self.driver.window_handles
+        #
+        # self.driver.switch_to_window(windows[-1])
+        #
+        # print(self.get_title())
+        #
+        # self.driver.switch_to_frame(self.sistema.Consulta.get('frame_impressao'))
+        #
+        # try:
+        #
+        #     imprimir = self.wait_for_element_to_be_visible(self.sistema.Consulta.get('imprimir'))
+        #
+        #     imprimir.click()
+        #
+        #
+        # except (NoSuchElementException, TimeoutException):
+        #
+        #     print("Não foi possível imprimir a página de consulta")
+        #
+        # finally:
+        #
+        #     #self.close()
+        #
+        #     self.driver.switch_to_window(main)
 
     def incluir_serviço(self, identificador, tipo='id_cpf'):
 
-        self._navigate(identificador, tipo, self.sistema.Servico['incluir'], self.sistema.Consulta[tipo])
+        try:
+            self._navigate(identificador, tipo, self.sistema.Servico))
+
+        except UnexpectedAlertPresentException:
+
+            print("Alerta Inesperado")
 
         # TODO: Finalizar método
 
-    def incluir_estacao(self, identificador, tipo_estacao, indicativo, sequencial,  tipo='id_cpf', uf='SP'):
+    def incluir_estacao(self, identificador, tipo_estacao, indicativo, sequencial='001', tipo='id_cpf', uf='SP'):
 
         if tipo_estacao not in ESTAÇÕES_RC:
             raise ValueError("Os tipos de estação devem ser: ".format(ESTAÇÕES_RC))
 
-        self._navigate(identificador, tipo, self.sistema.Estacao['incluir'], self.sistema.Consulta[tipo])
+        sis = self.sistema.Estacao
 
-        button = self.wait_for_element_to_click(self.sistema.Estacao['id_btn_dados_estacao'])
+        self._navigate(identificador, tipo, (sis['incluir'], sis[tipo], sis['id_confirmar']))
+
+        button = self.wait_for_element_to_click(sis['id_btn_dados_estacao'])
 
         button.click()
 
         try:
 
-            estado = Select(self.wait_for_element(self.sistema.Estacao['id_uf']))
+            estado = Select(self.wait_for_element(sis['id_uf']))
 
             estado.select_by_value(uf)
 
@@ -187,8 +211,7 @@ class Scpx(Sistema):
 
                 alert.dismiss()
 
-
-        indic= self.wait_for_element(self.sistema.Estacao['id_indicativo'])
+        indic= self.wait_for_element(sis['id_indicativo'])
 
         try:
 
@@ -204,11 +227,11 @@ class Scpx(Sistema):
 
         indic.send_keys(indicativo)
 
-        seq = self.wait_for_element(self.sistema.Estacao["id_seq"])
+        seq = self.wait_for_element(sis["id_seq"])
 
         seq.send_keys(sequencial)
 
-        tipo_est = Select(self.wait_for_element(self.sistema.Estacao['id_tipo']))
+        tipo_est = Select(self.wait_for_element(sis['id_tipo']))
 
         if tipo_estacao == 'Móvel':
 
@@ -221,7 +244,7 @@ class Scpx(Sistema):
         else:
             tipo_est.select_by_visible_text("Telecomando")
 
-        confirmar = self.wait_for_element_to_click(self.sistema.Estacao['id_confirmar'])
+        confirmar = self.wait_for_element_to_click(sis['id_confirmar'])
 
         try:
 

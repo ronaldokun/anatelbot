@@ -195,6 +195,16 @@ class Marcador(object):
 
     SALVAR = (By.NAME, "sbmGerenciarMarcador")
 
+class Acompanhamento_Especial(object):
+
+    GRUPOS = (By.ID, "selGrupoAcompanhamento")
+
+    TXT = (By.ID, "txaObservacao")
+
+    SALVAR = (By.NAME, "sbmCadastrarAcompanhamento")
+
+    EXCLUIR = (By.ID, "btnExcluir")
+
 class Envio(object):
 
     TITLE = "SEI - Enviar Processo"
@@ -1482,33 +1492,17 @@ class Agenda(object):
 
     btn_confirmar = (By.ID, "botaoFlatConfirmar")
 
-
-
-
-Entidade = dict(cpf=[(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'NumCNPJCPF')],
-                cnpj=[(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ')],
-                fistel=[(By.ID, 'pNumFistel'), (By.ID, 'pnumFistel')],
-                indicativo=[(By.ID, 'pIndicativo')],
-                nome=(By.ID, 't_NomeEntidade'),
-                email=(By.ID, 't_EndEletronico'),
-                rg=(By.ID, 'pf_NumIdentidade'),
-                orgexp=(By.ID, 'pf_SiglaOrgaoExp'),
-                nasc=(By.ID, 'pf_DataNascimento'),
-                ddd=(By.ID, 'tel_NumCodigoNacional0'),
-                fone=(By.ID, 'tel_NumTelefone0'),
-                cep=(By.ID, 'CodCep1'),
-                bt_cep=(By.ID, 'buscarEndereco'),
-                logr=(By.ID, 'EndLogradouro1'),
-                num=(By.ID, 'EndNumero1'),
-                comp=(By.ID, 'EndComplemento1'),
-                bairro=(By.ID, 'EndBairro1'),
-                uf=(By.ID, 'SiglaUf1'),
-                cidade=(By.ID, 'CodMunicipio1'),
-                confirmar=(By.ID, 'botaoFlatConfirmar'),
-                bt_dados=(By.ID, 'botaoFlatDadosComplementares'),
-                bt_fone=(By.ID, 'botaoFlatTelefones'),
-                bt_end=(By.ID, 'botaoFlatEndereço'))
-
+Entidade = {'cpf': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'NumCNPJCPF')],
+            'cnpj': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ')],
+            'fistel': [(By.ID, 'pNumFistel'), (By.ID, 'pnumFistel')], 'indicativo': [(By.ID, 'pIndicativo')],
+            'nome': (By.ID, 't_NomeEntidade'), 'email': (By.ID, 't_EndEletronico'), 'rg': (By.ID, 'pf_NumIdentidade'),
+            'orgexp': (By.ID, 'pf_SiglaOrgaoExp'), 'nasc': (By.ID, 'pf_DataNascimento'),
+            'ddd': (By.ID, 'tel_NumCodigoNacional0'), 'fone': (By.ID, 'tel_NumTelefone0'), 'cep': (By.ID, 'CodCep1'),
+            'bt_cep': (By.ID, 'buscarEndereco'), 'logr': (By.ID, 'EndLogradouro1'), 'num': (By.ID, 'EndNumero1'),
+            'comp': (By.ID, 'EndComplemento1'), 'bairro': (By.ID, 'EndBairro1'), 'uf': (By.ID, 'SiglaUf1'),
+            'cidade': (By.ID, 'CodMunicipio1'), 'confirmar': (By.ID, 'botaoFlatConfirmar'),
+            'bt_dados': (By.ID, 'botaoFlatDadosComplementares'), 'bt_fone': (By.ID, 'botaoFlatTelefones'),
+            'bt_end': (By.ID, 'botaoFlatEndereço')}
 
 class Scpx(object):
 
@@ -1520,9 +1514,8 @@ class Scpx(object):
                 'submit': (By.ID, "botaoFlatConfirmar"),
                 'impressao_completa': (By.ID, 'botaoFlatVersãoparaImpressão'),
                 'impressao_resumida': (By.ID, 'botaoFlatVersãoResumida'),
-                'imprimir': (By.ID, 'botaoFlatCLIQUEAQUIPARAIMPRIMIR')}
-
-
+                'imprimir': (By.ID, 'botaoFlatCLIQUEAQUIPARAIMPRIMIR'),
+                'frame_impressao': 'imprime1'}
 
     Ent = {'alterar_situacao': "http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
            'incluir': "http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I"}
@@ -1531,6 +1524,8 @@ class Scpx(object):
                'alterar': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
                'excluir': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=E",
                'licenciar': "http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp",
+               'id_cpf': (By.ID, 'pNumCnpjCpf'),
+                'id_fistel': (By.ID, 'pNumFistel'),
                'id_btn_dados_estacao': (By.ID, "botaoFlatDadosdaEstação"),
                'id_btn_lista_estacoes': (By.ID, "botaoFlatListadeEstações"),
                'id_btn_licenciar': (By.ID, "botaoFlatLicenciar"),
@@ -1540,21 +1535,19 @@ class Scpx(object):
                'id_tipo': (By.ID, "cmbTipoEstacao"),
                'id_confirmar': (By.ID, "botaoFlatConfirmar")}
 
-    Movimento = dict(transferir="http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
-                     atual=(By.ID, "pMovimento"),
-                     posterior=(By.ID, "CodTipoMovimento"))
+    Movimento = {'transferir': "http://sistemasnet/scpx/MovimentoTransferir/Tela.asp", 'atual': (By.ID, "pMovimento"),
+                 'posterior': (By.ID, "CodTipoMovimento")}
 
-    Servico = dict(incluir="http://sistemasnet/scpx/Servico/Tela.asp?Op=I",
-                   prorrogar_rf="http://sistemasnet/scpx/ServicoProrrogar/Tela.asp",
-                   id_btn_dados_estacao=(By.ID, "botaoFlatEstação"),
-                   id_confirmar=Estacao['id_confirmar'])
+    Servico = {'incluir': "http://sistemasnet/scpx/Servico/Tela.asp?Op=I",
+               'prorrogar_rf': "http://sistemasnet/scpx/ServicoProrrogar/Tela.asp",
+               'id_cpf': (By.ID, 'pNumCnpjCpf'),
+               'id_btn_dados_estacao': (By.ID, "botaoFlatEstação"),
+               'id_confirmar': (By.ID, "botaoFlatConfirmar")}
 
-    Licenca =  dict(imprimir="http://sistemasnet/scpx/Licenca/Tela.asp",
-                    cpf=(By.ID, 'pnumCPFCNPJ'),
-                    fistel=(By.ID, 'pnumFistel'),
-                    indicativo=Entidade['indicativo'],
-                    prorrogar="http://sistemasnet/scpx/LicencaProrrogar/Tela.asp",
-                    id_btn_lista_estacoes=Estacao['id_btn_lista_estacoes'])
+    Licenca = {'imprimir': "http://sistemasnet/scpx/Licenca/Tela.asp", 'cpf': (By.ID, 'pnumCPFCNPJ'),
+               'fistel': (By.ID, 'pnumFistel'), 'indicativo': Entidade['indicativo'],
+               'prorrogar': "http://sistemasnet/scpx/LicencaProrrogar/Tela.asp",
+               'id_btn_lista_estacoes': Estacao['id_btn_lista_estacoes']}
 
 class Scra(object):
 
@@ -1577,14 +1570,12 @@ class Slmm(object):
 
     Licenca = {"imprimir": "http://sistemasnet/stel/SCMM/LicencaImprimir/Tela.asp?SISQSmodulo=7766"}
 
-
 class Slma(object):
 
     Consulta = "http://sistemasnet/stel/SCMA/Consulta/Tela.asp"
 
 
     Licenca = {"imprimir": "http://sistemasnet/stel/SCMA/LicencaPadrao/ImpressaoLicenca.asp?SISQSmodulo=7005"}
-
 
 class Sigec(object):
 

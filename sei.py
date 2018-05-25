@@ -724,6 +724,46 @@ class Processo(Sei):
 
             (None, None)
 
+    def go_to_acomp_especial(self):
+
+        link = self.get_acoes().get("Acompanhamento Especial")
+
+        if link is not None:
+
+            main, new = self.nav_link_to_new_win(link)
+
+            return (main, new)
+
+        else:
+
+            (None, None)
+
+    def excluir_acomp_especial(self):
+
+        (main, new) = self.go_to_acomp_especial()
+
+        if new is not None:
+
+            try:
+
+                self.wait_for_element_to_click(helpers.Acompanhamento_Especial.EXCLUIR).click()
+
+            except TimeoutException:
+
+                print("Não foi possível excluir o Acompanhamento Especial")
+
+            try:
+
+                alert = self.alert_is_present(timeout=5)
+
+            except NoAlertPresentException:
+
+                print("Não houve pop-up de confirmação")
+
+            if alert:
+
+                alert.accept()
+
     def edita_marcador(self, tipo="", content=''):
 
         (main, new) = self.go_to_marcador()
@@ -732,26 +772,30 @@ class Processo(Sei):
 
             self.wait_for_element_to_click(helpers.Marcador.SELECT_MARCADOR).click()
 
-            if tipo != "":
+            try:
 
-                try:
-
-                    self.wait_for_element_to_be_visible(helpers.Marcador.LISTA_MARCADORES).click()
+                self.wait_for_element_to_be_visible(helpers.Marcador.LISTA_MARCADORES).click()
 
 
-                except TimeoutException:
+            except TimeoutException:
 
-                    print("Erro ao tentar clicar na lista de marcadores")
+                print("Erro ao tentar clicar na lista de marcadores")
 
-                try:
+            try:
 
-                        marcador = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
+                if tipo != "":
 
-                        marcador.click()
+                    marcador = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
 
-                except TimeoutException:
+                else:
 
-                    print("Erro ao clinar no marcador selecionado")
+                    marcador = self.wait_for_element_to_be_click((By.LINK_TEXT, ""))
+
+                marcador.click()
+
+            except TimeoutException:
+
+                print("Erro ao clinar no marcador selecionado")
 
 
             try:
@@ -776,7 +820,6 @@ class Processo(Sei):
             except TimeoutException:
 
                 print("Erro ao salvar o marcador")
-
 
             self.close()
 
@@ -946,6 +989,8 @@ class Processo(Sei):
         sleep(5)
 
         self.close()
+
+
 
 
 

@@ -60,7 +60,7 @@ class Sistema(Page):
         if not functions.check_input(identificador=identificador, tipo=tipo_id):
             raise ValueError("Identificador deve ser do tipo cpf, cnpj ou indicativo: " % identificador)
 
-        link, id_, submit = acoes
+        link, id_, submit = acoes['link'], acoes[tipo_id], acoes['submit']
 
         with self.wait_for_page_load():
 
@@ -176,7 +176,7 @@ class Scpx(Sistema):
     def incluir_serviço(self, identificador, tipo='id_cpf'):
 
         try:
-            self._navigate(identificador, tipo, self.sistema.Servico))
+            self._navigate(identificador, tipo, self.sistema.Servico)
 
         except UnexpectedAlertPresentException:
 
@@ -513,8 +513,6 @@ class Scpx(Sistema):
 
         return True
 
-
-
 def atualiza_cadastro(page, dados):
     if 'CPF' not in dados:
         raise ValueError("É Obrigatório informar o CPF")
@@ -674,7 +672,6 @@ def consultaSigec(page, ident, tipo='id_cpf'):
 
         elem.send_keys(ident + Keys.RETURN)
 
-    page.wait_for_page_load()
 
     # TODO: implement other elements
 

@@ -1585,6 +1585,8 @@ class Sigec(object):
 
     fistel = (By.ID, 'NumFistel')
 
+    Consulta = {'id_confirmar': (By.ID, 'botaoFlatConfirmar')}
+
 
 
 

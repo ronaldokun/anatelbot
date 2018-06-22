@@ -169,7 +169,7 @@ class PagInicial(Page):
 
                 link = Base.URL + p['processo'].a.attrs['href']
 
-                self.expedir_oficio(proc, num_doc, link)
+                self.expedir_oficio(num_doc, link)
 
                 chk = self.wait_for_element_to_click(
                     (By.ID, p['checkbox'].attrs['id']))
@@ -195,7 +195,7 @@ class PagInicial(Page):
 
         # Alert(self.driver).accept()
 
-    def expedir_oficio(self, proc, num_doc, link):
+    def expedir_oficio(self, num_doc, link):
 
         # Guarda o link para abrir o processo
         # elem = self.wait_for_element_to_click((By.LINK_TEXT, proc))
@@ -211,6 +211,8 @@ class PagInicial(Page):
         self.atualiza_andamento(buttons, info)
 
         self.enviar_processo_sede(buttons)
+
+        self.close()
 
         self.driver.switch_to_window(main_window)
 
@@ -229,7 +231,7 @@ class PagInicial(Page):
 
         self.driver.execute_script(Envio.LUPA)
 
-        sleep(5)
+        sleep(2)
 
         windows = self.driver.window_handles
 
@@ -244,20 +246,20 @@ class PagInicial(Page):
 
         unidade.send_keys(Envio.SIGLA + Keys.RETURN)
 
-        sleep(1)
+        sleep(2)
 
         sede = self.wait_for_element_to_be_visible(Envio.ID_SEDE)
 
         sede.click()
 
-        sleep(1)
+        sleep(2)
 
         self.wait_for_element_to_click(Envio.B_TRSP).click()
 
         # Fecha a janela_envio
         self.driver.close()
 
-        sleep(1)
+        sleep(2)
 
         # Troca o foco do navegador
         self.driver.switch_to_window(janela_andamento)
@@ -284,7 +286,7 @@ class PagInicial(Page):
         self.driver.switch_to_window(janela_processo)
 
         # fecha a janela processo
-        self.driver.close()
+        #self.driver.close()
 
     def acoes_oficio(self):
 

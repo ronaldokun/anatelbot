@@ -2,6 +2,10 @@ import functions
 import helpers
 from page import *
 from time import sleep
+from selenium.webdriver.common.by import By
+
+
+
 
 from selenium.webdriver.common.desired_capabilities import  DesiredCapabilities
 
@@ -49,7 +53,7 @@ class Sistema(Page):
 
         return (link, id_, submit)
 
-    def _navigate(self, identificador: str, tipo_id: str, acoes):
+    def _navigate(self, identificador: str, tipo_id: str, page_info: tuple):
         """ Check id and tipo_id consistency and navigate to link
 
         :param id: identificador, e.g. cpf: 11 digits, cnpj: 14 digits, indicativo: 4 to 6 characters
@@ -60,7 +64,7 @@ class Sistema(Page):
         if not functions.check_input(identificador=identificador, tipo=tipo_id):
             raise ValueError("Identificador deve ser do tipo cpf, cnpj ou indicativo: " % identificador)
 
-        link, id_, submit = acoes['link'], acoes[tipo_id], acoes['submit']
+        link, _id, submit = page_info
 
         with self.wait_for_page_load():
 
@@ -70,13 +74,13 @@ class Sistema(Page):
 
             try:
 
-                elem = self.wait_for_element_to_click(id_, timeout=10)
+                elem = self.wait_for_element_to_click(_id, timeout=10)
 
                 elem.send_keys(identificador) # + Keys.RETURN)
 
             except NoSuchElementException:
 
-                print("The html id: {} is not present on this webpage".format(identificador))
+                print("The html id: {} is not present on this webpage".format(_id))
 
             try:
 
@@ -101,13 +105,30 @@ class Scpx(Sistema):
 
         self.sistema = helpers.Scpx
 
+    def _get_acoes(self, helper, keys):
+        return tuple(helper.get(x) for x in keys)
+
     def consulta(self, id, tipo_id='id_cpf'):
 
-        self._navigate(id, tipo_id, self.sistema.Consulta)
+        helper = self.sistema.Consulta
 
-    def imprime_consulta(self, identificador, tipo='id_cpf', resumida=False):
+        links = ('link', tipo_id, 'submit')
 
-        self.consulta(identificador, tipo)
+        acoes = self._get_acoes(helper, links)
+
+        self._navigate(id, tipo_id, acoes)
+
+        try:
+
+            self.wait_for_element_to_click((By.LINK_TEXT, id), timeout=5).click()
+
+        except (NoSuchElementException, TimeoutException):
+
+            pass
+
+    def imprime_consulta(self, identificador, tipo_id='id_cpf', resumida=False):
+
+        self.consulta(identificador, tipo_id)
 
         try:
 
@@ -173,45 +194,83 @@ class Scpx(Sistema):
         #
         #     self.driver.switch_to_window(main)
 
-    def incluir_serviço(self, identificador, tipo='id_cpf'):
+    def servico_incluir(self, identificador, tipo_id='id_cpf'):
+
+        helper = self.sistema.Servico
+
+        acoes = self._get_acoes(helper, ('incluir', tipo_id, 'submit'))
 
         try:
-            self._navigate(identificador, tipo, self.sistema.Servico)
+            self._navigate(identificador, tipo_id, acoes)
 
         except UnexpectedAlertPresentException:
 
             print("Alerta Inesperado")
 
-        # TODO: Finalizar método
 
-    def incluir_estacao(self, identificador, tipo_estacao, indicativo, sequencial='001', tipo='id_cpf', uf='SP'):
+    def servico_excluir(self, identificador, documento, motivo='Renúncia', tipo_id='id_cpf'):
+
+        helper = self.sistema.Servico
+
+        acoes = self._get_acoes(helper, ('excluir', tipo_id, 'submit'))
+
+        try:
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            print("Alerta Inesperado")
+
+        alert = self.alert_is_present(2)
+
+        if alert: alert.dismiss()
+
+        btn = self.wait_for_element_to_click(helper['id_btn_dados_exclusão'])
+
+        btn.click()
+
+        doc = self.wait_for_element_to_be_visible(helper.get('id_doc_exclusão'))
+
+        doc.send_keys(documento)
+
+        motive = Select(self.wait_for_element_to_be_visible(helper.get('id_motivo_exclusão')))
+
+        motive.select_by_visible_text(motivo)
+
+        confirmar = self.wait_for_element_to_click(helper['submit'])
+
+        confirmar.click()
+
+        alert = self.alert_is_present(2)
+
+        if alert: alert.dismiss()
+
+    def incluir_estacao(self, identificador, tipo_estacao, indicativo, sede=True, sequencial='001', tipo_id='id_cpf', uf='SP'):
 
         if tipo_estacao not in ESTAÇÕES_RC:
             raise ValueError("Os tipos de estação devem ser: ".format(ESTAÇÕES_RC))
 
-        sis = self.sistema.Estacao
+        helper = self.sistema.Estacao
 
-        self._navigate(identificador, tipo, (sis['incluir'], sis[tipo], sis['id_confirmar']))
+        acoes = tuple([helper.get(x) for x in ('incluir', tipo_id, 'submit')])
 
-        button = self.wait_for_element_to_click(sis['id_btn_dados_estacao'])
+        self._navigate(identificador, tipo_id, acoes)
+
+        button = self.wait_for_element_to_click(helper['id_btn_dados_estacao'])
 
         button.click()
 
-        try:
+        estado = Select(self.wait_for_element(helper['id_uf']))
 
-            estado = Select(self.wait_for_element(sis['id_uf']))
+        estado.select_by_value(uf)
 
-            estado.select_by_value(uf)
+        alert = self.alert_is_present(5)
 
-        except UnexpectedAlertPresentException as e:
+        if alert:
 
-            alert = self.alert_is_present(5)
+            alert.dismiss()
 
-            if alert:
-
-                alert.dismiss()
-
-        indic= self.wait_for_element(sis['id_indicativo'])
+        indic= self.wait_for_element(helper['id_indicativo'])
 
         try:
 
@@ -227,11 +286,11 @@ class Scpx(Sistema):
 
         indic.send_keys(indicativo)
 
-        seq = self.wait_for_element(sis["id_seq"])
+        seq = self.wait_for_element(helper["id_seq"])
 
         seq.send_keys(sequencial)
 
-        tipo_est = Select(self.wait_for_element(sis['id_tipo']))
+        tipo_est = Select(self.wait_for_element(helper['id_tipo']))
 
         if tipo_estacao == 'Móvel':
 
@@ -241,27 +300,37 @@ class Scpx(Sistema):
 
             tipo_est.select_by_visible_text("Fixa")
 
+            if sede:
+
+                btn_sede = self.wait_for_element_to_click(helper['copiar_sede'])
+
+                btn_sede.click()
+
         else:
+
             tipo_est.select_by_visible_text("Telecomando")
 
-        confirmar = self.wait_for_element_to_click(sis['id_confirmar'])
+        if sede:
 
-        try:
+            confirmar = self.wait_for_element_to_click(helper['submit'])
 
             confirmar.click()
 
-        except UnexpectedAlertPresentException as e:
-
             alert = self.alert_is_present(2)
 
-            if alert:
+            if alert: alert.dismiss()
 
-                alert.dismiss()
+    def movimento_aprovar(self, identificador, origem, tipo_id='id_cpf'):
 
-    def aprovar_movimento(self, identificador, origem, tipo='id_cpf'):
+        helper = self.sistema.Movimento
+
+        links = ('transferir', tipo_id, 'submit')
+
+        acoes = self._get_acoes(helper, links)
 
         try:
-            self._navigate(identificador, tipo, self.sistema.Movimento['transferir'], self.sistema.Consulta[tipo])
+
+            self._navigate(identificador, tipo_id, acoes)
 
         except UnexpectedAlertPresentException:
 
@@ -270,96 +339,78 @@ class Scpx(Sistema):
             if alert: alert.accept()
 
 
-        movimento_atual = Select(self.wait_for_element_to_click(self.sistema.Movimento['atual']))
+        movimento_atual = Select(self.wait_for_element_to_click(helper['atual']))
 
         if origem.lower() == "a":
 
-            movimento_atual.select_by_visible_text("A - Em Análise")
-
-            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['id_confirmar'])
-
-            with self.wait_for_page_load(): confirmar.click()
-
-            movimento_a_transferir = Select(self.wait_for_element_to_click(self.sistema.Movimento['posterior']))
-
-            movimento_a_transferir.select_by_visible_text("")
-
+            movimento_atual.select_by_visible_text("A - Em análise")
 
         elif origem.lower() == "b":
 
             movimento_atual.select_by_visible_text(("B - Cadastro pela Anatel"))
 
-            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['id_confirmar'])
-
-            with self.wait_for_page_load(): confirmar.click()
-
-            movimento_a_transferir = Select(self.wait_for_element_to_click(self.sistema.Movimento['posterior']))
-
-            movimento_a_transferir.select_by_visible_text("E - Aprovado / Licença")
-
-            confirmar = self.wait_for_element_to_click(self.sistema.Estacao['id_confirmar'])
-
-            confirmar.click()
-
-            try:
-
-                alert = self.alert_is_present(5)
-
-                if alert:
-                    alert.accept()
-
-            except UnexpectedAlertPresentException:
-
-                pass
-
-    def licenciar_estacao(self, identificador, tipo='id_cpf', ppdess=True):
-
-        if ppdess:
-
-            self._navigate(identificador, tipo, self.sistema.Estacao['licenciar'])
-
-            if tipo == 'id_cpf':
-
-                cpf = self.wait_for_element_to_click((By.LINK_TEXT, identificador))
-
-                cpf.click()
-
-            try:
-
-                lista_estacoes = self.wait_for_element_to_click(self.sistema.Estacao['id_btn_lista_estacoes'])
-
-                lista_estacoes.click()
-
-                self.wait_for_element_to_click(self.sistema.Estacao['id_btn_licenciar']).click()
-
-            except UnexpectedAlertPresentException as e:
-
-                pass
-
-            
         else:
 
-            self._navigate(identificador, tipo, self.sistema.Estacao['licenciar'])
+            print("A transferência de movimento é somente à partir dos Movimentos A ou B")
 
-            if tipo == 'id_cpf':
+        confirmar = self.wait_for_element_to_click(helper['submit'])
 
-                cpf = self.wait_for_element_to_click((By.LINK_TEXT, identificador))
+        with self.wait_for_page_load(): confirmar.click()
 
-                cpf.click()
+        movimento_a_transferir = Select(self.wait_for_element_to_click(helper['posterior']))
 
-                return
+        movimento_a_transferir.select_by_visible_text("E - Aprovado / Licença")
 
-            #alert.accept()
+        confirmar = self.wait_for_element_to_click(helper['submit'])
+
+        confirmar.click()
+
+        alert = self.alert_is_present(5)
+
+        if alert: alert.accept()
+
+    def licenciar_estacao(self, identificador, tipo_id='id_cpf', ppdess=True):
+
+        helper = self.sistema.Estacao
+
+        acoes = tuple([helper.get(x) for x in ('licenciar', tipo_id, 'submit')])
+
+
+        self._navigate(identificador, tipo_id, acoes)
+
+        if tipo_id == 'id_cpf':
+
+            cpf = self.wait_for_element_to_click((By.LINK_TEXT, identificador))
+
+            cpf.click()
+
+        if not ppdess:
+
+            lista_estacoes = self.wait_for_element_to_click(helper['id_btn_lista_estacoes'])
+
+            lista_estacoes.click()
+
+            self.wait_for_element_to_click(helper['id_btn_licenciar']).click()
+
+        # Confirma o primeiro licenciamento
+
+        # alert = self.alert_is_present(5)
+
+        # if alert = alert.accept()
 
     def prorrogar_rf(self, identificador, tipo='id_cpf'):
 
-        self._navigate(identificador,tipo, self.sistema.Servico['prorrogar_rf'], self.sistema.Consulta[tipo])
+        helper = self.sistema.Servico
 
-        button = self.wait_for_element_to_click(self.sistema.Servico['id_btn_dados_estacao'])
+        acoes = tuple([helper.get(x) for x in ('prorrogar', tipo_id, 'submit')])
+
+        self._navigate(identificador,tipo_id, acoes)
+
+        button = self.wait_for_element_to_click(helper['id_btn_dados_estacao'])
 
         button.click()
 
-        confirmar = self.wait_for_element_to_click(self.sistema.Servico['id_confirmar'])
+        confirmar = self.wait_for_element_to_click(helper['id_confirmar'])
 
         confirmar.click()
 

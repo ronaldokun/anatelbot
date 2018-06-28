@@ -1533,21 +1533,33 @@ class Scpx(object):
                'id_indicativo': (By.ID, "NomeIndicativo"),
                'id_seq': (By.ID, "NumSequenciaIndicativo"),
                'id_tipo': (By.ID, "cmbTipoEstacao"),
-               'id_confirmar': (By.ID, "botaoFlatConfirmar")}
+               'copiar_sede': (By.ID, "botaoFlatCopiarEndereçoSede"),
+               'submit': (By.ID, "botaoFlatConfirmar")}
 
-    Movimento = {'transferir': "http://sistemasnet/scpx/MovimentoTransferir/Tela.asp", 'atual': (By.ID, "pMovimento"),
+    Movimento = {'transferir': "http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
+                 'id_cpf': Consulta['id_cpf'],
+                 'submit': (By.ID, "botaoFlatConfirmar"),
+                 'atual': (By.ID, "pMovimento"),
                  'posterior': (By.ID, "CodTipoMovimento")}
+
 
     Servico = {'incluir': "http://sistemasnet/scpx/Servico/Tela.asp?Op=I",
                'prorrogar_rf': "http://sistemasnet/scpx/ServicoProrrogar/Tela.asp",
+               'excluir': 'http://sistemasnet/scpx/Servico/Tela.asp?Op=E',
                'id_cpf': (By.ID, 'pNumCnpjCpf'),
                'id_btn_dados_estacao': (By.ID, "botaoFlatEstação"),
-               'id_confirmar': (By.ID, "botaoFlatConfirmar")}
+               'id_btn_dados_exclusão': (By.ID, 'botaoFlatDadosExclusão'),
+               'id_doc_exclusão': (By.ID, 'pDocAto'),
+               'id_motivo_exclusão': (By.ID, "CodMotivoExclusao"),
+               'submit': Estacao['submit']}
 
-    Licenca = {'imprimir': "http://sistemasnet/scpx/Licenca/Tela.asp", 'cpf': (By.ID, 'pnumCPFCNPJ'),
-               'fistel': (By.ID, 'pnumFistel'), 'indicativo': Entidade['indicativo'],
+    Licenca = {'imprimir': "http://sistemasnet/scpx/Licenca/Tela.asp",
                'prorrogar': "http://sistemasnet/scpx/LicencaProrrogar/Tela.asp",
-               'id_btn_lista_estacoes': Estacao['id_btn_lista_estacoes']}
+               'cpf': (By.ID, 'pnumCPFCNPJ'),
+               'fistel': (By.ID, 'pnumFistel'),
+               'indicativo': Entidade['indicativo'],
+               'id_btn_lista_estacoes': Estacao['id_btn_lista_estacoes'],
+               'submit': Estacao['submit']}
 
 class Scra(object):
 

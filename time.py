@@ -1,4 +1,4 @@
-
+﻿
 import os
 
 os.chdir(r'C:\Users\rsilva\Google Drive\projects\programming\automation')
@@ -24,7 +24,7 @@ def leave(time):
 
         print(dt.datetime.now())
 
-        sleep(60 * random.randint(1,10))
+        sleep(60 * random.randint(1,5))
 
     #try:
 
@@ -108,15 +108,15 @@ def enter(time):
 
 if __name__ == "__main__":
 
-    out_ = dt.datetime(2018, 5, 15, 12)
+    #out_ = dt.datetime(2018, 5, 15, 12)
 
-    leave(out_)
+    #leave(out_)
     
-    in_ = dt.datetime(2018, 5, 15, 13)
+    #in_ = dt.datetime(2018, 6, 27, 17)
 
-    enter(in_)
+    #enter(in_)
 
-    out_ = dt.datetime(2018, 5, 15, 20)
+    out_ = dt.datetime(2018, 6, 28, 20, 27)
 
     leave(out_)
 

@@ -669,7 +669,13 @@ class Processo(Sei):
 
         link = self.get_acoes().get('Anotações')
 
-        (main, new) = self.nav_link_to_new_win(link)
+        if link is not None:
+
+            main, new = self.nav_link_to_new_win(link)
+
+        else:
+
+            main, new = self.driver.current_window_handle, None
 
         return (main, new)
 
@@ -677,38 +683,48 @@ class Processo(Sei):
 
         (main, new) = self.go_to_postit()
 
-        postit = self.wait_for_element(helpers.Central.IN_POSTIT)
+        if new is not None:
 
-        postit.clear()
+            postit = self.wait_for_element(helpers.Central.IN_POSTIT)
 
-        if content != '':
-            postit.send_keys(content)
+            postit.clear()
 
-        chk_prioridade = self.wait_for_element_to_click(helpers.Central.CHK_PRIOR)
+            sleep(1)
 
-        if prioridade:
+            if content != '':
+                postit.send_keys(content)
 
-            if not chk_prioridade.is_selected():
+            chk_prioridade = self.wait_for_element_to_click(helpers.Central.CHK_PRIOR)
 
-                chk_prioridade.click()
+            if prioridade:
 
-        else:
+                if not chk_prioridade.is_selected():
 
-            if chk_prioridade.is_selected():
+                    chk_prioridade.click()
 
-                chk_prioridade.click()
+                    sleep(1)
 
-        btn = self.wait_for_element_to_click(helpers.Central.BT_POSTIT)
+            else:
 
-        btn.click()
+                if chk_prioridade.is_selected():
 
-        #self.close()
+                    chk_prioridade.click()
 
-        self.driver.switch_to_window(main)
+                    sleep(1)
 
-        self.tags['anotacao'] = content
+            btn = self.wait_for_element_to_click(helpers.Central.BT_POSTIT)
 
-        self.tags['anotacao_link'] = ''
+            btn.click()
+
+            sleep(1)
+
+            self.close()
+
+            self.driver.switch_to_window(main)
+
+            self.tags['anotacao'] = content
+
+            self.tags['anotacao_link'] = ''
 
     def go_to_marcador(self):
 
@@ -736,7 +752,7 @@ class Processo(Sei):
 
         else:
 
-            (None, None)
+            (self.driver.current_window_handle, None)
 
     def excluir_acomp_especial(self):
 
@@ -746,7 +762,11 @@ class Processo(Sei):
 
             try:
 
-                self.wait_for_element_to_click(helpers.Acompanhamento_Especial.EXCLUIR).click()
+                btn_excluir = self.wait_for_element_to_click(helpers.Acompanhamento_Especial.EXCLUIR, timeout=2)\
+
+                btn_excluir.click()
+
+                sleep(1)
 
             except TimeoutException:
 
@@ -763,6 +783,12 @@ class Processo(Sei):
             if alert:
 
                 alert.accept()
+
+            self.close()
+
+            self.driver.switch_to_window(main)
+
+            self.tags['Acompanhamento Especial'] = ""
 
     def edita_marcador(self, tipo="", content=''):
 
@@ -990,29 +1016,30 @@ class Processo(Sei):
 
         self.close()
 
+    def concluir_processo(self):
 
+        excluir = self.get_acoes().get('Concluir Processo').strip()
 
+        print(excluir)
 
+        assert excluir is not None, "A ação 'Concluir Processo não foi armazenada, verfique as ações do Processo"
 
+        # Switch to central frame
+        self.driver.switch_to_frame("ifrVisualizacao")
 
+        try:
 
+            self.driver.execute_script(excluir)
 
+        except JavascriptException as e:
 
+            print("One exception was catched: {}".format(repr(e)))
 
+        alert = self.alert_is_present(timeout=5)
 
+        if alert: alert.accept()
 
-
-
-
-
-
-
-
-
-
-
-
-
+        self.driver.switch_to_default_content()
 
 
 def exibir_bloco(Sei, numero):

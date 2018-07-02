@@ -207,7 +207,6 @@ class Scpx(Sistema):
 
             print("Alerta Inesperado")
 
-
     def servico_excluir(self, identificador, documento, motivo='Renúncia', tipo_id='id_cpf'):
 
         helper = self.sistema.Servico

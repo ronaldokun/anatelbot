@@ -5,7 +5,8 @@ Created on Mon Aug 28 20:19:59 2017
 
 @author: ronaldo
 """
-from typing import Dict, Any, Union, Tuple
+
+from collections import namedtuple
 
 from selenium.webdriver.common.by import By
 
@@ -49,13 +50,15 @@ class Login(object):
 
     PWD = (By.ID, "pwdSenha")
 
-class Base(object):
+class Sei_Base(object):
 
     INIT = (By.ID, "lnkControleProcessos")
 
     MENU = (By.ID, "lnkInfraMenuSistema")
 
     URL = "https://sei.anatel.gov.br/sei/"
+
+    PESQUISA = (By.ID, "txtPesquisaRapida")
 
 class Menu_lateral(object):
 
@@ -111,7 +114,7 @@ class Bloco(object):
 
     RET_BLOCO = ((By.ID, 'btnExcluir'))
 
-class Processo(object):
+class Proc_incluir(object):
 
     TITLE = "SEI - Processo"
 
@@ -165,7 +168,7 @@ class Oficio(object):
 
     #BTN_SALVAR = (By.CLASS_NAME, "cke_button cke_button__save cke_button_disabled")
 
-class Central(object):
+class Proc_central(object):
 
     ACOES = (By.ID, "divArvoreAcoes")
 
@@ -1506,7 +1509,7 @@ Entidade = {'cpf': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'Num
 
 class Scpx(object):
 
-    Consulta = {'link': 'http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714',
+    consulta = {'link': 'http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714',
                 'id_cpf': (By.ID, 'pNumCnpjCpf'),
                 'id_fistel': (By.ID, 'pNumFistel'),
                 'id_indicativo': (By.ID, 'pIndicativo'),
@@ -1517,15 +1520,24 @@ class Scpx(object):
                 'imprimir': (By.ID, 'botaoFlatCLIQUEAQUIPARAIMPRIMIR'),
                 'frame_impressao': 'imprime1'}
 
-    Ent = {'alterar_situacao': "http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
-           'incluir': "http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I"}
+    historico = {'link': 'http://sistemasnet/scpx/Chamada/Historico.asp?SISQSmodulo=12731',
+                 'id_cpf': (By.ID, 'pNumCnpjCpf'),
+                 'id_fistel': (By.ID, 'pNumFistel'),
+                 'id_indicativo': (By.ID, 'pIndicativo'),
+                 'submit': consulta['submit']}
 
-    Estacao = {'incluir': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
+    ent_alterar = {'alterar_situacao': "http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
+                   'id_cpf': (By.ID, 'NumCNPJCPF')}
+
+    ent_incluir = {'incluir': "http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I",
+                   'id_cpf': (By.ID, 'pNumCnpjCpf')}
+
+    estacao = {'incluir': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
                'alterar': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",
                'excluir': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=E",
                'licenciar': "http://sistemasnet/scpx/EstacaoLicenciar/Tela.asp",
                'id_cpf': (By.ID, 'pNumCnpjCpf'),
-                'id_fistel': (By.ID, 'pNumFistel'),
+               'id_fistel': (By.ID, 'pNumFistel'),
                'id_btn_dados_estacao': (By.ID, "botaoFlatDadosdaEstação"),
                'id_btn_lista_estacoes': (By.ID, "botaoFlatListadeEstações"),
                'id_btn_licenciar': (By.ID, "botaoFlatLicenciar"),
@@ -1536,14 +1548,29 @@ class Scpx(object):
                'copiar_sede': (By.ID, "botaoFlatCopiarEndereçoSede"),
                'submit': (By.ID, "botaoFlatConfirmar")}
 
-    Movimento = {'transferir': "http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
-                 'id_cpf': Consulta['id_cpf'],
+    formulario_imprimir = {'link': 'http://sistemasnet/scpx/Formulario/Tela.asp',
+                           'id_cpf': (By.ID, 'pNumCnpjCpf'),
+                           'id_fistel': (By.ID, 'pNumFistel'),
+                           'id_indicativo': (By.ID, 'pIndicativo'),
+                           'submit': (By.ID, 'botaoFlatConfirmar')}
+
+    movimento = {'transferir': "http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
+                 'id_cpf': consulta['id_cpf'],
                  'submit': (By.ID, "botaoFlatConfirmar"),
                  'atual': (By.ID, "pMovimento"),
                  'posterior': (By.ID, "CodTipoMovimento")}
 
+    liberar_indicativo = {'link': 'http://sistemasnet/scpx/IndicativoLiberar/Tela.asp',
+                          'id_uf': (By.ID, 'SiglaUF'),
+                          'id_cpf': (By.ID, 'Indicativo'),
+                          'id_sequencial': (By.ID, 'Sequencial'),
+                          'submit': (By.ID, 'botaoFlatConfirmar')}
 
-    Servico = {'incluir': "http://sistemasnet/scpx/Servico/Tela.asp?Op=I",
+    licenca_imprimir = {'link': 'http://sistemasnet/scpx/Licenca/Tela.asp',
+               }
+
+
+    servico = {'incluir': "http://sistemasnet/scpx/Servico/Tela.asp?Op=I",
                'prorrogar_rf': "http://sistemasnet/scpx/ServicoProrrogar/Tela.asp",
                'excluir': 'http://sistemasnet/scpx/Servico/Tela.asp?Op=E',
                'id_cpf': (By.ID, 'pNumCnpjCpf'),
@@ -1551,15 +1578,16 @@ class Scpx(object):
                'id_btn_dados_exclusão': (By.ID, 'botaoFlatDadosExclusão'),
                'id_doc_exclusão': (By.ID, 'pDocAto'),
                'id_motivo_exclusão': (By.ID, "CodMotivoExclusao"),
-               'submit': Estacao['submit']}
+               'submit': estacao['submit']}
 
-    Licenca = {'imprimir': "http://sistemasnet/scpx/Licenca/Tela.asp",
+    licenca = {'imprimir': "http://sistemasnet/scpx/Licenca/Tela.asp",
                'prorrogar': "http://sistemasnet/scpx/LicencaProrrogar/Tela.asp",
+               '2_via': 'http://sistemasnet/scpx/Licenca2Via/Tela.asp',
                'cpf': (By.ID, 'pnumCPFCNPJ'),
                'fistel': (By.ID, 'pnumFistel'),
                'indicativo': Entidade['indicativo'],
-               'id_btn_lista_estacoes': Estacao['id_btn_lista_estacoes'],
-               'submit': Estacao['submit']}
+               'id_btn_lista_estacoes': estacao['id_btn_lista_estacoes'],
+               'submit': estacao['submit']}
 
 class Scra(object):
 

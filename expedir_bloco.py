@@ -81,11 +81,11 @@ class PagInicial(Page):
 
     def go_to_initial_page(self):
         self.wait_for_element_to_click(
-            Base.INIT).click()
+            Sei_Base.INIT).click()
 
     def exibir_menu_lateral(self):
 
-        menu = self.wait_for_element(Base.MENU)
+        menu = self.wait_for_element(Sei_Base.MENU)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -167,7 +167,7 @@ class PagInicial(Page):
 
                 num_doc = p['documento'].a.string
 
-                link = Base.URL + p['processo'].a.attrs['href']
+                link = Sei_Base.URL + p['processo'].a.attrs['href']
 
                 self.expedir_oficio(num_doc, link)
 
@@ -218,13 +218,13 @@ class PagInicial(Page):
 
     def enviar_processo_sede(self, buttons):
 
-        assert self.get_title() == Processo.TITLE, \
+        assert self.get_title() == Proc_incluir.TITLE, \
             "Erro ao navegar para o processo"
 
 
         enviar = buttons[3]
 
-        link = Base.URL + enviar.attrs["href"]
+        link = Sei_Base.URL + enviar.attrs["href"]
 
         (janela_processo, janela_andamento) = navigate_link_to_new_window(
                 self.driver, link)
@@ -290,7 +290,7 @@ class PagInicial(Page):
 
     def acoes_oficio(self):
 
-        assert self.get_title() == Processo.TITLE, \
+        assert self.get_title() == Proc_incluir.TITLE, \
             "Erro ao navegar para o processo"
 
         # Switch to central frame
@@ -310,7 +310,7 @@ class PagInicial(Page):
 
     def info_oficio(self, num_doc):
 
-        assert self.get_title() == Processo.TITLE, \
+        assert self.get_title() == Proc_incluir.TITLE, \
             "Erro ao navegar para o processo"
 
         # Switch to tree frame
@@ -330,18 +330,18 @@ class PagInicial(Page):
 
     def atualiza_andamento(self, buttons, info):
 
-        assert self.get_title() == Processo.TITLE, \
+        assert self.get_title() == Proc_incluir.TITLE, \
             "Erro ao navegar para o processo"
 
         andamento = buttons[4]
 
-        link = Base.URL + andamento.attrs['href']
+        link = Sei_Base.URL + andamento.attrs['href']
 
         (proc_window, new_window) = navigate_link_to_new_window(self.driver, link)
 
         input_and = self.wait_for_element((By.ID, "txaDescricao"))
 
-        text = Central.AND_PRE + info + Central.AND_POS
+        text = Proc_central.AND_PRE + info + Proc_central.AND_POS
 
         input_and.send_keys(text)
 

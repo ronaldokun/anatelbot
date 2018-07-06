@@ -21,18 +21,21 @@ SERVICOS = ('Outorga: Rádio do Cidadão',
 TRANSLATION = {".":"", "/":"", "-":""}
 
 class make_xlat:
+
     def __init__(self, *args, **kwds):
         self.adict = dict(*args, **kwds)
         self.rx = self.make_rx( )
+
     def make_rx(self):
         return re.compile('|'.join(map(re.escape, self.adict)))
+
     def one_xlat(self, match):
         return self.adict[match.group(0)]
+
     def __call__(self, text):
         return self.rx.sub(self.one_xlat, text)
 
 strip_processo = make_xlat(TRANSLATION)
-
 
 def login_sei(driver, usr, pwd):
     """
@@ -60,7 +63,6 @@ def login_sei(driver, usr, pwd):
 
     return browser.driver
 
-
 class Sei(Page):
     """
     Esta subclasse da classe Page define métodos de execução de ações na
@@ -75,7 +77,7 @@ class Sei(Page):
         """ Simplifies the navigation of href pages on sei.anatel.gov.br
         by pre-appending the required prefix NAV_URL       """
 
-        prefix = helpers.Base.URL
+        prefix = helpers.Sei_Base.URL
 
         if prefix not in link:
 
@@ -104,13 +106,17 @@ class Sei(Page):
 
         striped = strip_processo(num)
 
-        if striped not in self._processos.keys():
+        if striped in self._processos.keys():
 
-            raise ValueError("O processo atual não existe ou não está aberto no SEI")
+            self.go(self._processos[striped]['link'])
 
-        self.go(self._processos[striped]['link'])
+            return Processo(self.driver, striped, tags=self._processos[striped])
 
-        return Processo(self.driver, striped, tags=self._processos[striped])
+        pesquisa = self.wait_for_element(helpers.Sei_Base.PESQUISA)
+
+        pesquisa.send_keys(num + Keys.ENTER)
+
+        return Processo(self.driver, striped, tags=None)
 
     def see_detailed(self):
         """
@@ -152,7 +158,7 @@ class Sei(Page):
         Assume que o link está presente em qualquer subpágina do SEI
         """
         self.wait_for_element_to_click(
-            helpers.Base.INIT).click()
+            helpers.Sei_Base.INIT).click()
 
     def show_lat_menu(self):
         """
@@ -160,7 +166,7 @@ class Sei(Page):
         links
         Assume que o link está presente em qualquer subpágina do SEI
         """
-        menu = self.wait_for_element(helpers.Base.MENU)
+        menu = self.wait_for_element(helpers.Sei_Base.MENU)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -198,16 +204,14 @@ class Sei(Page):
 
         contador = Select(contador)
 
-
         paginas = [pag.text for pag in contador.options]
 
-        for pag in paginas[1:]:
+        for pag in paginas:
             # One simple repetition to avoid more complex code
             contador = Select(self.wait_for_element(helpers.Sei_Inicial.CONT))
             contador.select_by_visible_text(pag)
             html_sei = Soup(self.driver.page_source, "lxml")
             processos += html_sei("tr", {"class": 'infraTrClara'})
-
 
         processos_abertos = []
 
@@ -221,7 +225,7 @@ class Sei(Page):
 
         self._set_processos(processos_abertos)
 
-    def update_elem(self, elem_id, dado):
+    def _update_elem(self, elem_id, dado):
 
         elem = self.wait_for_element(elem_id)
 
@@ -229,23 +233,24 @@ class Sei(Page):
 
         elem.send_keys(dado)
     # noinspection PyProtectedMember
-    def check_contact(self, nome):
+    def _check_contact(self, nome):
 
         nome = unidecode._unidecode(nome)
 
         if self.get_title() != helpers.Contato.TITLE:
 
             with self.wait_for_page_load():
-                self.vai_para_pag_contato()
+                self._vai_para_pag_contato()
 
         try:
 
             contato = self.wait_for_element_to_click(helpers.Pesq_contato.ID_SEARCH, timeout=5)
 
         except TimeoutException:
+
             print("Elemento não encontrado")
 
-            return (0,None)
+            return None
 
         contato.clear()
 
@@ -277,7 +282,7 @@ class Sei(Page):
 
             return None
 
-    def cria_contato(self, dados):
+    def _cria_contato(self, dados):
 
         novo_contato = self.wait_for_element_to_click(helpers.Contato.BTN_NOVO)
 
@@ -285,39 +290,9 @@ class Sei(Page):
 
             novo_contato.click()
 
-        self.mudar_dados_contato(dados, novo=True)
+        self._mudar_dados_contato(dados, novo=True)
 
-    def atualizar_contato(self, nome, dados):
-
-        tag_contact = self.check_contact(nome)
-
-        if not tag_contact:
-
-            self.cria_contato(dados)
-
-        else:
-
-            for tag in tag_contact:
-
-                for child in tag.children:
-
-                    if hasattr(child, 'attrs'):
-
-                        if child.get('title') == "Alterar Contato":
-
-                            link  = tag.get('href')
-
-                            if link:
-
-                                with self.wait_for_page_load():
-
-                                    self.go(link)
-
-                                self.mudar_dados_contato(dados)
-
-                                return
-
-    def mudar_dados_contato(self, dados, novo=False):
+    def _mudar_dados_contato(self, dados, novo=False):
 
         dados = {k:str(v).title() for k,v in dados.items() if k is not 'UF'}
 
@@ -331,7 +306,7 @@ class Sei(Page):
 
         self.wait_for_element_to_click(helpers.Contato.PF).click()
 
-        self.update_elem(helpers.Contato.SIGLA, dados.get('Cpf_RF', ''))
+        self._update_elem(helpers.Contato.SIGLA, dados.get('Cpf_RF', ''))
 
         if dados.get('Sexo', "") == 'FEMININO':
 
@@ -341,13 +316,13 @@ class Sei(Page):
 
             self.wait_for_element_to_click(helpers.Contato.MASCULINO).click()
 
-        self.update_elem(helpers.Contato.NOME, dados.get('Nome', ''))
+        self._update_elem(helpers.Contato.NOME, dados.get('Nome', ''))
 
-        self.update_elem(helpers.Contato.END, dados.get('Logradouro', '') + ' ' + dados.get('Num', ''))
+        self._update_elem(helpers.Contato.END, dados.get('Logradouro', '') + ' ' + dados.get('Num', ''))
 
-        self.update_elem(helpers.Contato.COMP, dados.get('Complemento', ''))
+        self._update_elem(helpers.Contato.COMP, dados.get('Complemento', ''))
 
-        self.update_elem(helpers.Contato.BAIRRO, dados.get('Bairro', ''))
+        self._update_elem(helpers.Contato.BAIRRO, dados.get('Bairro', ''))
 
         pais = self.wait_for_element(helpers.Contato.PAIS)
 
@@ -361,21 +336,21 @@ class Sei(Page):
 
         uf.select_by_visible_text(dados.get('UF', ''))
 
-        self.update_elem(helpers.Contato.CEP, dados.get('Cep', ''))
+        self._update_elem(helpers.Contato.CEP, dados.get('Cep', ''))
 
-        self.update_elem(helpers.Contato.CPF, dados.get('Cpf_RF', ''))
+        self._update_elem(helpers.Contato.CPF, dados.get('Cpf_RF', ''))
 
-        self.update_elem(helpers.Contato.RG, dados.get('Rg', ''))
+        self._update_elem(helpers.Contato.RG, dados.get('Rg', ''))
 
-        self.update_elem(helpers.Contato.ORG, dados.get('Org',''))
+        self._update_elem(helpers.Contato.ORG, dados.get('Org', ''))
 
-        self.update_elem(helpers.Contato.NASC, dados.get('Nasc', ''))
+        self._update_elem(helpers.Contato.NASC, dados.get('Nasc', ''))
 
-        self.update_elem(helpers.Contato.FONE, dados.get('Fone', ''))
+        self._update_elem(helpers.Contato.FONE, dados.get('Fone', ''))
 
-        self.update_elem(helpers.Contato.CEL, dados.get('Cel', ''))
+        self._update_elem(helpers.Contato.CEL, dados.get('Cel', ''))
 
-        self.update_elem(helpers.Contato.EMAIL, dados.get('Email', ''))
+        self._update_elem(helpers.Contato.EMAIL, dados.get('Email', ''))
 
         # Cidade por último para dar Tempo de Carregamento
 
@@ -390,7 +365,6 @@ class Sei(Page):
                 cidade. select_by_visible_text(option.text)
 
                 break
-
 
         if not novo:
 
@@ -420,7 +394,37 @@ class Sei(Page):
 
             salvar.click()
 
-    def vai_para_pag_contato(self):
+    def atualizar_contato(self, nome, dados):
+
+        tag_contact = self._check_contact(nome)
+
+        if not tag_contact:
+
+            self._cria_contato(dados)
+
+        else:
+
+            for tag in tag_contact:
+
+                for child in tag.children:
+
+                    if hasattr(child, 'attrs'):
+
+                        if child.get('title') == "Alterar Contato":
+
+                            link  = tag.get('href')
+
+                            if link:
+
+                                with self.wait_for_page_load():
+
+                                    self.go(link)
+
+                                self._mudar_dados_contato(dados, novo=False)
+
+                                return
+
+    def _vai_para_pag_contato(self):
 
         html = Soup(self.driver.page_source, 'lxml')
 
@@ -437,7 +441,7 @@ class Sei(Page):
 
         if self.get_title() != helpers.Pesq_contato.TITLE:
 
-            self.vai_para_pag_contato()
+            self._vai_para_pag_contato()
 
         pesquisa = self.wait_for_element(helpers.Pesq_contato.ID_SEARCH)
 
@@ -477,7 +481,7 @@ class Sei(Page):
         tipo.click()
 
         if desc:
-            espec = self.wait_for_element(helpers.Processo.ESPEC)
+            espec = self.wait_for_element(helpers.Proc_incluir.ESPEC)
 
             espec.send_keys(desc)
 
@@ -488,15 +492,15 @@ class Sei(Page):
 
         if nivel == 'público':
 
-            nivel = self.wait_for_element(helpers.Processo.PUBL)
+            nivel = self.wait_for_element(helpers.Proc_incluir.PUBL)
 
         elif nivel == 'restrito':
 
-            nivel = self.wait_for_element(helpers.Processo.REST)
+            nivel = self.wait_for_element(helpers.Proc_incluir.REST)
 
         else:
 
-            nivel = self.wait_for_element(helpers.Processo.SIG)
+            nivel = self.wait_for_element(helpers.Proc_incluir.SIG)
 
         nivel.click()
 
@@ -513,20 +517,40 @@ class Processo(Sei):
     def get_tags(self):
         return self.tags
 
+    def _acoes_processo(self):
+
+        assert self.get_title() == helpers.Proc_incluir.TITLE, \
+            "Erro ao navegar para o processo"
+
+        # Switch to central frame
+        self.driver.switch_to_frame("ifrVisualizacao")
+
+        self.wait_for_element(helpers.Proc_central.ACOES)
+
+        html_frame = Soup(self.driver.page_source, "lxml")
+
+        acoes = html_frame.find(id="divArvoreAcoes").contents
+
+        self.driver.switch_to_default_content()
+
+        self.acoes = functions.cria_dict_acoes(acoes)
+
     def get_acoes(self):
 
         if self.acoes == {}:
-
             self._acoes_processo()
 
         return self.acoes
+
+    def is_open(self):
+        return 'Concluir Processo' in self.get_acoes()
 
     def close_processo(self):
         self.driver.close()
 
     def info_oficio(self, num_doc):
 
-        assert self.get_title() == helpers.Processo.TITLE, \
+        assert self.get_title() == helpers.Proc_incluir.TITLE, \
             "Erro ao navegar para o processo"
 
         # Switch to tree frame
@@ -545,26 +569,8 @@ class Processo(Sei):
 
             return info
 
-    def _acoes_processo(self):
-
-        assert self.get_title() == helpers.Processo.TITLE, \
-            "Erro ao navegar para o processo"
-
-        # Switch to central frame
-        self.driver.switch_to_frame("ifrVisualizacao")
-
-        self.wait_for_element(helpers.Central.ACOES)
-
-        html_frame = Soup(self.driver.page_source, "lxml")
-
-        acoes = html_frame.find(id="divArvoreAcoes").contents
-
-        self.driver.switch_to_default_content()
-
-        self.acoes = functions.cria_dict_acoes(acoes)
-
     def update_andamento(self, buttons, info):
-        assert self.get_title() == helpers.Processo.TITLE, \
+        assert self.get_title() == helpers.Proc_incluir.TITLE, \
             "Erro ao navegar para o processo"
 
         andamento = buttons[4]
@@ -573,13 +579,13 @@ class Processo(Sei):
 
         (proc_window, and_window) = Page.nav_link_to_new_win(self.driver, link)
 
-        input_and = self.wait_for_element(helpers.Central.IN_AND)
+        input_and = self.wait_for_element(helpers.Proc_central.IN_AND)
 
-        text = helpers.Central.AND_PRE + info + helpers.Central.AND_POS
+        text = helpers.Proc_central.AND_PRE + info + helpers.Proc_central.AND_POS
 
         input_and.send_keys(text)
 
-        self.wait_for_element_to_click(helpers.Central.SV_AND).click()
+        self.wait_for_element_to_click(helpers.Proc_central.SV_AND).click()
 
         self.driver.close()
 
@@ -588,7 +594,7 @@ class Processo(Sei):
     def send_proc_to_sede(self, buttons):
 
         with self.wait_for_page_load():
-            assert self.get_title() == helpers.Processo.TITLE, \
+            assert self.get_title() == helpers.Proc_incluir.TITLE, \
                 "Erro na função 'send_proc_to_sede"
 
             enviar = buttons[3]
@@ -685,7 +691,7 @@ class Processo(Sei):
 
         if new is not None:
 
-            postit = self.wait_for_element(helpers.Central.IN_POSTIT)
+            postit = self.wait_for_element(helpers.Proc_central.IN_POSTIT)
 
             postit.clear()
 
@@ -694,7 +700,7 @@ class Processo(Sei):
             if content != '':
                 postit.send_keys(content)
 
-            chk_prioridade = self.wait_for_element_to_click(helpers.Central.CHK_PRIOR)
+            chk_prioridade = self.wait_for_element_to_click(helpers.Proc_central.CHK_PRIOR)
 
             if prioridade:
 
@@ -712,7 +718,7 @@ class Processo(Sei):
 
                     sleep(1)
 
-            btn = self.wait_for_element_to_click(helpers.Central.BT_POSTIT)
+            btn = self.wait_for_element_to_click(helpers.Proc_central.BT_POSTIT)
 
             btn.click()
 
@@ -935,7 +941,7 @@ class Processo(Sei):
 
         janela_processo, janela_oficio = windows[-2], windows[-1]
 
-        self.go(self.get_tags().get('link'))
+        #self.go_to_processo(self.numero)
 
         if dados:
 
@@ -1041,7 +1047,6 @@ class Processo(Sei):
 
         self.driver.switch_to_default_content()
 
-
 def exibir_bloco(Sei, numero):
     if Sei.get_title() != loc.Blocos.TITLE:
         Sei.go_to_blocos()
@@ -1082,7 +1087,6 @@ def armazena_bloco(Sei, numero):
         lista_processos.append(proc)
 
     return lista_processos
-
 
 def expedir_bloco(Sei, numero):
 

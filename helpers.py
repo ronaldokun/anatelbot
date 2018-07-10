@@ -1554,11 +1554,16 @@ class Scpx(object):
                            'id_indicativo': (By.ID, 'pIndicativo'),
                            'submit': (By.ID, 'botaoFlatConfirmar')}
 
-    movimento = {'transferir': "http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
-                 'id_cpf': consulta['id_cpf'],
-                 'submit': (By.ID, "botaoFlatConfirmar"),
-                 'atual': (By.ID, "pMovimento"),
-                 'posterior': (By.ID, "CodTipoMovimento")}
+    movimento = dict(transferir="http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
+                     cancelar='http://sistemasnet/scpx/MovimentoCancelar/Tela.asp',
+                     id_btn_lista_estacoes=estacao['id_btn_lista_estacoes'],
+                     id_btn_marcar_todos=(By.ID, 'botaoFlatMarcarTodos'),
+                     id_txt_cancelar=(By.ID, 'TxtComentarioMov'),
+                     id_cpf=consulta['id_cpf'],
+                     id_proc=(By.ID, 'NumProcesso'),
+                     submit=(By.ID, "botaoFlatConfirmar"),
+                     id_atual=(By.ID, "pMovimento"),
+                     id_posterior=(By.ID, "CodTipoMovimento"))
 
     liberar_indicativo = {'link': 'http://sistemasnet/scpx/IndicativoLiberar/Tela.asp',
                           'id_uf': (By.ID, 'SiglaUF'),
@@ -1568,7 +1573,6 @@ class Scpx(object):
 
     licenca_imprimir = {'link': 'http://sistemasnet/scpx/Licenca/Tela.asp',
                }
-
 
     servico = {'incluir': "http://sistemasnet/scpx/Servico/Tela.asp?Op=I",
                'prorrogar_rf': "http://sistemasnet/scpx/ServicoProrrogar/Tela.asp",

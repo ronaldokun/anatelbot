@@ -1,8 +1,10 @@
+import re
 import functions
 import helpers
 from page import *
 from time import sleep
 from selenium.webdriver.common.by import By
+
 
 
 
@@ -97,7 +99,7 @@ class Scpx(Sistema):
     interativos da ANATEL
     """
 
-    def __init__(self, driver, login="", senha="", timeout=5):
+    def __init__(self, driver, login="", senha="", timeout=2):
 
         super().__init__(driver, login, senha, timeout)
 
@@ -105,6 +107,22 @@ class Scpx(Sistema):
 
     def _get_acoes(self, helper, keys):
         return tuple(helper.get(x) for x in keys)
+
+    def _click_button(self, btn_id):
+
+        try:
+
+            button = self.wait_for_element_to_click(btn_id)
+
+            button.click()
+
+        except NoSuchElementException as e:
+
+            print(repr(e))
+
+        alert = self.alert_is_present(timeout=5)
+
+        if alert: alert.accept()
 
     def consulta(self, id, tipo_id='id_cpf'):
 
@@ -317,7 +335,7 @@ class Scpx(Sistema):
 
             if alert: alert.dismiss()
 
-    def movimento_aprovar(self, identificador, origem, tipo_id='id_cpf'):
+    def movimento_transferir(self, identificador, origem, dest, tipo_id='id_cpf', proc=None):
 
         helper = self.sistema.movimento
 
@@ -336,7 +354,7 @@ class Scpx(Sistema):
             if alert: alert.accept()
 
 
-        movimento_atual = Select(self.wait_for_element_to_click(helper['atual']))
+        movimento_atual = Select(self.wait_for_element_to_click(helper['id_atual']))
 
         if origem.lower() == "a":
 
@@ -354,9 +372,31 @@ class Scpx(Sistema):
 
         with self.wait_for_page_load(): confirmar.click()
 
-        movimento_a_transferir = Select(self.wait_for_element_to_click(helper['posterior']))
+        if origem.lower() == 'a':
 
-        movimento_a_transferir.select_by_visible_text("E - Aprovado / Licença")
+            assert proc is not None, "Forneça o número do processo para incluir no cadastro!"
+
+            num_processo = self.wait_for_element(helper['id_proc'])
+
+            num_processo.clear()
+
+            proc = re.sub('[.-/]', '', proc)
+
+            num_processo.send_keys(proc)
+
+        movimento_a_transferir = Select(self.wait_for_element_to_click(helper['id_posterior']))
+
+        if dest.lower() == 'e':
+
+            movimento_a_transferir.select_by_visible_text("E - Aprovado / Licença")
+
+        elif dest.lower() == 'g':
+
+            movimento_a_transferir.select_by_visible_text("G - Cadastro pelo usuário (auto-cadastramento)")
+
+            motivo = self.wait_for_element_to_click(helper['id_txt_cancelar'])
+
+            motivo.send_keys("Cadastro Incorreto. Estação será refeita com dados corretos")
 
         confirmar = self.wait_for_element_to_click(helper['submit'])
 
@@ -365,6 +405,30 @@ class Scpx(Sistema):
         alert = self.alert_is_present(5)
 
         if alert: alert.accept()
+
+    def movimento_cancelar(self, identificador, tipo_id='id_cpf'):
+
+        helper = self.sistema.movimento
+
+        links = ('cancelar', tipo_id, 'submit')
+
+        acoes = self._get_acoes(helper, links)
+
+        try:
+
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            alert = self.alert_is_present(2)
+
+            if alert: alert.accept()
+
+        self._click_button(helper['id_btn_lista_estacoes'])
+
+        self._click_button(helper['id_btn_marcar_todos'])
+
+        self._click_button(helper['submit'])
 
     def licenciar_estacao(self, identificador, tipo_id='id_cpf', ppdess=True):
 

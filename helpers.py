@@ -40,25 +40,23 @@ class Rf_Sapiens(object):
 
     NAME = (By.ID, "textfield-1015-inputE1")
 
-class Login(object):
+class Sei(object):
 
-    URL = "https://sei.anatel.gov.br"
+    Login = namedtuple('Login', 'url, title, log, pwd')("https://sei.anatel.gov.br",
+                                                        "SEI / ANATEL",
+                                                        (By.ID, "txtUsuario"),
+                                                        (By.ID, "pwdSenha"))
 
-    TITLE = "SEI / ANATEL"
+    Base = namedtuple('Base', 'init, menu, url, pesquisa')((By.ID, "lnkControleProcessos"),
+                                                           (By.ID, "lnkInfraMenuSistema"),
+                                                           "https://sei.anatel.gov.br/sei/",
+                                                           (By.ID, "txtPesquisaRapida"))
 
-    LOG = (By.ID, "txtUsuario")
+    Oficio = namedtuple('Oficio', 'editor, top_frame, iframes, btn_salvar')((By.ID, "frmEditor"),
+                                                                            (By.ID, "cke_4_top"),
+                                                                            (By.CLASS_NAME, "cke_wysiwyg_frame cke_reset"),
+                                                                            (By.ID, "cke_129"))
 
-    PWD = (By.ID, "pwdSenha")
-
-class Sei_Base(object):
-
-    INIT = (By.ID, "lnkControleProcessos")
-
-    MENU = (By.ID, "lnkInfraMenuSistema")
-
-    URL = "https://sei.anatel.gov.br/sei/"
-
-    PESQUISA = (By.ID, "txtPesquisaRapida")
 
 class Menu_lateral(object):
 
@@ -155,16 +153,6 @@ class Proc_incluir(object):
             'Sigilo do Inquérito Policial (Art. 20 do Código de Processo Penal)',
             'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)'
             ]
-
-class Oficio(object):
-
-    EDITOR = (By.ID, "frmEditor")
-
-    TOP_FRAME = (By.ID, "cke_4_top")
-
-    IFRAMES = (By.CLASS_NAME, "cke_wysiwyg_frame cke_reset")
-
-    BTN_SALVAR = (By.ID, "cke_129")
 
     #BTN_SALVAR = (By.CLASS_NAME, "cke_button cke_button__save cke_button_disabled")
 
@@ -1568,16 +1556,16 @@ class Scpx(object):
                            'id_indicativo': (By.ID, 'pIndicativo'),
                            'submit': (By.ID, 'botaoFlatConfirmar')}
 
-    movimento = dict(transferir="http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
-                     cancelar='http://sistemasnet/scpx/MovimentoCancelar/Tela.asp',
-                     id_btn_lista_estacoes=estacao['id_btn_lista_estacoes'],
-                     id_btn_marcar_todos=(By.ID, 'botaoFlatMarcarTodos'),
-                     id_txt_cancelar=(By.ID, 'TxtComentarioMov'),
-                     id_cpf=consulta['id_cpf'],
-                     id_proc=(By.ID, 'NumProcesso'),
-                     submit=(By.ID, "botaoFlatConfirmar"),
-                     id_atual=(By.ID, "pMovimento"),
-                     id_posterior=(By.ID, "CodTipoMovimento"))
+    movimento = {'transferir': "http://sistemasnet/scpx/MovimentoTransferir/Tela.asp",
+                 'cancelar': 'http://sistemasnet/scpx/MovimentoCancelar/Tela.asp',
+                 'id_btn_lista_estacoes': estacao['id_btn_lista_estacoes'],
+                 'id_btn_marcar_todos': (By.ID, 'botaoFlatMarcarTodos'),
+                 'id_txt_cancelar': (By.ID, 'TxtComentarioMov'),
+                 'id_cpf': consulta['id_cpf'],
+                 'id_proc': (By.ID, 'NumProcesso'),
+                 'submit': (By.ID, "botaoFlatConfirmar"),
+                 'id_atual': (By.ID, "pMovimento"),
+                 'id_posterior': (By.ID, "CodTipoMovimento")}
 
     liberar_indicativo = {'link': 'http://sistemasnet/scpx/IndicativoLiberar/Tela.asp',
                           'id_uf': (By.ID, 'SiglaUF'),

@@ -45,12 +45,14 @@ def login_sei(driver, usr, pwd):
     SEI.
     """
 
+    links = helpers.Sei.Login
+
     browser = Page(driver)
-    browser.driver.get(helpers.Login.URL)
+    browser.driver.get(links.url)
     # page.driver.maximize_window()
 
-    usuario = browser.wait_for_element_to_click(helpers.Login.LOG)
-    senha = browser.wait_for_element_to_click(helpers.Login.PWD)
+    usuario = browser.wait_for_element_to_click(links.log)
+    senha = browser.wait_for_element_to_click(links.pwd)
 
     # Clear any clutter on the form
     usuario.clear()
@@ -296,7 +298,7 @@ class Sei(Page):
         """ Simplifies the navigation of href pages on sei.anatel.gov.br
         by pre-appending the required prefix NAV_URL       """
 
-        prefix = helpers.Sei_Base.URL
+        prefix = helpers.Sei.Base.url
 
         if prefix not in link:
 
@@ -327,7 +329,7 @@ class Sei(Page):
 
             return Processo(self.driver, striped, tags=self._processos[striped])
 
-        pesquisa = self.wait_for_element(helpers.Sei_Base.PESQUISA)
+        pesquisa = self.wait_for_element(helpers.Sei.Base.pesquisa)
 
         pesquisa.send_keys(num + Keys.ENTER)
 
@@ -374,7 +376,7 @@ class Sei(Page):
         Assume que o link está presente em qualquer subpágina do SEI
         """
         self.wait_for_element_to_click(
-            helpers.Sei_Base.INIT).click()
+            helpers.Base.init).click()
 
     def show_lat_menu(self):
         """
@@ -382,7 +384,7 @@ class Sei(Page):
         links
         Assume que o link está presente em qualquer subpágina do SEI
         """
-        menu = self.wait_for_element(helpers.Sei_Base.MENU)
+        menu = self.wait_for_element(helpers.Base.menu)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -933,13 +935,9 @@ class Processo(Sei):
 
         self._incluir_documento("Ofício")
 
-        texto_padrao = self.wait_for_element_to_click(helper.get('id_txt_padrao'))
+        self._click_button(helper.get('id_txt_padrao'))
 
-        texto_padrao.click()
-
-        tipos = Select(self.wait_for_element_to_click(helper.get('id_modelos')))
-
-        tipos.select_by_visible_text(tipo)
+        self._select_by_text(helper.get('id_modelos'), tipo)
 
         if acesso == 'publico':
 
@@ -961,11 +959,9 @@ class Processo(Sei):
 
             raise ValueError("Você provavelmente não vai querer mandar um Ofício Sigiloso")
 
-        confirmar = self.wait_for_element_to_click(helper.get('submit'))
-
         windows =  self.driver.window_handles
 
-        confirmar.click()
+        self._click_button(helper.get('submit'))
 
         self.wait_for_new_window(windows)
 
@@ -1030,10 +1026,11 @@ class Processo(Sei):
 
         self._click_button(helper.get('submit'))
 
-
     def editar_oficio(self, dados, existing=False):
 
-        self.wait_for_element_to_be_visible(helpers.Oficio.EDITOR)
+        links = helpers.Sei.Oficio
+
+        self.wait_for_element_to_be_visible(links.editor)
 
         frames = self.driver.find_elements_by_tag_name("iframe")
 
@@ -1050,7 +1047,9 @@ class Processo(Sei):
         # TODO: make this more general
         for tag, value in dados.items():
 
-            element = self.wait_for_element((By.XPATH, "//p[@class='Texto_Alinhado_Esquerda' and contains(text(), '{0}')]".format(tag)))
+            xpath = r"//p[@class='Texto_Alinhado_Esquerda' and contains(text(), '{0}')]"
+
+            element = self.wait_for_element((By.XPATH, xpath.format(tag)))
 
             action = ActionChains(self.driver)
 
@@ -1060,19 +1059,19 @@ class Processo(Sei):
 
             action.perform()
 
-            sleep(2)
+            sleep(1)
 
             action.key_down(Keys.DELETE)
 
             action.perform()
 
-            sleep(2)
+            sleep(1)
 
-            script = "arguments[0].innerHTML = `{}`;".format(value)
+            script = "arguments[0].innerHTML = `{0}`;".format(value)
 
             self.driver.execute_script(script, element)
 
-            sleep(2)
+            sleep(1)
 
             #actions = ActionChains(self.driver)
 
@@ -1084,7 +1083,7 @@ class Processo(Sei):
 
         sleep(2)
 
-        salvar = self.wait_for_element_to_click(helpers.Oficio.BTN_SALVAR)
+        salvar = self.wait_for_element_to_click(links.btn_salvar)
 
         # Necessary steps to save
         #self.driver.execute_script('arguments[0].removeAttribute("aria-disabled")', salvar)

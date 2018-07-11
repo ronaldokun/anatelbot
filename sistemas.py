@@ -1,15 +1,10 @@
 import re
+from bs4 import  BeautifulSoup as soup
 import functions
 import helpers
 from page import *
 from time import sleep
 from selenium.webdriver.common.by import By
-
-
-
-
-
-from selenium.webdriver.common.desired_capabilities import  DesiredCapabilities
 
 SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
 
@@ -17,6 +12,9 @@ PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
             r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$',
             r'^(P){1}([A-Z]){4}$',
             r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})']
+
+ESTAÇÕES_RC = ["Fixa", "Móvel", "Telecomando"]
+
 
 class Sistema(Page):
 
@@ -35,22 +33,6 @@ class Sistema(Page):
             alert.accept()
 
         return self
-
-    def get_dados_navegacao(dict_acao, tipo):
-
-        if not link:
-
-            link = dict_acao.get('link')
-
-        if not id_:
-
-            id_ = dict_acao.get(tipo)
-
-        if not submit:
-
-            submit = dict_acao.get('submit')
-
-        return (link, id_, submit)
 
     def _navigate(self, identificador: str, tipo_id: str, page_info: tuple):
         """ Check id and tipo_id consistency and navigate to link
@@ -91,20 +73,6 @@ class Sistema(Page):
 
                 print("Não foi possível clicar no Botão Confirmar")
 
-ESTAÇÕES_RC = ["Fixa", "Móvel", "Telecomando"]
-
-class Scpx(Sistema):
-    """
-    Esta subclasse da classe Page define métodos de execução de funções nos sistemas
-    interativos da ANATEL
-    """
-
-    def __init__(self, driver, login="", senha="", timeout=2):
-
-        super().__init__(driver, login, senha, timeout)
-
-        self.sistema = helpers.Scpx
-
     def _get_acoes(self, helper, keys):
         return tuple(helper.get(x) for x in keys)
 
@@ -124,13 +92,67 @@ class Scpx(Sistema):
 
         if alert: alert.accept()
 
+    def _update_elem(self, elem_id, dado):
+
+        elem = self.wait_for_element(elem_id)
+
+        elem.clear()
+
+        elem.send_keys(dado)
+
+    def _select_by_text(self, select_id, text):
+
+        try:
+
+            select = Select(self.wait_for_element_to_click(select_id))
+
+            select.select_by_visible_text(text)
+
+        except (NoSuchElementException, UnexpectedAlertPresentException) as e:
+
+            alert = self.alert_is_present(timeout=2)
+
+            if alert: alert.accept()
+
+            print(repr(e))
+
+    def _extrai_cadastro(self, source):
+
+        trs = source.find_all('tr')
+        dados = {}
+        i = 1
+        for tr in trs:
+            td = tr.find_all('td', string=True)
+            label = tr.find_all('label', string=True)
+
+            i = 1
+            for field, result in zip(td, label):
+                field, result = field.text[:-1], result.text
+                if field in dados:
+                    field = field + "_" + str(i + 1)
+                dados[field] = result
+
+        return dados
+
+class Scpx(Sistema):
+    """
+    Esta subclasse da classe Page define métodos de execução de funções nos sistemas
+    interativos da ANATEL
+    """
+
+    def __init__(self, driver, login="", senha="", timeout=2):
+
+        super().__init__(driver, login, senha, timeout)
+
+        self.sis = helpers.Scpx
+
     def consulta(self, id, tipo_id='id_cpf'):
 
-        helper = self.sistema.consulta
+        h = self.sis.consulta
 
         links = ('link', tipo_id, 'submit')
 
-        acoes = self._get_acoes(helper, links)
+        acoes = self._get_acoes(h, links)
 
         self._navigate(id, tipo_id, acoes)
 
@@ -146,9 +168,11 @@ class Scpx(Sistema):
 
         self.consulta(identificador, tipo_id)
 
+        h = self.sis.consulta
+
         try:
 
-            elem = self.wait_for_element_to_click(self.sistema.consulta['id_btn_estacao'])
+            elem = self.wait_for_element_to_click(h.get('id_btn_estacao'))
 
             elem.click()
 
@@ -162,14 +186,12 @@ class Scpx(Sistema):
 
             if resumida:
 
-                # self.driver.execute_script("VersaoImpressao('R')")
-                btn = self.wait_for_element_to_click(self.sistema.consulta.get('impressao_resumida'))
+                btn_id = h.get('impressao_resumida')
 
 
             else:
 
-                # self.driver.execute_script("VersaoImpressao('N')")
-                btn = self.wait_for_element_to_click(self.sistema.consulta.get('impressao_completa'))
+                btn_id = h.get('impressao_completa')
 
         except:
 
@@ -177,44 +199,13 @@ class Scpx(Sistema):
 
             return
 
-        #windows = self.driver.window_handles
-
-        #main = windows[-1]
-
-        btn.click()
-
-        #self.wait_for_new_window(windows)
-
-        # windows = self.driver.window_handles
-        #
-        # self.driver.switch_to_window(windows[-1])
-        #
-        # print(self.get_title())
-        #
-        # self.driver.switch_to_frame(self.sistema.Consulta.get('frame_impressao'))
-        #
-        # try:
-        #
-        #     imprimir = self.wait_for_element_to_be_visible(self.sistema.Consulta.get('imprimir'))
-        #
-        #     imprimir.click()
-        #
-        #
-        # except (NoSuchElementException, TimeoutException):
-        #
-        #     print("Não foi possível imprimir a página de consulta")
-        #
-        # finally:
-        #
-        #     #self.close()
-        #
-        #     self.driver.switch_to_window(main)
+        self._click_button(btn_id)
 
     def servico_incluir(self, identificador, tipo_id='id_cpf'):
 
-        helper = self.sistema.servico
+        h = self.sis.servico
 
-        acoes = self._get_acoes(helper, ('incluir', tipo_id, 'submit'))
+        acoes = self._get_acoes(h, ('incluir', tipo_id, 'submit'))
 
         try:
             self._navigate(identificador, tipo_id, acoes)
@@ -225,9 +216,9 @@ class Scpx(Sistema):
 
     def servico_excluir(self, identificador, documento, motivo='Renúncia', tipo_id='id_cpf'):
 
-        helper = self.sistema.servico
+        h = self.sis.servico
 
-        acoes = self._get_acoes(helper, ('excluir', tipo_id, 'submit'))
+        acoes = self._get_acoes(h, ('excluir', tipo_id, 'submit'))
 
         try:
             self._navigate(identificador, tipo_id, acoes)
@@ -240,21 +231,13 @@ class Scpx(Sistema):
 
         if alert: alert.dismiss()
 
-        btn = self.wait_for_element_to_click(helper['id_btn_dados_exclusão'])
+        self._click_button(h.get('id_btn_dados_exclusão'))
 
-        btn.click()
+        self._update_elem(h.get('id_doc_exclusão'), documento)
 
-        doc = self.wait_for_element_to_be_visible(helper.get('id_doc_exclusão'))
+        self._select_by_text(h.get('id_motivo_exclusão'), motivo)
 
-        doc.send_keys(documento)
-
-        motive = Select(self.wait_for_element_to_be_visible(helper.get('id_motivo_exclusão')))
-
-        motive.select_by_visible_text(motivo)
-
-        confirmar = self.wait_for_element_to_click(helper['submit'])
-
-        confirmar.click()
+        self._click_button(h.get('submit'))
 
         alert = self.alert_is_present(2)
 
@@ -265,79 +248,39 @@ class Scpx(Sistema):
         if tipo_estacao not in ESTAÇÕES_RC:
             raise ValueError("Os tipos de estação devem ser: ".format(ESTAÇÕES_RC))
 
-        helper = self.sistema.estacao
+        helper = self.sis.estacao
 
-        acoes = tuple([helper.get(x) for x in ('incluir', tipo_id, 'submit')])
+        acoes = self._get_acoes(helper, ('incluir', tipo_id, 'submit'))
 
         self._navigate(identificador, tipo_id, acoes)
 
-        button = self.wait_for_element_to_click(helper['id_btn_dados_estacao'])
+        self._click_button(helper.get('id_btn_dados_estacao'))
 
-        button.click()
-
-        estado = Select(self.wait_for_element(helper['id_uf']))
-
-        estado.select_by_value(uf)
+        self._select_by_text(helper.get('id_uf'), uf)
 
         alert = self.alert_is_present(5)
 
-        if alert:
+        if alert: alert.dismiss()
 
-            alert.dismiss()
+        self._update_elem(helper.get('id_indicativo'), indicativo)
 
-        indic= self.wait_for_element(helper['id_indicativo'])
+        self._update_elem(helper.get('id_seq'), sequencial)
 
-        try:
+        self._select_by_text(helper.get('id_tipo'), tipo_estacao)
 
-            indic.send_keys(indicativo)
+        if tipo_estacao == "Fixa" and sede:
 
-        except UnexpectedAlertPresentException as e:
+            self._click_button(helper.get('copiar_sede'))
 
-            alert = self.alert_is_present(2)
+        self._click_button(helper.get('submit'))
 
-            if alert:
+        alert = self.alert_is_present(2)
 
-                alert.dismiss()
-
-        indic.send_keys(indicativo)
-
-        seq = self.wait_for_element(helper["id_seq"])
-
-        seq.send_keys(sequencial)
-
-        tipo_est = Select(self.wait_for_element(helper['id_tipo']))
-
-        if tipo_estacao == 'Móvel':
-
-            tipo_est.select_by_visible_text("Móvel")
-
-        elif tipo_estacao == "Fixa":
-
-            tipo_est.select_by_visible_text("Fixa")
-
-            if sede:
-
-                btn_sede = self.wait_for_element_to_click(helper['copiar_sede'])
-
-                btn_sede.click()
-
-        else:
-
-            tipo_est.select_by_visible_text("Telecomando")
-
-        if sede:
-
-            confirmar = self.wait_for_element_to_click(helper['submit'])
-
-            confirmar.click()
-
-            alert = self.alert_is_present(2)
-
-            if alert: alert.dismiss()
+        if alert: alert.dismiss()
 
     def movimento_transferir(self, identificador, origem, dest, tipo_id='id_cpf', proc=None):
 
-        helper = self.sistema.movimento
+        helper = self.sis.movimento
 
         links = ('transferir', tipo_id, 'submit')
 
@@ -353,54 +296,48 @@ class Scpx(Sistema):
 
             if alert: alert.accept()
 
-
-        movimento_atual = Select(self.wait_for_element_to_click(helper['id_atual']))
+        id_atual = helper.get('id_atual')
 
         if origem.lower() == "a":
 
-            movimento_atual.select_by_visible_text("A - Em análise")
+            text = "A - Em análise"
 
         elif origem.lower() == "b":
 
-            movimento_atual.select_by_visible_text(("B - Cadastro pela Anatel"))
+            text = "B - Cadastro pela Anatel"
 
         else:
 
             print("A transferência de movimento é somente à partir dos Movimentos A ou B")
 
-        confirmar = self.wait_for_element_to_click(helper['submit'])
+            return
 
-        with self.wait_for_page_load(): confirmar.click()
+        self._select_by_text(id_atual, text)
+
+        self._click_button(helper.get('submit'))
 
         if origem.lower() == 'a':
 
             assert proc is not None, "Forneça o número do processo para incluir no cadastro!"
 
-            num_processo = self.wait_for_element(helper['id_proc'])
-
-            num_processo.clear()
-
             proc = re.sub('[.-/]', '', proc)
 
-            num_processo.send_keys(proc)
+            self._update_elem(helper.get('id_proc'), proc)
 
-        movimento_a_transferir = Select(self.wait_for_element_to_click(helper['id_posterior']))
+        id_posterior = helper.get('id_posterior')
 
         if dest.lower() == 'e':
 
-            movimento_a_transferir.select_by_visible_text("E - Aprovado / Licença")
+            self._select_by_text(id_posterior, "E - Aprovado / Licença")
 
         elif dest.lower() == 'g':
 
-            movimento_a_transferir.select_by_visible_text("G - Cadastro pelo usuário (auto-cadastramento)")
+            self._select_by_text(id_posterior, "G - Cadastro pelo usuário (auto-cadastramento)")
 
-            motivo = self.wait_for_element_to_click(helper['id_txt_cancelar'])
+            self._update_elem(helper.get('id_txt_cancelar'),
+                                         "Cadastro Incorreto. Estação será refeita com dados corretos")
 
-            motivo.send_keys("Cadastro Incorreto. Estação será refeita com dados corretos")
-
-        confirmar = self.wait_for_element_to_click(helper['submit'])
-
-        confirmar.click()
+        self._click_button(helper.get('submit'))
 
         alert = self.alert_is_present(5)
 
@@ -408,7 +345,7 @@ class Scpx(Sistema):
 
     def movimento_cancelar(self, identificador, tipo_id='id_cpf'):
 
-        helper = self.sistema.movimento
+        helper = self.sis.movimento
 
         links = ('cancelar', tipo_id, 'submit')
 
@@ -430,72 +367,83 @@ class Scpx(Sistema):
 
         self._click_button(helper['submit'])
 
-    def licenciar_estacao(self, identificador, tipo_id='id_cpf', ppdess=True):
+    def licenciar_estacao(self, identificador, tipo_id='id_cpf', ppdess=True, silent=False):
 
-        helper = self.sistema.estacao
+        helper = self.sis.estacao
 
-        acoes = tuple([helper.get(x) for x in ('licenciar', tipo_id, 'submit')])
-
+        acoes = self._get_acoes(helper, ('licenciar', tipo_id, 'submit'))
 
         self._navigate(identificador, tipo_id, acoes)
 
         if tipo_id == 'id_cpf':
 
-            cpf = self.wait_for_element_to_click((By.LINK_TEXT, identificador))
-
-            cpf.click()
+            self._click_button((By.LINK_TEXT, identificador))
 
         if not ppdess:
 
-            lista_estacoes = self.wait_for_element_to_click(helper['id_btn_lista_estacoes'])
+            self._click_button(helper.get('id_btn_lista_estacoes'))
+            self._click_button(helper.get('id_btn_licenciar'))
 
-            lista_estacoes.click()
+        if silent:
 
-            self.wait_for_element_to_click(helper['id_btn_licenciar']).click()
+            alert = self.alert_is_present(5)
 
-        # Confirma o primeiro licenciamento
+            if alert: alert.accept()
 
-        # alert = self.alert_is_present(5)
+    def prorrogar_rf(self, identificador, tipo_id='id_cpf'):
 
-        # if alert = alert.accept()
+        helper = self.sis.servico
 
-    def prorrogar_rf(self, identificador, tipo='id_cpf'):
-
-        helper = self.sistema.servico
-
-        acoes = tuple([helper.get(x) for x in ('prorrogar', tipo_id, 'submit')])
+        acoes = self._get_acoes(helper, ('prorrogar', tipo_id, 'submit'))
 
         self._navigate(identificador,tipo_id, acoes)
 
-        button = self.wait_for_element_to_click(helper['id_btn_dados_estacao'])
+        self._click_button(helper.get('id_btn_dados_estacao'))
 
-        button.click()
-
-        confirmar = self.wait_for_element_to_click(helper['id_confirmar'])
-
-        confirmar.click()
+        self._click_button(helper.get('submit'))
 
         alert = self.alert_is_present(5)
 
-        if alert:
+        if alert: alert.accept()
 
-            alert.accept()
+    def prorrogar_estacao(self, identificador, tipo_id='id_cpf'):
 
-    def prorrogar_estacao(self, identificador, tipo='id_cpf'):
+        helper = self.sis.licenca
 
-        self._navigate(identificador, tipo, self.sistema.licenca['prorrogar'])
+        acoes = self._get_acoes('prorrogar', tipo_id, 'submit')
 
-        button = self.wait_for_element_to_click(self.sistema.licenca['id_btn_lista_estacoes'])
+        self._navigate(identificador, tipo_id, acoes)
 
-        button.click()
+        self._click_button(helper.get('id_btn_lista_estacoes'))
 
-    def imprimir_licenca(self, identificador, tipo="id_cpf"):
+    def imprimir_licenca(self, identificador, tipo_id="id_cpf"):
 
-        self._navigate(identificador, tipo=tipo, link=self.sistema.licenca["imprimir"], id=self.sistema.licenca['cpf'])
+        helper = helpers.sis.licenca
+
+        acoes = self._get_acoes('imprimir', tipo_id, 'submit')
+
+        self._navigate(identificador, helper, acoes)
+
+    def extrai_cadastro(self, id, tipo_id='id_cpf'):
+
+        self.consulta(id, tipo_id)
+
+        source = soup(self.driver.page_source, 'lxml')
+
+        return self._extrai_cadastro(source)
+
+
+class Boleto(Sistema):
+
+    def __init__(self, driver, login="", senha="", timeout=2):
+
+        super().__init__(driver, login, senha, timeout)
+
+        self.sis = helpers.Boleto
 
     def imprime_boleto(self, ident, id_type):
         """ This function receives a webdriver object, navigates it to the
-        loc.Boleto page, inserts the identification 'ident' in the proper
+        helpers.Boleto page, inserts the identification 'ident' in the proper
         field and commands the print of the boleto
         """
 
@@ -595,7 +543,9 @@ class Scpx(Sistema):
         #
         # return True
 
-    def save_new_window(self, filename):
+
+
+def save_new_window(page, filename):
 
         try:
 
@@ -624,8 +574,6 @@ class Scpx(Sistema):
         self.driver.switch_to_window(windows[0])
 
         return True
-
-
 
 def atualiza_cadastro(page, dados):
     if 'CPF' not in dados:

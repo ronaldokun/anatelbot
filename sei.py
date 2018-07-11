@@ -1,5 +1,6 @@
 # modules only
 import re
+import datetime as dt
 
 import unidecode
 from bs4 import BeautifulSoup as Soup
@@ -73,157 +74,9 @@ class Sei(Page):
         super().__init__(driver)
         self._processos = processos
 
-    def go(self, link):
-        """ Simplifies the navigation of href pages on sei.anatel.gov.br
-        by pre-appending the required prefix NAV_URL       """
-
-        prefix = helpers.Sei_Base.URL
-
-        if prefix not in link:
-
-            link = prefix + link
-
-        self.driver.get(link)
-
-    def get_processos(self):
-        return self._processos
-
     def _set_processos(self, processos):
 
         self._processos = {strip_processo(p['numero']) : p for p in processos}
-
-    def filter_processos(self, **kwargs):
-
-        processos = {}
-
-        for k,v in kwargs:
-
-            processos = {p : q for p, q in self._processos.items() if p.get(k) == v}
-
-        return processos
-
-    def go_to_processo(self, num):
-
-        striped = strip_processo(num)
-
-        if striped in self._processos.keys():
-
-            self.go(self._processos[striped]['link'])
-
-            return Processo(self.driver, striped, tags=self._processos[striped])
-
-        pesquisa = self.wait_for_element(helpers.Sei_Base.PESQUISA)
-
-        pesquisa.send_keys(num + Keys.ENTER)
-
-        return Processo(self.driver, striped, tags=None)
-
-    def see_detailed(self):
-        """
-        Expands the visualization from the main page in SEI
-        """
-        try:
-            ver_todos = self.wait_for_element_to_click(helpers.Sei_Inicial.ATR)
-
-            if ver_todos.text == "Ver todos os processos":
-                ver_todos.click()
-
-        except TimeoutException:
-
-            print("A página não carregou no tempo limite ou cheque o link\
-                  'ver todos os processos'")
-
-        try:
-
-            visual_detalhado = self.wait_for_element_to_click(
-                helpers.Sei_Inicial.VISUAL)
-
-            if visual_detalhado.text == "Visualização detalhada":
-                visual_detalhado.click()
-
-        except TimeoutException:
-
-            print("A página não carregou no tempo limite ou cheque o link\
-            de visualização detalhada")
-
-    def is_init_page(self):
-        """Retorna True se a página estiver na página inicial do SEI, False
-        caso contrário"""
-        return self.get_title() == helpers.Sei_Inicial.TITLE
-
-    def go_to_init_page(self):
-        """
-        Navega até a página inicial do SEI caso já esteja nela
-        a página é recarregada
-        Assume que o link está presente em qualquer subpágina do SEI
-        """
-        self.wait_for_element_to_click(
-            helpers.Sei_Base.INIT).click()
-
-    def show_lat_menu(self):
-        """
-        Exibe o Menu Lateral á Esquerda no SEI para acessos aos seus diversos
-        links
-        Assume que o link está presente em qualquer subpágina do SEI
-        """
-        menu = self.wait_for_element(helpers.Sei_Base.MENU)
-
-        if menu.get_attribute("title") == "Exibir Menu do Sistema":
-            menu.click()
-
-    def itera_processos(self):
-        """
-        Navega as páginas de processos abertos no SEI e guarda as tags
-        html dos processos como objeto soup no atributo processos_abertos
-        """
-
-        # Apaga o conteúdo atual da lista de processos
-        processos = []
-
-        # assegura que está inicial
-        if not self.is_init_page():
-            self.go_to_init_page()
-
-        # Mostra página com informações detalhadas
-        self.see_detailed()
-
-        html_sei = Soup(self.driver.page_source, "lxml")
-
-        processos += html_sei("tr", {"class": 'infraTrClara'})
-
-
-        try:
-
-            contador = self.wait_for_element(helpers.Sei_Inicial.CONT, timeout=30)
-
-        except TimeoutException:
-
-            print("A página demorou muito tempo para carregar ou há somente 1 página de Processos")
-
-            return
-
-        contador = Select(contador)
-
-        paginas = [pag.text for pag in contador.options]
-
-        for pag in paginas:
-            # One simple repetition to avoid more complex code
-            contador = Select(self.wait_for_element(helpers.Sei_Inicial.CONT))
-            contador.select_by_visible_text(pag)
-            html_sei = Soup(self.driver.page_source, "lxml")
-            processos += html_sei("tr", {"class": 'infraTrClara'})
-
-        processos_abertos = []
-
-        for line in processos:
-
-            tags = line("td")
-
-            if len(tags) == 6:
-
-                processos_abertos.append(functions.armazena_tags(tags))
-
-        self._set_processos(processos_abertos)
 
     def _update_elem(self, elem_id, dado):
 
@@ -232,7 +85,39 @@ class Sei(Page):
         elem.clear()
 
         elem.send_keys(dado)
-    # noinspection PyProtectedMember
+
+    def _click_button(self, btn_id):
+
+        try:
+
+            button = self.wait_for_element_to_click(btn_id)
+
+            button.click()
+
+        except NoSuchElementException as e:
+
+            print(repr(e))
+
+        alert = self.alert_is_present(timeout=5)
+
+        if alert: alert.accept()
+
+    def _select_by_text(self, select_id, text):
+
+        try:
+
+            select = Select(self.wait_for_element_to_click(select_id))
+
+            select.select_by_visible_text(text)
+
+        except (NoSuchElementException, UnexpectedAlertPresentException) as e:
+
+            alert = self.alert_is_present(timeout=2)
+
+            if alert: alert.accept()
+
+            print(repr(e))
+
     def _check_contact(self, nome):
 
         nome = unidecode._unidecode(nome)
@@ -394,6 +279,168 @@ class Sei(Page):
 
             salvar.click()
 
+    def _vai_para_pag_contato(self):
+
+        html = Soup(self.driver.page_source, 'lxml')
+
+        tag = html.find('li', string='Listar')
+
+        if not tag:
+            raise LookupError("The tag of type {0} and string {1} is not present in the page".format('<li>', 'Listar'))
+
+        link = tag.a.attrs['href']
+
+        self.go(link)
+
+    def go(self, link):
+        """ Simplifies the navigation of href pages on sei.anatel.gov.br
+        by pre-appending the required prefix NAV_URL       """
+
+        prefix = helpers.Sei_Base.URL
+
+        if prefix not in link:
+
+            link = prefix + link
+
+        self.driver.get(link)
+
+    def get_processos(self):
+        return self._processos
+
+    def filter_processos(self, **kwargs):
+
+        processos = {}
+
+        for k,v in kwargs:
+
+            processos = {p : q for p, q in self._processos.items() if p.get(k) == v}
+
+        return processos
+
+    def go_to_processo(self, num):
+
+        striped = strip_processo(num)
+
+        if striped in self._processos.keys():
+
+            self.go(self._processos[striped]['link'])
+
+            return Processo(self.driver, striped, tags=self._processos[striped])
+
+        pesquisa = self.wait_for_element(helpers.Sei_Base.PESQUISA)
+
+        pesquisa.send_keys(num + Keys.ENTER)
+
+        return Processo(self.driver, striped, tags=None)
+
+    def see_detailed(self):
+        """
+        Expands the visualization from the main page in SEI
+        """
+        try:
+            ver_todos = self.wait_for_element_to_click(helpers.Sei_Inicial.ATR)
+
+            if ver_todos.text == "Ver todos os processos":
+                ver_todos.click()
+
+        except TimeoutException:
+
+            print("A página não carregou no tempo limite ou cheque o link\
+                  'ver todos os processos'")
+
+        try:
+
+            visual_detalhado = self.wait_for_element_to_click(
+                helpers.Sei_Inicial.VISUAL)
+
+            if visual_detalhado.text == "Visualização detalhada":
+                visual_detalhado.click()
+
+        except TimeoutException:
+
+            print("A página não carregou no tempo limite ou cheque o link\
+            de visualização detalhada")
+
+    def is_init_page(self):
+        """Retorna True se a página estiver na página inicial do SEI, False
+        caso contrário"""
+        return self.get_title() == helpers.Sei_Inicial.TITLE
+    # noinspection PyProtectedMember
+
+    def go_to_init_page(self):
+        """
+        Navega até a página inicial do SEI caso já esteja nela
+        a página é recarregada
+        Assume que o link está presente em qualquer subpágina do SEI
+        """
+        self.wait_for_element_to_click(
+            helpers.Sei_Base.INIT).click()
+
+    def show_lat_menu(self):
+        """
+        Exibe o Menu Lateral á Esquerda no SEI para acessos aos seus diversos
+        links
+        Assume que o link está presente em qualquer subpágina do SEI
+        """
+        menu = self.wait_for_element(helpers.Sei_Base.MENU)
+
+        if menu.get_attribute("title") == "Exibir Menu do Sistema":
+            menu.click()
+
+    def itera_processos(self):
+        """
+        Navega as páginas de processos abertos no SEI e guarda as tags
+        html dos processos como objeto soup no atributo processos_abertos
+        """
+
+        # Apaga o conteúdo atual da lista de processos
+        processos = []
+
+        # assegura que está inicial
+        if not self.is_init_page():
+            self.go_to_init_page()
+
+        # Mostra página com informações detalhadas
+        self.see_detailed()
+
+        html_sei = Soup(self.driver.page_source, "lxml")
+
+        processos += html_sei("tr", {"class": 'infraTrClara'})
+
+
+        try:
+
+            contador = self.wait_for_element(helpers.Sei_Inicial.CONT, timeout=30)
+
+        except TimeoutException:
+
+            print("A página demorou muito tempo para carregar ou há somente 1 página de Processos")
+
+            return
+
+        contador = Select(contador)
+
+        paginas = [pag.text for pag in contador.options]
+
+        for pag in paginas:
+            # One simple repetition to avoid more complex code
+            contador = Select(self.wait_for_element(helpers.Sei_Inicial.CONT))
+            contador.select_by_visible_text(pag)
+            html_sei = Soup(self.driver.page_source, "lxml")
+            processos += html_sei("tr", {"class": 'infraTrClara'})
+
+        processos_abertos = []
+
+        for line in processos:
+
+            tags = line("td")
+
+            if len(tags) == 6:
+
+                processos_abertos.append(functions.armazena_tags(tags))
+
+        self._set_processos(processos_abertos)
+
     def atualizar_contato(self, nome, dados):
 
         tag_contact = self._check_contact(nome)
@@ -423,19 +470,6 @@ class Sei(Page):
                                 self._mudar_dados_contato(dados, novo=False)
 
                                 return
-
-    def _vai_para_pag_contato(self):
-
-        html = Soup(self.driver.page_source, 'lxml')
-
-        tag = html.find('li', string='Listar')
-
-        if not tag:
-            raise LookupError("The tag of type {0} and string {1} is not present in the page".format('<li>', 'Listar'))
-
-        link = tag.a.attrs['href']
-
-        self.go(link)
 
     def pesquisa_contato(self, name):
 
@@ -891,35 +925,33 @@ class Processo(Sei):
 
     def incluir_oficio(self, tipo, dados={}, acesso='publico', hipotese=None):
 
+        helper = helpers.Gerar_Doc.oficio
+
         if tipo not in helpers.Gerar_Doc.TEXTOS_PADRAO:
 
             raise ValueError("Tipo de Ofício inválido: {}".format(tipo))
 
         self._incluir_documento("Ofício")
 
-        texto_padrao = self.wait_for_element_to_click(helpers.Gerar_Doc.ID_TXT_PADRAO)
+        texto_padrao = self.wait_for_element_to_click(helper.get('id_txt_padrao'))
 
         texto_padrao.click()
 
-        tipos = Select(self.wait_for_element_to_click(helpers.Gerar_Doc.ID_MODELOS_OF))
+        tipos = Select(self.wait_for_element_to_click(helper.get('id_modelos')))
 
         tipos.select_by_visible_text(tipo)
 
         if acesso == 'publico':
 
-            acesso = self.wait_for_element_to_click(helpers.Gerar_Doc.ID_PUB)
-
-            acesso.click()
+            self._click_button(helper.get('id_pub'))
 
         elif acesso == 'restrito':
 
-            acesso = self.wait_for_element_to_click(helpers.Gerar_Doc.ID_RES)
+            self._click_button(helper.get('id_restrito'))
 
-            acesso.click()
+            hip = Select(self.wait_for_element_to_click(helper.get('id_hip_legal')))
 
-            hip = Select(self.wait_for_element_to_click(helpers.Gerar_Doc.ID_HIP))
-
-            if hipotese not in helpers.Gerar_Doc.HIPOTESES:
+            if hipotese not in helper.HIPOTESES:
 
                 raise ValueError("Hipótese Legal Inválida: ", hipotese)
 
@@ -929,7 +961,7 @@ class Processo(Sei):
 
             raise ValueError("Você provavelmente não vai querer mandar um Ofício Sigiloso")
 
-        confirmar = self.wait_for_element_to_click(helpers.Gerar_Doc.CONFIRMAR)
+        confirmar = self.wait_for_element_to_click(helper.get('submit'))
 
         windows =  self.driver.window_handles
 
@@ -953,8 +985,51 @@ class Processo(Sei):
 
         self.driver.switch_to_window(janela_processo)
 
-    def incluir_informe(self, ):
+    def incluir_informe(self):
         pass
+
+    def incluir_doc_externo(self, tipo, path, arvore= '', formato='nato', acesso='publico', hipotese=None):
+
+        helper = helpers.Gerar_Doc.doc_externo
+
+        if tipo not in helpers.Gerar_Doc.EXTERNO_TIPOS:
+
+            raise ValueError("Tipo de Documento Externo Inválido: {}".format(tipo))
+
+        self._incluir_documento("Externo")
+
+        self._select_by_text(helper.get('id_tipo'), tipo)
+
+        today = dt.datetime.today().strftime("%d%m%Y")
+
+        self._update_elem(helper.get('id_data'), today)
+
+        if arvore: self._update_elem(helper.get('id_txt_tree'), arvore)
+
+        if formato.lower() == 'nato': self._click_button(helper.get('id_nato'))
+
+        if acesso == 'publico':
+
+            self._click_button(helper.get('id_pub'))
+
+        elif acesso == 'restrito':
+
+            self._click_button(helper.get('id_restrito'))
+
+            if hipotese not in helper.HIPOTESES:
+
+                raise ValueError("Hipótese Legal Inválida: ", hipotese)
+
+            self._select_by_text(helper.get('id_hip_legal'), hipotese)
+
+        else:
+
+            raise ValueError("Você provavelmente não vai querer um documento Externo Sigiloso")
+
+        self._update_elem(helper.get('id_file_upload'), path)
+
+        self._click_button(helper.get('submit'))
+
 
     def editar_oficio(self, dados, existing=False):
 

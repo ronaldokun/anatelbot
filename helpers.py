@@ -991,13 +991,33 @@ class Criar_Processo(object):
 
 class Gerar_Doc(object):
 
-    TIPOS = ["Externo",
+    TIPOS = ("Externo",
              "Ofício",
-             "Informe"]
+             "Informe")
 
-    ID_TXT_PADRAO = (By.ID, "optTextoPadrao")
+    EXTERNO_TIPOS = ("Boleto",
+                     "Licença")
 
-    ID_MODELOS_OF = (By.ID, "selTextoPadrao")
+
+    doc_externo = dict(id_tipo=(By.ID, 'selSerie'),
+                       id_data=(By.ID, 'txtDataElaboracao'),
+                       id_txt_tree=(By.ID, 'txtNumero'),
+                       id_nato=(By.ID, 'optNato'),
+                       id_digit=(By.ID, 'optDigitalizado'),
+                       id_pub=(By.ID, "optPublico"),
+                       id_restrito=(By.ID, "optRestrito"),
+                       id_hip_legal=(By.ID, "selHipoteseLegal"),
+                       id_file_upload=(By.ID, "filArquivo"),
+                       submit = (By.ID, "btnSalvar"))
+
+    oficio = dict(id_txt_padrao=(By.ID, "optTextoPadrao"),
+                  id_modelos=(By.ID, "selTextoPadrao"),
+                  id_descricao=(By.ID, 'txtDescricao'),
+                  id_dest = (By.ID, "txtDestinatario"),
+                  id_pub=(By.ID, "optPublico"),
+                  id_restrito = (By.ID, "optRestrito"),
+                  id_hip_legal = (By.ID, "selHipoteseLegal"),
+                  submit=(By.ID, "btnSalvar"))
 
     TEXTOS_PADRAO = ['Arquivamento de processo no SEI',
                      'Arquivamento de processo no SEI',
@@ -1259,14 +1279,6 @@ class Gerar_Doc(object):
                      'vaznetto_RD_Of_Informa_Autocad',
                      'vaznetto_RD_Of_Informa_Autocad']
 
-    ID_DEST = (By.ID, "txtDestinatario")
-
-    ID_PUB = (By.ID, "optPublico")
-
-    ID_RES = (By.ID, "optRestrito")
-
-    ID_HIP = (By.ID, "selHipoteseLegal")
-
     HIPOTESES = [' ',
                 'Controle Interno (Art. 26, § 3º, da Lei nº 10.180/2001)',
                 'Controle Interno (Art. 26, § 3º, da Lei nº 10.180/2001)',
@@ -1315,7 +1327,9 @@ class Gerar_Doc(object):
                 'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)',
                 'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)']
 
-    CONFIRMAR = (By.ID, "btnSalvar")
+class Externo(object):
+
+    tipo = (By.ID, )
 
 class Pesq_contato(object):
 

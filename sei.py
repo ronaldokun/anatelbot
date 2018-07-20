@@ -72,9 +72,9 @@ class Sei(Page):
     página principal do SEI e de resgate de informações
     """
 
-    def __init__(self, driver, processos = {}):
+    def __init__(self, driver, processos = None):
         super().__init__(driver)
-        self._processos = processos
+        self._processos = processos if processos is not None else dict()
 
     def _set_processos(self, processos):
 
@@ -82,11 +82,17 @@ class Sei(Page):
 
     def _update_elem(self, elem_id, dado):
 
-        elem = self.wait_for_element(elem_id)
+        try:
 
-        elem.clear()
+            elem = self.wait_for_element(elem_id)
 
-        elem.send_keys(dado)
+            elem.clear()
+
+            elem.send_keys(dado)
+
+        except NoSuchElementException as e:
+
+            return e
 
     def _click_button(self, btn_id):
 
@@ -96,11 +102,11 @@ class Sei(Page):
 
             button.click()
 
-        except NoSuchElementException as e:
+        except (NoSuchElementException, TimeoutException) as e:
 
-            print(repr(e))
+            raise(repr(e))
 
-        alert = self.alert_is_present(timeout=5)
+        alert = self.alert_is_present(timeout=2)
 
         if alert: alert.accept()
 
@@ -329,9 +335,15 @@ class Sei(Page):
 
             return Processo(self.driver, striped, tags=self._processos[striped])
 
-        pesquisa = self.wait_for_element(helpers.Sei.Base.pesquisa)
+        try:
 
-        pesquisa.send_keys(num + Keys.ENTER)
+            self._update_elem(helpers.Sei.Base.pesquisa, num + Keys.ENTER)
+
+        except NoSuchElementException:
+
+            self.go_to_init_page()
+
+            self.go_to_processo(num)
 
         return Processo(self.driver, striped, tags=None)
 
@@ -375,8 +387,14 @@ class Sei(Page):
         a página é recarregada
         Assume que o link está presente em qualquer subpágina do SEI
         """
-        self.wait_for_element_to_click(
-            helpers.Base.init).click()
+
+        try:
+
+            self._click_button(helpers.Sei.Base.init)
+
+        except:
+
+            self.go("")
 
     def show_lat_menu(self):
         """
@@ -542,13 +560,16 @@ class Sei(Page):
 
 class Processo(Sei):
 
-    def __init__(self, driver, numero, tags={}):
+    #TODO: Rastrear Árvore e guardar documentos
+
+    def __init__(self, driver, numero, tags=None):
         super().__init__(driver)
         self.driver = driver
         self.numero = numero
-        self.tags = tags
+        self.tags = tags if tags is not None else dict()
         self.acoes = {}
         self.tree = {}
+        self.link = self.driver.current_url
 
     def get_tags(self):
         return self.tags
@@ -764,9 +785,11 @@ class Processo(Sei):
 
             self.driver.switch_to_window(main)
 
-            self.tags['anotacao'] = content
+            if 'anotacao' and 'anotacao_link' in self.tags:
 
-            self.tags['anotacao_link'] = ''
+                self.tags['anotacao'] = content
+
+                self.tags['anotacao_link'] = ''
 
     def go_to_marcador(self):
 
@@ -802,35 +825,33 @@ class Processo(Sei):
 
         if new is not None:
 
-            try:
+            if self.check_element_exists(helpers.Acompanhamento_Especial.EXCLUIR):
 
-                btn_excluir = self.wait_for_element_to_click(helpers.Acompanhamento_Especial.EXCLUIR, timeout=2)\
+                try:
 
-                btn_excluir.click()
+                    self._click_button(helpers.Acompanhamento_Especial.EXCLUIR)
 
-                sleep(1)
+                except TimeoutException:
 
-            except TimeoutException:
+                    print("Não foi possível excluir o Acompanhamento Especial")
 
-                print("Não foi possível excluir o Acompanhamento Especial")
+                try:
 
-            try:
+                    alert = self.alert_is_present(timeout=5)
 
-                alert = self.alert_is_present(timeout=5)
+                except NoAlertPresentException:
 
-            except NoAlertPresentException:
+                    print("Não houve pop-up de confirmação")
 
-                print("Não houve pop-up de confirmação")
+                if alert:
 
-            if alert:
+                    alert.accept()
 
-                alert.accept()
+                self.close()
 
-            self.close()
+                self.driver.switch_to_window(main)
 
-            self.driver.switch_to_window(main)
-
-            self.tags['Acompanhamento Especial'] = ""
+                self.tags['Acompanhamento Especial'] = ""
 
     def edita_marcador(self, tipo="", content=''):
 
@@ -838,56 +859,13 @@ class Processo(Sei):
 
         if new is not None:
 
-            self.wait_for_element_to_click(helpers.Marcador.SELECT_MARCADOR).click()
+            self._click_button(helpers.Marcador.SELECT_MARCADOR)
 
-            try:
+            self._click_button((By.LINK_TEXT, tipo))
 
-                self.wait_for_element_to_be_visible(helpers.Marcador.LISTA_MARCADORES).click()
+            self._update_elem(helpers.Marcador.TXT_MARCADOR, content)
 
-
-            except TimeoutException:
-
-                print("Erro ao tentar clicar na lista de marcadores")
-
-            try:
-
-                if tipo != "":
-
-                    marcador = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
-
-                else:
-
-                    marcador = self.wait_for_element_to_be_click((By.LINK_TEXT, ""))
-
-                marcador.click()
-
-            except TimeoutException:
-
-                print("Erro ao clinar no marcador selecionado")
-
-
-            try:
-
-                texto_marcador = self.wait_for_element(helpers.Marcador.TXT_MARCADOR)
-
-                texto_marcador.clear()
-
-                if content != '':
-
-                    texto_marcador.send_keys(content)
-
-            except TimeoutException:
-
-                print("Erro ao tentar modificar o texto do marcador")
-
-
-            try:
-
-                self.wait_for_element_to_click(helpers.Marcador.SALVAR).click()
-
-            except TimeoutException:
-
-                print("Erro ao salvar o marcador")
+            self._click_button(helpers.Marcador.SALVAR)
 
             self.close()
 
@@ -907,25 +885,15 @@ class Processo(Sei):
 
                 self.go(link)
 
-            try:
-
-                link = self.wait_for_element_to_be_visible((By.LINK_TEXT, tipo), timeout=5)
-
-            except TimeoutException:
-
-                print("Erro ao navegar para o link Incluir Documento")
-
-            #main, new = self.nav_link_to_new_win(link)
-
-            link.click()
-
-            #return main, new
+            self._click_button((By.LINK_TEXT, tipo))
 
         else:
 
             raise ValueError("Problema com o link de ações do processo: 'Incluir Documento'")
 
-    def incluir_oficio(self, tipo, dados={}, acesso='publico', hipotese=None):
+    def incluir_oficio(self, tipo, dados={}, anexo=False, acesso='publico', hipotese=None):
+
+        #TODO:Inclui anexo
 
         helper = helpers.Gerar_Doc.oficio
 
@@ -981,6 +949,8 @@ class Processo(Sei):
 
         self.driver.switch_to_window(janela_processo)
 
+        self.go(self.link)
+
     def incluir_informe(self):
         pass
 
@@ -1026,6 +996,8 @@ class Processo(Sei):
 
         self._click_button(helper.get('submit'))
 
+        self.go(self.link)
+
     def editar_oficio(self, dados, existing=False):
 
         links = helpers.Sei.Oficio
@@ -1034,11 +1006,9 @@ class Processo(Sei):
 
         frames = self.driver.find_elements_by_tag_name("iframe")
 
-        #assert len(frames) >=3, "O Número de Frames da página de edição do Ofício é {}".format(len(frames))
-
         while len(frames) < 3:
 
-            sleep(2)
+            sleep(1)
 
             frames = self.driver.find_elements_by_tag_name("iframe")
 
@@ -1047,7 +1017,7 @@ class Processo(Sei):
         # TODO: make this more general
         for tag, value in dados.items():
 
-            xpath = r"//p[@class='Texto_Alinhado_Esquerda' and contains(text(), '{0}')]"
+            xpath = r"//p[contains(text(), '{0}')]"
 
             element = self.wait_for_element((By.XPATH, xpath.format(tag)))
 
@@ -1059,48 +1029,42 @@ class Processo(Sei):
 
             action.perform()
 
-            sleep(1)
+            sleep(0.5)
+
+            action.key_down(Keys.RETURN)
+
+            action.perform()
 
             action.key_down(Keys.DELETE)
 
             action.perform()
 
-            sleep(1)
+            sleep(0.5)
 
             script = "arguments[0].innerHTML = `{0}`;".format(value)
 
             self.driver.execute_script(script, element)
 
-            sleep(1)
-
-            #actions = ActionChains(self.driver)
-
-            #actions.click().send_keys(Keys.RETURN)
-
-            #actions.perform()
+            sleep(0.5)
 
         self.driver.switch_to.parent_frame()
 
-        sleep(2)
-
-        salvar = self.wait_for_element_to_click(links.btn_salvar)
+        self._click_button(links.submit)
 
         # Necessary steps to save
         #self.driver.execute_script('arguments[0].removeAttribute("aria-disabled")', salvar)
 
         #self.driver.execute_script('arguments[0].class = "cke_button cke_button__save cke_button_off"', salvar)
 
-        salvar.click()
+        #salvar.click()
 
-        sleep(5)
+        #sleep(5)
 
-        self.close()
+        #self.close()
 
     def concluir_processo(self):
 
         excluir = self.get_acoes().get('Concluir Processo').strip()
-
-        print(excluir)
 
         assert excluir is not None, "A ação 'Concluir Processo não foi armazenada, verfique as ações do Processo"
 

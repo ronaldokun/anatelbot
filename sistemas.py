@@ -15,14 +15,23 @@ PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
 
 ESTAÇÕES_RC = ["Fixa", "Móvel", "Telecomando"]
 
+STRIP = ("/", ".", "-")
+
+def strip_string(str_):
+
+    return "".join(s for s in str_ if s not in STRIP)
+
 
 class Sistema(Page):
+
 
     def __init__(self, driver, login="", senha="", timeout=5):
 
         super().__init__(driver)
 
         self.driver.get('http://sistemasnet')
+
+        self.timeout = timeout
 
         alert = self.alert_is_present(timeout=timeout)
 
@@ -45,42 +54,26 @@ class Sistema(Page):
         if not functions.check_input(identificador=identificador, tipo=tipo_id):
             raise ValueError("Identificador deve ser do tipo cpf, cnpj ou indicativo: " % identificador)
 
+        identificador = strip_string(identificador)
+
         link, _id, submit = page_info
 
         with self.wait_for_page_load():
 
             self.driver.get(link)
 
-        with self.wait_for_page_load():
+        self._update_elem(_id, identificador)
 
-            try:
-
-                elem = self.wait_for_element_to_click(_id, timeout=10)
-
-                elem.send_keys(identificador)
-
-            except NoSuchElementException:
-
-                print("The html id: {} is not present on this webpage".format(_id))
-
-            try:
-
-                submit = self.wait_for_element_to_click(submit, timeout=2)
-
-                submit.click()
-
-            except (NoSuchElementException, TimeoutException):
-
-                print("Não foi possível clicar no Botão Confirmar")
+        self._click_button(submit)
 
     def _get_acoes(self, helper, keys):
-        return tuple(helper.get(x) for x in keys)
+        return tuple(helper[x] for x in keys)
 
-    def _click_button(self, btn_id):
+    def _click_button(self, btn_id, timeout=5):
 
         try:
 
-            button = self.wait_for_element_to_click(btn_id)
+            button = self.wait_for_element_to_click(btn_id, timeout=timeout)
 
             button.click()
 
@@ -88,19 +81,25 @@ class Sistema(Page):
 
             print(repr(e))
 
-        alert = self.alert_is_present(timeout=5)
+        alert = self.alert_is_present(timeout=timeout)
 
         if alert: alert.accept()
 
-    def _update_elem(self, elem_id, dado):
+    def _update_elem(self, elem_id, dado, timeout=5):
 
-        elem = self.wait_for_element(elem_id)
+        try:
+
+            elem = self.wait_for_element(elem_id, timeout=timeout)
+
+        except NoSuchElementException as e:
+
+            print(e)
 
         elem.clear()
 
         elem.send_keys(dado)
 
-    def _select_by_text(self, select_id, text):
+    def _select_by_text(self, select_id, text, timeout=5):
 
         try:
 
@@ -110,7 +109,7 @@ class Sistema(Page):
 
         except (NoSuchElementException, UnexpectedAlertPresentException) as e:
 
-            alert = self.alert_is_present(timeout=2)
+            alert = self.alert_is_present(timeout=timeout)
 
             if alert: alert.accept()
 
@@ -118,19 +117,21 @@ class Sistema(Page):
 
     def _extrai_cadastro(self, source):
 
-        trs = source.find_all('tr')
-        dados = {}
-        i = 1
-        for tr in trs:
-            td = tr.find_all('td', string=True)
-            label = tr.find_all('label', string=True)
 
-            i = 1
-            for field, result in zip(td, label):
-                field, result = field.text[:-1], result.text
-                if field in dados:
-                    field = field + "_" + str(i + 1)
-                dados[field] = result
+        #TODO: iterate over the <tbody> tags
+
+        dados = {}
+
+        for tr in source.find_all('tr'):
+
+            for td in tr.find_all('td', string=True):
+
+                key = td.text.strip(" :")
+                value = td.find_next_sibling('td')
+
+                if value and key not in dados:
+
+                    dados[key] = value.text.strip()
 
         return dados
 
@@ -146,7 +147,7 @@ class Scpx(Sistema):
 
         self.sis = helpers.Scpx
 
-    def consulta(self, id, tipo_id='id_cpf'):
+    def consulta(self, id, tipo_id='id_cpf', timeout=5):
 
         h = self.sis.consulta
 
@@ -156,13 +157,17 @@ class Scpx(Sistema):
 
         self._navigate(id, tipo_id, acoes)
 
+        id = strip_string(id)
+
         try:
 
-            self.wait_for_element_to_click((By.LINK_TEXT, id), timeout=5).click()
+            self._click_button((By.LINK_TEXT, id), timeout=timeout)
 
         except (NoSuchElementException, TimeoutException):
 
-            pass
+            pass #print("There is no such element or not found {}".format(id))
+
+        self._click_button(h['id_btn_estacao'], timeout=timeout)
 
     def imprime_consulta(self, identificador, tipo_id='id_cpf', resumida=False):
 
@@ -201,9 +206,11 @@ class Scpx(Sistema):
 
         self._click_button(btn_id)
 
-    def servico_incluir(self, identificador, tipo_id='id_cpf'):
+    def servico_incluir(self, identificador, num_processo, tipo_id='id_cpf', silent=False):
 
         h = self.sis.servico
+
+        num_processo = strip_string(num_processo)
 
         acoes = self._get_acoes(h, ('incluir', tipo_id, 'submit'))
 
@@ -213,6 +220,13 @@ class Scpx(Sistema):
         except UnexpectedAlertPresentException:
 
             print("Alerta Inesperado")
+
+        self._update_elem(h.get('id_num_proc'), num_processo)
+
+        self._click_button(h.get('id_btn_corresp'))
+
+        if silent:
+            self._click_button(h.get('submit'))
 
     def servico_excluir(self, identificador, documento, motivo='Renúncia', tipo_id='id_cpf'):
 
@@ -248,6 +262,8 @@ class Scpx(Sistema):
         if tipo_estacao not in ESTAÇÕES_RC:
             raise ValueError("Os tipos de estação devem ser: ".format(ESTAÇÕES_RC))
 
+        assert functions.check_input(indicativo, tipo='indicativo'), 'Formato de Indicativo Inválido'
+
         helper = self.sis.estacao
 
         acoes = self._get_acoes(helper, ('incluir', tipo_id, 'submit'))
@@ -272,13 +288,13 @@ class Scpx(Sistema):
 
             self._click_button(helper.get('copiar_sede'))
 
-        self._click_button(helper.get('submit'))
+        self._click_button(helper.get('submit'), timeout=10)
 
         alert = self.alert_is_present(2)
 
         if alert: alert.dismiss()
 
-    def movimento_transferir(self, identificador, origem, dest, tipo_id='id_cpf', proc=None):
+    def movimento_transferir(self, identificador, origem, dest, proc, tipo_id='id_cpf'):
 
         helper = self.sis.movimento
 
@@ -316,9 +332,8 @@ class Scpx(Sistema):
 
         self._click_button(helper.get('submit'))
 
-        if origem.lower() == 'a':
 
-            assert proc is not None, "Forneça o número do processo para incluir no cadastro!"
+        if self.check_element_exists(helper.get('id_proc'), timeout=1):
 
             proc = re.sub('[.-/]', '', proc)
 
@@ -377,7 +392,7 @@ class Scpx(Sistema):
 
         if tipo_id == 'id_cpf':
 
-            self._click_button((By.LINK_TEXT, identificador))
+            self._click_button((By.LINK_TEXT, strip_string(identificador)))
 
         if not ppdess:
 
@@ -394,7 +409,7 @@ class Scpx(Sistema):
 
         helper = self.sis.servico
 
-        acoes = self._get_acoes(helper, ('prorrogar', tipo_id, 'submit'))
+        acoes = self._get_acoes(helper, ('prorrogar_rf', tipo_id, 'submit'))
 
         self._navigate(identificador,tipo_id, acoes)
 
@@ -408,25 +423,39 @@ class Scpx(Sistema):
 
     def prorrogar_estacao(self, identificador, tipo_id='id_cpf'):
 
-        helper = self.sis.licenca
+        helper = self.sis.licenca_prorrogar
 
-        acoes = self._get_acoes('prorrogar', tipo_id, 'submit')
+        acoes = self._get_acoes(helper, ('link', tipo_id, 'submit'))
 
-        self._navigate(identificador, tipo_id, acoes)
+        try:
+
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException as e:
+
+            print(repr(e))
+
+        alert = self.alert_is_present(timeout=5)
+
+        alert.dismiss()
 
         self._click_button(helper.get('id_btn_lista_estacoes'))
 
+        self._click_button(helper['submit'])
+
     def imprimir_licenca(self, identificador, tipo_id="id_cpf"):
 
-        helper = helpers.sis.licenca
+        helper = self.sis.licenca['imprimir']
 
-        acoes = self._get_acoes('imprimir', tipo_id, 'submit')
+        acoes = self._get_acoes(helper, ('link', tipo_id, 'submit'))
 
         self._navigate(identificador, helper, acoes)
 
-    def extrai_cadastro(self, id, tipo_id='id_cpf'):
+        self._click_button(helper['id_btn_imprimir'])
 
-        self.consulta(id, tipo_id)
+    def extrai_cadastro(self, id, tipo_id='id_cpf', timeout=5):
+
+        self.consulta(id, tipo_id, timeout=timeout)
 
         source = soup(self.driver.page_source, 'lxml')
 

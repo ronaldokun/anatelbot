@@ -52,11 +52,10 @@ class Sei(object):
                                                            "https://sei.anatel.gov.br/sei/",
                                                            (By.ID, "txtPesquisaRapida"))
 
-    Oficio = namedtuple('Oficio', 'editor, top_frame, iframes, btn_salvar')((By.ID, "frmEditor"),
+    Oficio = namedtuple('Oficio', 'editor, top_frame, iframes, submit')((By.ID, "frmEditor"),
                                                                             (By.ID, "cke_4_top"),
                                                                             (By.CLASS_NAME, "cke_wysiwyg_frame cke_reset"),
                                                                             (By.ID, "cke_129"))
-
 
 class Menu_lateral(object):
 
@@ -984,6 +983,9 @@ class Gerar_Doc(object):
              "Informe")
 
     EXTERNO_TIPOS = ("Boleto",
+                     "E-mail",
+                     "Relação",
+                     "Relatório",
                      "Licença")
 
 
@@ -1124,14 +1126,12 @@ class Gerar_Doc(object):
                      'RA_Exigencia_Prova',
                      'RA_Exigencia_Prova',
                      'RA_PPDESS',
-                     'RA_PPDESS',
                      'RA_Repetidora Abaixo 200 km',
                      'RA_Repetidora Abaixo 200 km',
                      'RA_Repetidora Indef._PF',
                      'RA_Repetidora Indef._PF',
                      'RC_Oficio de Cassação',
                      'RC_OF_Boletos_Emissão_Licença',
-                     'RC_OF_Boletos_Emissão_Licença',
                      'RC_OF_Cancelamento_Serviço',
                      'RC_OF_Cancelamento_Serviço',
                      'RC_OF_Envio_Licença',
@@ -1139,7 +1139,9 @@ class Gerar_Doc(object):
                      'RC_OF_Exigência',
                      'RC_OF_Exigência',
                      'RC_OF_PPDESS',
-                     'RC_OF_PPDESS',
+                     'RC_OF_Sem_Contexto_PPDESS',
+                     'RC_OF_Sem_Contexto_TFI',
+                     'RC_OF_Sem_Contexto_Licença',
                      'RD Checklist Licenciamento',
                      'RD Checklist Licenciamento',
                      'RD_CheckList_Alt_Téc_FM',
@@ -1511,7 +1513,14 @@ Entidade = {'cpf': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'Num
 
 class Scpx(object):
 
+    INPUT_IDS = dict(cpf=((By.ID, 'pNumCnpjCpf'),(By.ID, 'NumCNPJCPF'),(By.ID, 'pnumCPFCNPJ')),
+                     fistel=((By.ID, 'pNumFistel'), (By.ID, 'pnumFistel')),
+                     indicativo=((By.ID, 'pIndicativo'),))
+
+    submit = ((By.ID, "botaoFlatConfirmar"),)
+
     consulta = {'link': 'http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714',
+                'id_nome': (By.ID, 'pNomeEntidade'),
                 'id_cpf': (By.ID, 'pNumCnpjCpf'),
                 'id_fistel': (By.ID, 'pNumFistel'),
                 'id_indicativo': (By.ID, 'pIndicativo'),
@@ -1569,7 +1578,7 @@ class Scpx(object):
 
     liberar_indicativo = {'link': 'http://sistemasnet/scpx/IndicativoLiberar/Tela.asp',
                           'id_uf': (By.ID, 'SiglaUF'),
-                          'id_cpf': (By.ID, 'Indicativo'),
+                          'id_indicato': (By.ID, 'Indicativo'),
                           'id_sequencial': (By.ID, 'Sequencial'),
                           'submit': (By.ID, 'botaoFlatConfirmar')}
 
@@ -1579,21 +1588,33 @@ class Scpx(object):
     servico = {'incluir': "http://sistemasnet/scpx/Servico/Tela.asp?Op=I",
                'prorrogar_rf': "http://sistemasnet/scpx/ServicoProrrogar/Tela.asp",
                'excluir': 'http://sistemasnet/scpx/Servico/Tela.asp?Op=E',
+               'id_num_proc': (By.ID, 'NumProcesso'),
                'id_cpf': (By.ID, 'pNumCnpjCpf'),
                'id_btn_dados_estacao': (By.ID, "botaoFlatEstação"),
                'id_btn_dados_exclusão': (By.ID, 'botaoFlatDadosExclusão'),
+               'id_btn_corresp': (By.ID, 'botaoFlatEndereçoCorrespondência'),
                'id_doc_exclusão': (By.ID, 'pDocAto'),
                'id_motivo_exclusão': (By.ID, "CodMotivoExclusao"),
-               'submit': estacao['submit']}
+               'submit': (By.ID, "botaoFlatConfirmar")}
 
-    licenca = {'imprimir': "http://sistemasnet/scpx/Licenca/Tela.asp",
+    licenca = {'imprimir': {'link': "http://sistemasnet/scpx/Licenca/Tela.asp",
+                            'id_cpf': (By.ID, 'pnumCPFCNPJ'),
+                            'submit': estacao['submit'],
+                            'id_btn_imprimir': (By.ID, 'botaoFlatImprimir')},
                'prorrogar': "http://sistemasnet/scpx/LicencaProrrogar/Tela.asp",
                '2_via': 'http://sistemasnet/scpx/Licenca2Via/Tela.asp',
-               'cpf': (By.ID, 'pnumCPFCNPJ'),
-               'fistel': (By.ID, 'pnumFistel'),
-               'indicativo': Entidade['indicativo'],
+               'id_cpf': (By.ID, 'pnumCPFCNPJ'),
+               'id_fistel': (By.ID, 'pnumFistel'),
+               'id_indicativo': Entidade['indicativo'],
                'id_btn_lista_estacoes': estacao['id_btn_lista_estacoes'],
                'submit': estacao['submit']}
+
+    licenca_prorrogar = {"link": "http://sistemasnet/scpx/LicencaProrrogar/Tela.asp",
+                         "id_cpf": (By.ID, 'pNumCnpjCpf'),
+                         'id_fistel': (By.ID, 'pnumFistel'),
+                         'id_indicativo': Entidade['indicativo'],
+                         'id_btn_lista_estacoes': estacao['id_btn_lista_estacoes'],
+                         'submit': estacao['submit']}
 
 class Scra(object):
 

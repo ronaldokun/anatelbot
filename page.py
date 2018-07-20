@@ -104,10 +104,10 @@ class Page(object):
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator):
+    def check_element_exists(self, *locator, timeout=2):
         try:
-            self.wait_for_element(*locator)
-        except TimeoutException:
+            self.wait_for_element_to_be_visible(*locator, timeout=timeout)
+        except (TimeoutException, NoSuchElementException):
             return False
         return True
 

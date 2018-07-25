@@ -1,10 +1,14 @@
 import re
 from bs4 import  BeautifulSoup as soup
+from collections import namedtuple
 import functions
 import helpers
 from page import *
 from time import sleep
 from selenium.webdriver.common.by import By
+import pyperclip as clip # copiar o texto clipboard
+import pyautogui as gui
+
 
 SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
 
@@ -43,7 +47,7 @@ class Sistema(Page):
 
         return self
 
-    def _navigate(self, identificador: str, tipo_id: str, page_info: tuple):
+    def _navigate(self, identificador: str, tipo_id: str, page_info: tuple, silent=True):
         """ Check id and tipo_id consistency and navigate to link
 
         :param id: identificador, e.g. cpf: 11 digits, cnpj: 14 digits, indicativo: 4 to 6 characters
@@ -64,7 +68,8 @@ class Sistema(Page):
 
         self._update_elem(_id, identificador)
 
-        self._click_button(submit)
+        if silent:
+            self._click_button(submit)
 
     def _get_acoes(self, helper, keys):
         return tuple(helper[x] for x in keys)
@@ -117,10 +122,11 @@ class Sistema(Page):
 
     def _extrai_cadastro(self, source):
 
-
         #TODO: iterate over the <tbody> tags
 
         dados = {}
+
+        source = self.driver.page_source
 
         for tr in source.find_all('tr'):
 
@@ -151,9 +157,7 @@ class Scpx(Sistema):
 
         h = self.sis.consulta
 
-        links = ('link', tipo_id, 'submit')
-
-        acoes = self._get_acoes(h, links)
+        acoes = self._get_acoes(h, ('link', tipo_id, 'submit'))
 
         self._navigate(id, tipo_id, acoes)
 
@@ -175,17 +179,7 @@ class Scpx(Sistema):
 
         h = self.sis.consulta
 
-        try:
-
-            elem = self.wait_for_element_to_click(h.get('id_btn_estacao'))
-
-            elem.click()
-
-        except NoSuchElementException:
-
-            print("Não foi possível clicar no botão 'Estação' na página consulta")
-
-            return
+        self._click_button(h.get('id_btn_estacao'))
 
         try:
 
@@ -257,7 +251,7 @@ class Scpx(Sistema):
 
         if alert: alert.dismiss()
 
-    def incluir_estacao(self, identificador, tipo_estacao, indicativo, sede=True, sequencial='001', tipo_id='id_cpf', uf='SP'):
+    def incluir_estacao(self, identificador, tipo_estacao, indicativo, tipo_id='id_cpf', sede=True, sequencial='001',  uf='SP'):
 
         if tipo_estacao not in ESTAÇÕES_RC:
             raise ValueError("Os tipos de estação devem ser: ".format(ESTAÇÕES_RC))
@@ -461,6 +455,101 @@ class Scpx(Sistema):
 
         return self._extrai_cadastro(source)
 
+class Sec(Sistema):
+
+    def __init__(self, driver, login="", senha="", timeout=2):
+
+        super().__init__(driver, login, senha, timeout)
+
+        self.sis = helpers.Sec
+
+    def _extrai_inscritos_prova(self):
+
+        dados = {}
+
+        source = soup(self.driver.page_source, "lxml")
+
+        base = 'http://sistemasnet/SEC/Prova/BancaEspecialImpressao/'
+
+        Inscrito = namedtuple('Inscrito', 'link cpf nome coer impresso')
+
+        for tr in source.find_all('tr', id=('TRplus2', 'TRplus3', 'TRplus4')):
+
+            td =  list(tr.find_all('td'))
+
+            assert len(td) >= 5, "O identificador tabular retornado não é válido"
+
+            link = td[0].a.attrs['onclick'].split("'")[1]
+
+            link = base + link
+
+            cpf = td[1].label.text.strip()
+
+            nome = td[0].a.text.strip().upper()
+
+            coer = td[2].label.text.strip()
+
+            impresso = hasattr(td[-1].label, 'text') and td[-1].label.text != ""
+
+            dados[cpf] = Inscrito(link, cpf, nome, coer, impresso)
+
+        return dados
+
+
+    def imprimir_provas(self, data, horario, num_registros, cpf=None):
+
+        h = self.sis.Prova.imprimir
+
+        self.driver.get(h['link'])
+
+        #"http://sistemasnet/SEC/Prova/BancaEspecialImpressao/DadosProva.asp?idtProvaAgenda=11513&NumCpfAvaliador=31888916877")
+
+        if cpf is not None:
+
+            self._update_elem(h['id_cpf'], cpf)
+
+        sleep(2)
+
+        #self._click_button(h['submit'])
+
+        sleep(2)
+
+        #self._click_button((By.LINK_TEXT, " ".join([data, horario])))
+
+        self.driver.execute_script(h['alt_reg'])
+
+        self._update_elem(h['num_reg'], str(num_registros) + Keys.RETURN)
+
+        sleep(5)
+
+        dados = self._extrai_inscritos_prova()
+
+        dados = sorted(list(dados.values()), key=lambda v: v.nome)
+
+        for v in dados:
+
+            self.driver.get(v.link)
+
+            sleep(5)
+
+            clip.copy(v.nome)
+
+            confirm = gui.confirm('Imprimir Prova?')
+
+            if confirm == 'OK':
+
+                self._click_button(h['id_bt_imprimir'])
+
+            else:
+
+                next
+
+            clip.copy(v.nome)
+
+    def alterar_nome(self, cpf, novo):
+
+        pass
+
 
 class Boleto(Sistema):
 
@@ -470,107 +559,46 @@ class Boleto(Sistema):
 
         self.sis = helpers.Boleto
 
-    def imprime_boleto(self, ident, id_type):
+    def imprime_boleto(self, ident, tipo_id):
         """ This function receives a webdriver object, navigates it to the
         helpers.Boleto page, inserts the identification 'ident' in the proper
         field and commands the print of the boleto
         """
 
-        ident, serv, id_type, sis = functions.check_input(ident, id_type)
+        h = self.sis.imprimir
 
-        self.driver.get(sis.URL)
+        # acoes = self._get_acoes(h, ('link', tipo_id, 'submit'))
 
-        if id_type in ('cpf', 'cnpj'):
+        self.driver.get(h['link'])
 
-            elem = self.wait_for_element_to_click(sis.B_CPF)
+        if tipo_id == 'id_cpf':
 
-            elem.click()
+            self._click_button(h['id_cpf'])
 
-            elem = self.wait_for_element_to_click(sis.INPUT_CPF)
+            input_ = h['input_cpf']
 
         else:
 
-            elem = self.wait_for_element_to_click(sis.B_FISTEL)
+            self._click_button(h['id_fistel'])
 
-            elem.click()
+            input_ = h['input_fistel']
 
-            elem = self.wait_for_element_to_click(sis.INPUT_FISTEL)
+        self._update_elem(input_, ident)
 
-        # self._navigate(sis.URL, id, id_type)
+        self._update_elem(h['input_data'], functions.last_day_of_month())
 
-        elem.clear()
+        self._click_button(h['submit'])
 
-        elem.send_keys(ident)
+        self._click_button(h['marcar_todos'])
 
-        date = self.wait_for_element_to_click(sis.INPUT_DATA)
-
-        date.clear()
-
-        date.send_keys(functions.last_day_of_month() + Keys.RETURN)
-
-        #
-        # try:
-        #
-        #     marcar = self.wait_for_element_to_click(sis.MRK_TODOS)
-        #
-        #     marcar.click()
-        #
-        #     sleep(5)
-        #
-        # except:
-        #
-        #     print("Não foi possível marcar todos os boletos")
-        #
-        #     return False
-        #
-        # try:
-        #
-        #     imprimir = self.wait_for_element_to_click(sis.PRINT)
-        #
-        #     imprimir.click()
-        #
-        # except:
-        #
-        #     print("Não foi possível imprimir todos os boletos")
-        #
-        #     return False
+        self._click_button(h['btn_print'])
 
         try:
 
             self.wait_for_new_window()
 
-        except:
 
-            print("A espera pela nova janela não funcionou!")
 
-        #
-        # try:
-        #
-        #     windows = page.driver.window_handles
-        #
-        #     main = windows[0]
-        #
-        #     boleto = windows[1]
-        #
-        #     page.driver.switch_to_window(boleto)
-        #
-        #     save_page(page, ident)
-        #
-        #
-        #
-        #     page.close()
-        #
-        #     page.driver.switch_to_window(main)
-        #
-        # except:
-        #
-        #     print("Não foi possível salvar a nova janela")
-        #
-        #
-        #
-        #     return False
-        #
-        # return True
 
 
 

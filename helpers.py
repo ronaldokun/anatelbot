@@ -1383,23 +1383,15 @@ class Contato(object):
 
 class Boleto(object):
 
-    URL = 'http://sistemasnet/boleto/Boleto/ConsultaDebitos.asp?SISQSmodulo=6853'
-
-    B_FISTEL = (By.ID, 'indTipoConsulta0')
-
-    B_CPF = (By.ID, 'indTipoConsulta1')
-
-    INPUT_FISTEL = (By.ID, 'NumFistel')
-
-    INPUT_CPF = (By.ID, 'NumCNPJCPF')
-
-    INPUT_DATA = (By.ID, 'DataPPDUR')
-
-    BUT_CONF = (By.ID, 'botaoFlatConfirmar')
-
-    MRK_TODOS = (By.ID, 'botaoFlatMarcarTodos')
-
-    PRINT = (By.ID, 'botaoFlatImprimirSelecionados')
+    imprimir = dict(link='http://sistemasnet/boleto/Boleto/ConsultaDebitos.asp',
+                    id_fistel=(By.ID, 'indTipoConsulta0'),
+                    id_cpf=(By.ID, 'indTipoConsulta1'),
+                    input_fistel=(By.ID, 'NumFistel'),
+                    input_cpf=(By.ID, 'NumCNPJCPF'),
+                    input_data=(By.ID, 'DataPPDUR'),
+                    submit=(By.ID, 'botaoFlatConfirmar'),
+                    marcar_todos=(By.ID, 'botaoFlatMarcarTodos'),
+                    btn_print=(By.ID, 'botaoFlatImprimirSelecionados'))
 
 class Sec(object):
 
@@ -1454,6 +1446,16 @@ class Sec(object):
     Insc_Inc = 'http://sistemasnet/SEC/Inscricao/Incluir/Tela.asp?SISQSmodulo=4029'
 
     Insc_Mnt = 'http://sistemasnet/SEC/Inscricao/Reativar/Tela.asp?SISQSmodulo=18333'
+
+    Prova = namedtuple('Banca_Especial', 'imprimir responder')\
+        ({'link': 'http://sistemasnet/SEC/Prova/BancaEspecialImpressao/Tela.asp',
+         'id_cpf': (By.ID, 'NumCnpjCpf'),
+         'submit': (By.ID, 'botaoFlatConfirmar'),
+         'alt_reg': "AlteraNumReg();",
+         'num_reg': (By.NAME, 'NumReg'),
+         'id_bt_imprimir': (By.ID, "botaoFlat  Imprimir")},
+         {}
+        )
 
     Prova_Res = 'http://sistemasnet/SEC/Prova/Resultado/Tela.asp?SISQSmodulo=3872'
 
@@ -1513,9 +1515,10 @@ Entidade = {'cpf': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'Num
 
 class Scpx(object):
 
-    INPUT_IDS = dict(cpf=((By.ID, 'pNumCnpjCpf'),(By.ID, 'NumCNPJCPF'),(By.ID, 'pnumCPFCNPJ')),
-                     fistel=((By.ID, 'pNumFistel'), (By.ID, 'pnumFistel')),
-                     indicativo=((By.ID, 'pIndicativo'),))
+
+    IDS = dict(cpf=((By.ID, 'pNumCnpjCpf'), (By.ID, 'NumCNPJCPF'), (By.ID, 'pnumCPFCNPJ')),
+               fistel=((By.ID, 'pNumFistel'), (By.ID, 'pnumFistel')),
+               indicativo=((By.ID, 'pIndicativo'),))
 
     submit = ((By.ID, "botaoFlatConfirmar"),)
 
@@ -1537,11 +1540,12 @@ class Scpx(object):
                  'id_indicativo': (By.ID, 'pIndicativo'),
                  'submit': consulta['submit']}
 
-    ent_alterar = {'alterar_situacao': "http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
-                   'id_cpf': (By.ID, 'NumCNPJCPF')}
+    entidade_alterar = {'link': "http://sistemasnet/scpx/Chamada/CadastroSRFRegularizado.asp",
+                        'id_cpf': (By.ID, 'NumCNPJCPF'),
+                        'submit': (By.ID, 'botaoFlatConfirmar')}
 
-    ent_incluir = {'incluir': "http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I",
-                   'id_cpf': (By.ID, 'pNumCnpjCpf')}
+    entidade_incluir = {'incluir': "http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I",
+                        'id_cpf': (By.ID, 'pNumCnpjCpf')}
 
     estacao = {'incluir': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=I",
                'alterar': "http://sistemasnet/scpx/Estacao/Tela.asp?OP=A",

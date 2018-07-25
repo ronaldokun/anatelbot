@@ -30,7 +30,7 @@ class Page(object):
         navigation methods
         """
 
-    timeout = 15
+    timeout = 60
 
     def __init__(self, driver):
         """ Initializes the webdriver and the timeout"""

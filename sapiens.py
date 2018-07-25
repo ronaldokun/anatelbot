@@ -94,7 +94,7 @@ class LoginPage(Page):
         # Hit Enter
         senha.send_keys(Keys.RETURN)
 
-        return self.driver
+        return Page_sapiens(self.driver)
 
 
 class Page_sapiens(Page):
@@ -108,7 +108,6 @@ class Page_sapiens(Page):
         self.close()
 
         self.driver = driver
-
 
     def add_registro(self, registro):
 

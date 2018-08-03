@@ -28,13 +28,14 @@ KEYS = ['processo',
         'situacao',
         'interessado']
 
-PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
+PATTERNS = [r'^(P){1}(X){1}(\d){1}([A-Z]){1}(\d){4}$',
             r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$',
             r'^(P){1}([A-Z]){4}$',
             r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})']
 
 
 def pode_expedir(linha):
+
     """Verifica algumas condições necessárias para expedição do Ofício no SEI
     Args:
         linha: Dicionário das html tags presentes nas linhas

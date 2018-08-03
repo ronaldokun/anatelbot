@@ -1142,6 +1142,7 @@ class Gerar_Doc(object):
                      'RC_OF_Sem_Contexto_PPDESS',
                      'RC_OF_Sem_Contexto_TFI',
                      'RC_OF_Sem_Contexto_Licença',
+                     'RC_OF_Sem_Contexto_Exclusão',
                      'RD Checklist Licenciamento',
                      'RD Checklist Licenciamento',
                      'RD_CheckList_Alt_Téc_FM',
@@ -1650,7 +1651,17 @@ class Slma(object):
 
 class Sigec(object):
 
-    consulta = "http://sistemasnet/sigec/ConsultasGerais/SituacaoCadastral/tela.asp"
+    consulta = {'geral': {'link': "http://sistemasnet/sigec/ConsultasGerais/SituacaoCadastral/tela.asp",
+                          'id_cpf': (By.ID, "NumCNPJCPF"),
+                          'id_fistel': (By.ID, "NumFistel"),
+                          'id_indicativo': (By.ID, "NomeIndicativo"),
+                          'id_nome': (By.ID, "NomeEntidade"),
+                          'id_btn_exata': (By.ID, "indTipoComparacao0"),
+                          'id_btn_init': (By.ID, "indTipoComparacao1")}
+                }
+
+
+
 
     cpf = (By.ID, "NumCNPJCPF")
 

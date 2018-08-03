@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 
 from helpers import Sapiens, Rf_Sapiens
 from page import Page
+import pandas as pd
 
 KEYS = ['CPF', 'Nome', 'Mãe', 'Data de Nascimento', 'Sexo',
         'Ano do Óbito','Nacionalidade','Título de Eleitor',
@@ -122,6 +123,21 @@ class Page_sapiens(Page):
         :type cpf: string
         """
         return self.registros.get(cpf, None)
+
+    def saveas_dataframe(self):
+
+        df = pd.Dataframe(columns=KEYS)
+
+        for k,v in self.registros.items():
+
+            registro = pd.Series(v.values())
+
+            registro["CPF"] = k
+
+            df = df.append(registro, ignore_index=True)
+
+        return df
+
 
     def go_to_RF(self):
         self.driver.get(Rf_Sapiens.URL)

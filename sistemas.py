@@ -12,7 +12,7 @@ import pyautogui as gui
 
 SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
 
-PATTERNS = [r'^(P){1}(X){1}(\d){1}([C-Z]){1}(\d){4}$',
+PATTERNS = [r'^(P){1}(X){1}(\d){1}([A-Z]){1}(\d){4}$',
             r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$',
             r'^(P){1}([A-Z]){4}$',
             r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})']
@@ -45,7 +45,8 @@ class Sistema(Page):
 
             alert.accept()
 
-        return self
+        return
+
 
     def _navigate(self, identificador: str, tipo_id: str, page_info: tuple, silent=True):
         """ Check id and tipo_id consistency and navigate to link
@@ -126,8 +127,6 @@ class Sistema(Page):
 
         dados = {}
 
-        source = self.driver.page_source
-
         for tr in source.find_all('tr'):
 
             for td in tr.find_all('td', string=True):
@@ -163,13 +162,13 @@ class Scpx(Sistema):
 
         id = strip_string(id)
 
-        try:
+        #try:
 
-            self._click_button((By.LINK_TEXT, id), timeout=timeout)
+        #    self._click_button((By.LINK_TEXT, id), timeout=timeout)
 
-        except (NoSuchElementException, TimeoutException):
+        #except (NoSuchElementException, TimeoutException):
 
-            pass #print("There is no such element or not found {}".format(id))
+        #    pass #print("There is no such element or not found {}".format(id))
 
         self._click_button(h['id_btn_estacao'], timeout=timeout)
 
@@ -550,6 +549,14 @@ class Sec(Sistema):
 
         pass
 
+class Sigec(Sistema):
+
+    def __init__(self, driver, login="", senha="", timeout=2):
+
+        super().__init__(driver, login, senha, timeout)
+
+        self.sis = helpers.Sigec
+
 
 class Boleto(Sistema):
 
@@ -593,9 +600,9 @@ class Boleto(Sistema):
 
         self._click_button(h['btn_print'])
 
-        try:
+        #self.wait_for_new_window()
 
-            self.wait_for_new_window()
+
 
 
 

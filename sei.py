@@ -958,9 +958,9 @@ class Processo(Sei):
 
         helper = helpers.Gerar_Doc.doc_externo
 
-        if tipo not in helpers.Gerar_Doc.EXTERNO_TIPOS:
+        #if tipo not in helpers.Gerar_Doc.EXTERNO_TIPOS:
 
-            raise ValueError("Tipo de Documento Externo Inválido: {}".format(tipo))
+        #    raise ValueError("Tipo de Documento Externo Inválido: {}".format(tipo))
 
         self._incluir_documento("Externo")
 

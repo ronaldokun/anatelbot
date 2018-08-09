@@ -1,10 +1,15 @@
 
 from bs4 import BeautifulSoup as soup
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 
-from helpers import Sapiens, Rf_Sapiens
+
+import helpers as h
+
+from helpers import Rf_Sapiens
 from page import Page
 import pandas as pd
+from collections import defaultdict
 
 KEYS = ['CPF', 'Nome', 'Mãe', 'Data de Nascimento', 'Sexo',
         'Ano do Óbito','Nacionalidade','Título de Eleitor',
@@ -72,18 +77,17 @@ def cria_dict_dados(registros):
 
     return dados
 
-
 class LoginPage(Page):
 
     def login(self, usr, pwd):
         """
         make login and return and instance of browser"""
 
-        self.driver.get(Sapiens.URL)
+        self.driver.get(h.Sapiens.URL)
         self.driver.maximize_window()
 
-        usuario = self.wait_for_element_to_click(Sapiens.LOGIN)
-        senha = self.wait_for_element_to_click(Sapiens.SENHA)
+        usuario = self.wait_for_element_to_click(h.Sapiens.LOGIN)
+        senha = self.wait_for_element_to_click(h.Sapiens.SENHA)
 
         # Clear any clutter on the form
         usuario.clear()
@@ -95,14 +99,18 @@ class LoginPage(Page):
         # Hit Enter
         senha.send_keys(Keys.RETURN)
 
-        return Page_sapiens(self.driver)
+        return Sapiens(self.driver)
 
+class Sapiens(Page):
 
-class Page_sapiens(Page):
-
-    def __init__(self, driver, registros):
+    def __init__(self, driver, registros=None):
         self.driver = driver
-        self.registros = registros
+        if registros is None:
+            self.registros = dict()
+
+        else:
+            self.registros = registros
+
 
     def reset_driver(self, driver):
 
@@ -114,8 +122,7 @@ class Page_sapiens(Page):
 
         key, value = registro
 
-        if key not in self.registros.keys() or self.get_registro[key] is None:
-            self.registros[key] = value
+        self.registros[key] = value
 
     def get_registro(self, cpf):
         """
@@ -138,8 +145,8 @@ class Page_sapiens(Page):
 
         return df
 
-
     def go_to_RF(self):
+
         self.driver.get(Rf_Sapiens.URL)
 
 
@@ -151,29 +158,17 @@ class Page_sapiens(Page):
 
         if len(cpf) == 11:
 
+            #self._click_button((By.LINK_TEXT, "Pessoas Físicas"))
 
-            try: #TODO: Verify this properly
-
-                btn_pf = self.wait_for_element_to_click(Rf_Sapiens.BTN_PF, timeout=0.5)
-
-                btn_pf.click()
-
-            except:
-                pass
+            #self._click_button(Rf_Sapiens.BTN_PF)
 
             id_input = Rf_Sapiens.ID_INPUT_CPF
 
         elif len(cpf) == 14:
 
-            try:
+            #self._click_button((By.LINK_TEXT, "Pessoas Jurídicas"))
 
-
-                btn_pj = self.wait_for_element_to_click(Rf_Sapiens.BTN_PJ, timeout=5)
-
-                btn_pj.click()
-
-            except:
-                pass
+            self._click_button(Rf_Sapiens.BTN_PJ, 1)
 
             id_input = Rf_Sapiens.ID_INPUT_CNPJ
 
@@ -181,11 +176,7 @@ class Page_sapiens(Page):
 
             raise ValueError("Número identificador inválido {}".format(cpf))
 
-
-        entidade = self.wait_for_element(id_input)
-        entidade.clear()
-
-        entidade.send_keys(str(cpf) + Keys.RETURN)
+        self._update_elem(id_input, dado=str(cpf)+Keys.RETURN)
 
         if self.check_element_exists(Rf_Sapiens.RESULTADO):
 
@@ -209,6 +200,8 @@ class Page_sapiens(Page):
             resultado = cria_dict_dados(resultado)
 
             self.add_registro((cpf, resultado))
+
+
 
 
 

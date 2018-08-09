@@ -54,6 +54,60 @@ class Page(object):
         """ Basic implementation class"""
         self.driver.close()
 
+    def _click_button(self, btn_id, timeout=5):
+
+        try:
+
+            button = self.wait_for_element_to_click(btn_id, timeout=timeout)
+
+            button.click()
+
+        except ElementClickInterceptedException:
+
+            #ActionChains(self.driver).move_to_element(button).click(button).perform()
+
+            self.driver.execute_script("arguments[0].click();", button)
+
+
+        except NoSuchElementException as e:
+
+            print(repr(e))
+
+        alert = self.alert_is_present(timeout=timeout)
+
+        if alert: alert.accept()
+
+    def _update_elem(self, elem_id, dado, timeout=5):
+
+        try:
+
+            elem = self.wait_for_element(elem_id, timeout=timeout)
+
+        except NoSuchElementException as e:
+
+            print(e)
+
+        elem.clear()
+
+        elem.send_keys(dado)
+
+    def _select_by_text(self, select_id, text, timeout=5):
+
+        try:
+
+            select = Select(self.wait_for_element_to_click(select_id))
+
+            select.select_by_visible_text(text)
+
+        except (NoSuchElementException, UnexpectedAlertPresentException) as e:
+
+            alert = self.alert_is_present(timeout=timeout)
+
+            if alert: alert.accept()
+
+            print(repr(e))
+
+
     @contextmanager
     def wait_for_page_load(self, timeout=timeout):
         """ Only used when navigating between Pages with different titles"""

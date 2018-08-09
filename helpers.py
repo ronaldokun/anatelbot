@@ -28,7 +28,7 @@ class Rf_Sapiens(object):
 
     BTN_PF = (By.ID, "tab-1083-btnInnerE1")
 
-    BTN_PJ = (By.ID, "tab-1084-btnInnertE1")
+    BTN_PJ = (By.ID, "tab-1084-btnInnerEl")
 
     ID_INPUT_CPF = (By.ID, "textfield-1014-inputEl")
 

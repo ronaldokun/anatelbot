@@ -47,7 +47,6 @@ class Sistema(Page):
 
         return
 
-
     def _navigate(self, identificador: str, tipo_id: str, page_info: tuple, silent=True):
         """ Check id and tipo_id consistency and navigate to link
 
@@ -74,52 +73,6 @@ class Sistema(Page):
 
     def _get_acoes(self, helper, keys):
         return tuple(helper[x] for x in keys)
-
-    def _click_button(self, btn_id, timeout=5):
-
-        try:
-
-            button = self.wait_for_element_to_click(btn_id, timeout=timeout)
-
-            button.click()
-
-        except NoSuchElementException as e:
-
-            print(repr(e))
-
-        alert = self.alert_is_present(timeout=timeout)
-
-        if alert: alert.accept()
-
-    def _update_elem(self, elem_id, dado, timeout=5):
-
-        try:
-
-            elem = self.wait_for_element(elem_id, timeout=timeout)
-
-        except NoSuchElementException as e:
-
-            print(e)
-
-        elem.clear()
-
-        elem.send_keys(dado)
-
-    def _select_by_text(self, select_id, text, timeout=5):
-
-        try:
-
-            select = Select(self.wait_for_element_to_click(select_id))
-
-            select.select_by_visible_text(text)
-
-        except (NoSuchElementException, UnexpectedAlertPresentException) as e:
-
-            alert = self.alert_is_present(timeout=timeout)
-
-            if alert: alert.accept()
-
-            print(repr(e))
 
     def _extrai_cadastro(self, source):
 
@@ -162,13 +115,13 @@ class Scpx(Sistema):
 
         id = strip_string(id)
 
-        #try:
+        try:
 
-        #    self._click_button((By.LINK_TEXT, id), timeout=timeout)
+            self._click_button((By.LINK_TEXT, id), timeout=timeout)
 
-        #except (NoSuchElementException, TimeoutException):
+        except (NoSuchElementException, TimeoutException):
 
-        #    pass #print("There is no such element or not found {}".format(id))
+            pass #print("There is no such element or not found {}".format(id))
 
         self._click_button(h['id_btn_estacao'], timeout=timeout)
 
@@ -557,7 +510,6 @@ class Sigec(Sistema):
 
         self.sis = helpers.Sigec
 
-
 class Boleto(Sistema):
 
     def __init__(self, driver, login="", senha="", timeout=2):
@@ -601,13 +553,6 @@ class Boleto(Sistema):
         self._click_button(h['btn_print'])
 
         #self.wait_for_new_window()
-
-
-
-
-
-
-
 
 def save_new_window(page, filename):
 

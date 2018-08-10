@@ -28,7 +28,6 @@ def strip_string(str_):
 
 class Sistema(Page):
 
-
     def __init__(self, driver, login="", senha="", timeout=5):
 
         super().__init__(driver)
@@ -47,7 +46,7 @@ class Sistema(Page):
 
         return
 
-    def _navigate(self, identificador: str, tipo_id: str, page_info: tuple, silent=True):
+    def _navigate(self, identificador: str, tipo_id: str, acoes: tuple, silent=True):
         """ Check id and tipo_id consistency and navigate to link
 
         :param id: identificador, e.g. cpf: 11 digits, cnpj: 14 digits, indicativo: 4 to 6 characters
@@ -60,38 +59,31 @@ class Sistema(Page):
 
         identificador = strip_string(identificador)
 
-        link, _id, submit = page_info
+        link, _id, submit = acoes
 
         with self.wait_for_page_load():
 
             self.driver.get(link)
 
-        self._update_elem(_id, identificador)
-
         if silent:
-            self._click_button(submit)
+
+            if not submit:
+
+                self._update_elem(_id, identificador+Keys.RETURN)
+
+            else:
+
+                self._update_elem(_id, identificador)
+
+                self._click_button(submit)
+
+        else:
+
+            self._update_elem(_id, identificador)
 
     def _get_acoes(self, helper, keys):
-        return tuple(helper[x] for x in keys)
+        return tuple(helper.get(x, None) for x in keys)
 
-    def _extrai_cadastro(self, source):
-
-        #TODO: iterate over the <tbody> tags
-
-        dados = {}
-
-        for tr in source.find_all('tr'):
-
-            for td in tr.find_all('td', string=True):
-
-                key = td.text.strip(" :")
-                value = td.find_next_sibling('td')
-
-                if value and key not in dados:
-
-                    dados[key] = value.text.strip()
-
-        return dados
 
 class Scpx(Sistema):
     """
@@ -109,7 +101,7 @@ class Scpx(Sistema):
 
         h = self.sis.consulta
 
-        acoes = self._get_acoes(h, ('link', tipo_id, 'submit'))
+        acoes = self._get_acoes(h, ('link', tipo_id, None)) #'submit'))
 
         self._navigate(id, tipo_id, acoes)
 
@@ -296,7 +288,7 @@ class Scpx(Sistema):
             self._select_by_text(id_posterior, "G - Cadastro pelo usuário (auto-cadastramento)")
 
             self._update_elem(helper.get('id_txt_cancelar'),
-                                         "Cadastro Incorreto. Estação será refeita com dados corretos")
+                              "Cadastro Incorreto. Estação será refeita com dados corretos")
 
         self._click_button(helper.get('submit'))
 
@@ -403,17 +395,130 @@ class Scpx(Sistema):
 
         self.consulta(id, tipo_id, timeout=timeout)
 
+        dados = {}
+
         source = soup(self.driver.page_source, 'lxml')
 
-        return self._extrai_cadastro(source)
+        for tr in source.find_all('tr'):
+
+            for td in tr.find_all('td', string=True):
+
+                key = td.text.strip(" :")
+                value = td.find_next_sibling('td')
+
+                if key not in dados:
+                    dados[key] = value.text.strip()
+
+        return dados
 
 class Sec(Sistema):
+
 
     def __init__(self, driver, login="", senha="", timeout=2):
 
         super().__init__(driver, login, senha, timeout)
 
         self.sis = helpers.Sec
+
+    def atualiza_cadastro(self, dados, novo=False):
+
+        """
+
+        :param dados: dictionary of all the fiels in the Sec -> Entidade -> Alterar page
+        :return: None
+
+        It assumes all values are correctly pre-formatted
+        """
+
+        #TODO: generalize and check_input
+
+        h = self.sis.Ent_Alt
+
+        acoes = self._get_acoes(h, ('link', 'id_cpf', 'submit'))
+
+        cpf = dados['CPF'].replace("-", "").replace(".", "")
+
+        self._navigate(cpf, h, acoes)
+
+        email = dados.get('Email', "")
+
+        if email:
+            self._update_elem(h['email'], email)
+
+        self._click_button(h['bt_dados'])
+
+        if 'RG' in dados:
+            self._update_elem(h['rg'], dados['RG'])
+
+        if 'Orgexp' in dados:
+            self._update_elem(h['orgexp'], dados['Orgexp'])
+
+        if 'Data de Nascimento' in dados:
+            self._update_elem(h['nasc'], dados['Data de Nascimento'])
+
+        self._click_button(h['bt_fone'])
+
+
+        ddd = dados.get('ddd', "11")
+
+        self._update_elem(h['ddd'], ddd)
+
+        fone = dados.get('Fone', '1234567890')
+
+        self._update_elem(h['fone'], fone)
+
+        self._click_button(h['bt_end'])
+
+        if 'Cep' in dados:
+
+            cep = dados['Cep'].replace("-", '')
+
+            self._update_elem(h['cep'], cep)
+
+            self._click_button(h['bt_cep'])
+
+            alert = self.alert_is_present(5)
+
+            if alert:
+
+                return(alert.get_text)
+
+            for _ in range(10):
+
+                logr = self.wait_for_element_to_be_visible(h['logr'])
+
+                if logr.get_attribute('value') is not None:
+
+                    break
+
+                sleep(1)
+
+            else:
+
+                if 'Logradouro' not in dados:
+                    raise ValueError("É Obrigatório informar o logradouro")
+
+                self._update_elem(h['logr'], dados['Logradouro'])
+
+            bairro = self.wait_for_element(h['bairro'])
+
+            if bairro.get_attribute('value') is not None:
+
+                self._update_elem(h['bairro'], dados.get("Bairro", 'N/A'))
+
+            if 'Número' not in dados:
+                raise ValueError("É obrigatório informar o número na atualização\
+            do endereço")
+
+            self._update_elem(h['num'], dados['Número'])
+
+            comp = dados.get("Complemento", "")
+
+            self._update_elem(h['comp'], comp)
+
+        self.driver.execute_script(h['submit_script'])
+
+
 
     def _extrai_inscritos_prova(self):
 
@@ -446,7 +551,6 @@ class Sec(Sistema):
             dados[cpf] = Inscrito(link, cpf, nome, coer, impresso)
 
         return dados
-
 
     def imprimir_provas(self, data, horario, num_registros, cpf=None):
 
@@ -497,12 +601,12 @@ class Sec(Sistema):
                 next
 
             clip.copy(v.nome)
-
     def alterar_nome(self, cpf, novo):
 
         pass
 
 class Sigec(Sistema):
+
 
     def __init__(self, driver, login="", senha="", timeout=2):
 
@@ -510,23 +614,57 @@ class Sigec(Sistema):
 
         self.sis = helpers.Sigec
 
+    def extrai_cadastro(self, id, tipo_id='id_cpf'):
+
+        self.consulta_geral(id, tipo_id, 30)
+
+        dados = {}
+
+        source = soup(self.driver.page_source, 'lxml')
+
+        for tr in source.find_all('tr'):
+
+            for td in tr.find_all('td', string=True):
+
+                key = td.text.strip(" :")
+                value = td.find_next_sibling('td')
+
+                if key not in dados:
+                    dados[key] = value.text.strip()
+
+        return dados
+    def consulta_geral(self, ident, tipo_id='id_cpf', timeout=5, simples=True):
+
+        h = self.sis.consulta['geral']
+
+        acoes = self._get_acoes(h, ('link', tipo_id, 'submit'))
+
+        if not simples:
+            pass
+
+        self._navigate(ident, tipo_id, acoes)
+
+
+
+
 class Boleto(Sistema):
+
 
     def __init__(self, driver, login="", senha="", timeout=2):
 
         super().__init__(driver, login, senha, timeout)
 
         self.sis = helpers.Boleto
-
     def imprime_boleto(self, ident, tipo_id):
+
         """ This function receives a webdriver object, navigates it to the
         helpers.Boleto page, inserts the identification 'ident' in the proper
         field and commands the print of the boleto
         """
 
-        h = self.sis.imprimir
-
         # acoes = self._get_acoes(h, ('link', tipo_id, 'submit'))
+
+        h = self.sis.imprimir
 
         self.driver.get(h['link'])
 
@@ -551,8 +689,9 @@ class Boleto(Sistema):
         self._click_button(h['marcar_todos'])
 
         self._click_button(h['btn_print'])
+#self.wait_for_new_window()
 
-        #self.wait_for_new_window()
+
 
 def save_new_window(page, filename):
 
@@ -584,135 +723,7 @@ def save_new_window(page, filename):
 
         return True
 
-def atualiza_cadastro(page, dados):
-    if 'CPF' not in dados:
-        raise ValueError("É Obrigatório informar o CPF")
 
-    if len(str(dados['CPF'])) != 11:
-        raise ValueError("O CPF deve ter 11 caracteres!")
-
-    def atualiza_campo(data, locator):
-
-        data = str(data)
-
-        elem = page.wait_for_element(locator)
-
-        elem.clear()
-
-        elem.send_keys(data)
-
-        # Navigate to page
-
-    page.driver.get(helpers.Sec.Ent_Alt)
-
-    cpf = page.wait_for_element_to_click(helpers.Entidade.idade.cpf)
-
-    cpf.send_keys(str(dados['CPF']) + Keys.RETURN)
-
-    if 'Email' in dados:
-        atualiza_campo(dados['Email'], helpers.Entidade.idade.email)
-
-    btn = page.wait_for_element_to_click(helpers.Entidade.idade.bt_dados)
-
-    btn.click()
-
-    if 'RG' in dados:
-        atualiza_campo(dados['RG'], helpers.Entidade.idade.rg)
-
-    if 'Orgexp' in dados:
-        atualiza_campo(dados['Orgexp'], helpers.Entidade.idade.orgexp)
-
-    if 'Data de Nascimento' in dados:
-        data = dados['Data de Nascimento']
-
-        data = data.replace('-', '')
-
-        atualiza_campo(data, helpers.Entidade.nasc)
-
-    btn = page.wait_for_element_to_click(helpers.Entidade.bt_fone)
-
-    btn.click()
-
-    if 'ddd' in dados:
-
-        atualiza_campo(dados['ddd'], helpers.Entidade.ddd)
-
-    else:
-
-        ddd = '11'
-
-        atualiza_campo(ddd, helpers.Entidade.ddd)
-
-        # if 'Fone' in dados:
-
-    #   atualiza_campo(dados['Fone'], Entidade.fone)
-
-    # else:
-
-    #   fone = '123456789'
-
-    #  atualiza_campo(fone, Entidade.fone)
-
-    btn = page.wait_for_element_to_click(helpers.Entidade.bt_end)
-
-    btn.click()
-
-    if 'Cep' in dados:
-
-        cep = dados['Cep']
-
-        cep = cep.replace('-', '')
-
-        atualiza_campo(cep, helpers.Entidade.cep)
-
-        cep = page.wait_for_element_to_click(helpers.Entidade.bt_cep)
-
-        cep.click()
-
-        for i in range(30):
-
-            logr = page.wait_for_element(helpers.Entidade.logr)
-
-            if logr.get_attribute('value'):
-                break
-
-            sleep(1)
-
-        else:
-
-            if 'Logradouro' not in dados:
-                raise ValueError("É Obrigatório informar o logradouro")
-            atualiza_campo(dados['Logradouro'], helpers.Entidade.logr)
-
-        if 'Número' not in dados:
-
-            raise ValueError("É obrigatório informar o número na atualização\
-            do endereço")
-
-        else:
-
-            atualiza_campo(dados['Número'], helpers.Entidade.num)
-
-            if 'Complemento' in dados:
-                atualiza_campo(dados['Complemento'], helpers.Entidade.comp)
-
-            bairro = page.wait_for_element(helpers.Entidade.bairro)
-
-            if not bairro.get_attribute('value'):
-
-                if 'Bairro' not in dados:
-                    raise ValueError("É obrigatório informar o bairro na atualização\
-                                     do endereço")
-
-            else:
-
-                atualiza_campo(dados['Bairro'], helpers.Entidade.bairro)
-
-            # confirmar = page.wait_for_element(Entidade.confirmar)
-
-            # confirmar.click()
-
-            page.driver.execute_script(helpers.Entidade.submit)
 
 def imprime_licenca(page, ident, serv, tipo):
 
@@ -721,30 +732,6 @@ def imprime_licenca(page, ident, serv, tipo):
     page.driver.get(sis.Licenca['Imprimir'])
 
     navigate(page, ident, sis.Licenca, tipo)
-
-def consultaSigec(page, ident, tipo='id_cpf'):
-    if (tipo == 'cpf' or tipo == 'fistel') and len(ident) != 11:
-        raise ValueError("O número de dígitos do {0} deve ser 11".format(tipo))
-
-    if tipo == 'cnpj' and len(ident) != 14:
-        raise ValueError("O número de dígitos do {0} deve ser 14".format(tipo))
-
-    page.driver.get(helpers.Sigec.consulta)
-
-    if tipo in ('cpf', 'cnpj'):
-
-        elem = page.wait_for_element_to_click(helpers.Sigec.cpf)
-
-        elem.send_keys(ident + Keys.RETURN)
-
-    elif tipo == 'fistel':
-
-        elem = page.wait_for_element_to_click(helpers.Sigec.fistel)
-
-        elem.send_keys(ident + Keys.RETURN)
-
-
-    # TODO: implement other elements
 
 def abrir_agenda_prova(sec, datas):
 

@@ -47,6 +47,8 @@ if __name__ == '__main__':
 
         gc.collect()
 
+        print("Atualizado - Linha: {1}, Nome: {2}".format(i+2, df.loc[i, "Nome"]))
+
     df.to_excel("Relatório_de_Entidades_Alteradas.xlsx", index=False)
 
     sec.driver.close()

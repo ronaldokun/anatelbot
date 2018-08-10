@@ -34,20 +34,21 @@ if __name__ == '__main__':
 
     sec = sistemas.Sec(webdriver.Firefox(), 'rsilva', "Savorthemom3nts")
 
-    df['Erros'] = ""
+    df['Erro'] = ""
 
     for i in range(df.shape[0]):
 
         try:
+
             sec.atualiza_cadastro(df.iloc[i])
 
         except:
 
-            df.loc[i,"Erros"] = True
+            df.loc[i, "Erro"] = True
 
         gc.collect()
 
-        print("Atualizado - Linha: {1}, Nome: {2}".format(i+2, df.loc[i, "Nome"]))
+        print("Atualizado - Linha: {0}".format(str(i + start)))
 
     df.to_excel("Relatório_de_Entidades_Alteradas.xlsx", index=False)
 

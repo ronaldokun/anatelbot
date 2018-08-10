@@ -483,7 +483,7 @@ class Sec(Sistema):
 
                 return(alert.get_text)
 
-            for _ in range(10):
+            for _ in range(5):
 
                 logr = self.wait_for_element_to_be_visible(h['logr'])
 
@@ -494,11 +494,18 @@ class Sec(Sistema):
                 sleep(1)
 
             else:
+                pass
 
-                if 'Logradouro' not in dados:
-                    raise ValueError("É Obrigatório informar o logradouro")
 
-                self._update_elem(h['logr'], dados['Logradouro'])
+            uf = self.wait_for_element_to_be_visible(h['uf'])
+
+            while uf.get_attribute('value') == "":
+                uf = self.wait_for_element_to_be_visible(h['uf'])
+
+            if 'Logradouro' not in dados:
+                raise ValueError("É Obrigatório informar o logradouro")
+
+            self._update_elem(h['logr'], dados['Logradouro'])
 
             bairro = self.wait_for_element(h['bairro'])
 

@@ -1434,7 +1434,29 @@ class Sec(object):
 
     Cert_2nVia = 'http://sistemasnet/SEC/Certificado/SegundaVia/Tela.asp?SISQSmodulo=4145'
 
-    Ent_Alt = 'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=A&SISQSmodulo=5263'
+    Ent_Alt = {'link':'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=A',
+               'id_cpf': (By.ID, 'pNumCnpjCpf'),
+               'id_nome': (By.ID, 'pNomeEntidade'),
+               'submit': (By.ID, 'botaoFlatConfirmar'),
+               'email': (By.ID, 't_EndEletronico'),
+               'rg': (By.ID, 'pf_NumIdentidade'),
+               'orgexp': (By.ID, 'pf_SiglaOrgaoExp'),
+               'nasc': (By.ID, 'pf_DataNascimento'),
+               'ddd': (By.ID, 'tel_NumCodigoNacional0'),
+               'fone': (By.ID, 'tel_NumTelefone0'),
+               'cep': (By.ID, 'CodCep1'),
+               'bt_cep': (By.ID, 'buscarEndereco'),
+               'logr': (By.ID, 'EndLogradouro1'),
+               'num': (By.ID, 'EndNumero1'),
+               'comp': (By.ID, 'EndComplemento1'),
+               'bairro': (By.ID, 'EndBairro1'),
+               'cidade': (By.ID, 'CodMunicipio1'),
+               'uf': (By.ID, 'SiglaUf1'),
+               'bt_dados': (By.ID, 'botaoFlatDadosComplementares'),
+               'bt_fone': (By.ID, 'botaoFlatTelefones'),
+               'bt_end': (By.ID, 'botaoFlatEndereço'),
+               'submit_script' : "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')"
+               }
 
     Ent_AltRF = 'http://sistemasnet/SEC/Chamada/CadastroSRFRegularizado.asp?SISQSmodulo=16374'
 
@@ -1460,7 +1482,6 @@ class Sec(object):
 
     Prova_Res = 'http://sistemasnet/SEC/Prova/Resultado/Tela.asp?SISQSmodulo=3872'
 
-    submit = "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')"
 
 class Agenda(object):
 
@@ -1505,14 +1526,13 @@ class Agenda(object):
 Entidade = {'cpf': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ'), (By.ID, 'NumCNPJCPF')],
             'cnpj': [(By.ID, 'pNumCnpjCpf'), (By.ID, 'pnumCPFCNPJ')],
             'fistel': [(By.ID, 'pNumFistel'), (By.ID, 'pnumFistel')], 'indicativo': [(By.ID, 'pIndicativo')],
-            'nome': (By.ID, 't_NomeEntidade'), 'email': (By.ID, 't_EndEletronico'), 'rg': (By.ID, 'pf_NumIdentidade'),
+            'nome': (By.ID, 'pNomeEntidade'), 'email': (By.ID, 't_EndEletronico'), 'rg': (By.ID, 'pf_NumIdentidade'),
             'orgexp': (By.ID, 'pf_SiglaOrgaoExp'), 'nasc': (By.ID, 'pf_DataNascimento'),
             'ddd': (By.ID, 'tel_NumCodigoNacional0'), 'fone': (By.ID, 'tel_NumTelefone0'), 'cep': (By.ID, 'CodCep1'),
             'bt_cep': (By.ID, 'buscarEndereco'), 'logr': (By.ID, 'EndLogradouro1'), 'num': (By.ID, 'EndNumero1'),
             'comp': (By.ID, 'EndComplemento1'), 'bairro': (By.ID, 'EndBairro1'), 'uf': (By.ID, 'SiglaUf1'),
             'cidade': (By.ID, 'CodMunicipio1'), 'confirmar': (By.ID, 'botaoFlatConfirmar'),
-            'bt_dados': (By.ID, 'botaoFlatDadosComplementares'), 'bt_fone': (By.ID, 'botaoFlatTelefones'),
-            'bt_end': (By.ID, 'botaoFlatEndereço')}
+            }
 
 class Scpx(object):
 

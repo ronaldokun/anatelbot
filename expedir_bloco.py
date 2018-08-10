@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Thu Aug 24 23:14:09 2017
@@ -17,6 +17,7 @@ from selenium.webdriver.common.keys import Keys
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
+import helpers
 from helpers import *
 from page import Page
 from time import sleep
@@ -28,11 +29,13 @@ class LoginPage(Page):
         """
         make login and return and instance of browser"""
 
-        self.driver.get(Login.URL)
+        helper = helpers.Sei.Login
+
+        self.driver.get(helper.url)
         # self.driver.maximize_window()
 
-        usuario = self.wait_for_element_to_click(Login.LOG)
-        senha = self.wait_for_element_to_click(Login.PWD)
+        usuario = self.wait_for_element_to_click(helper.log)
+        senha = self.wait_for_element_to_click(helper.pwd)
 
         # Clear any clutter on the form
         usuario.clear()
@@ -81,11 +84,11 @@ class PagInicial(Page):
 
     def go_to_initial_page(self):
         self.wait_for_element_to_click(
-            Sei_Base.INIT).click()
+            Base.init).click()
 
     def exibir_menu_lateral(self):
 
-        menu = self.wait_for_element(Sei_Base.MENU)
+        menu = self.wait_for_element(Sei.Base.menu)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -167,7 +170,7 @@ class PagInicial(Page):
 
                 num_doc = p['documento'].a.string
 
-                link = Sei_Base.URL + p['processo'].a.attrs['href']
+                link = Sei.Base.url + p['processo'].a.attrs['href']
 
                 self.expedir_oficio(num_doc, link)
 
@@ -224,7 +227,7 @@ class PagInicial(Page):
 
         enviar = buttons[3]
 
-        link = Sei_Base.URL + enviar.attrs["href"]
+        link = Sei.Base.url + enviar.attrs["href"]
 
         (janela_processo, janela_andamento) = navigate_link_to_new_window(
                 self.driver, link)
@@ -335,7 +338,7 @@ class PagInicial(Page):
 
         andamento = buttons[4]
 
-        link = Sei_Base.URL + andamento.attrs['href']
+        link = Sei.Base.url + andamento.attrs['href']
 
         (proc_window, new_window) = navigate_link_to_new_window(self.driver, link)
 

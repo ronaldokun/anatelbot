@@ -438,6 +438,8 @@ class Sec(Sistema):
 
         cpf = dados['CPF'].replace("-", "").replace(".", "")
 
+        dados = {k:v.title() for k,v in dados.items()}
+
         self._navigate(cpf, h, acoes)
 
         email = dados.get('Email', "")
@@ -483,39 +485,35 @@ class Sec(Sistema):
 
                 return(alert.get_text)
 
-            for _ in range(5):
-
-                logr = self.wait_for_element_to_be_visible(h['logr'])
-
-                if logr.get_attribute('value') is not None:
-
-                    break
-
-                sleep(1)
-
-            else:
-                pass
-
-
             uf = self.wait_for_element_to_be_visible(h['uf'])
 
-            while uf.get_attribute('value') == "":
+            # After clicking the 'bt_cep' button it takes a while until the uf.value attribute is set
+            # until then there is no uf.value
+            while not uf.get_attribute('value'):
+
                 uf = self.wait_for_element_to_be_visible(h['uf'])
 
-            if 'Logradouro' not in dados:
-                raise ValueError("É Obrigatório informar o logradouro")
+            logr = self.wait_for_element_to_be_visible(h['logr'])
 
-            self._update_elem(h['logr'], dados['Logradouro'])
+            # if the CEP loading didn't retrieve the logradouro, update it manually
+            if not logr.get_attribute('value'):
+
+                if 'Logradouro' not in dados:
+                    raise ValueError("É Obrigatório informar o logradouro")
+
+                self._update_elem(h['logr'], dados['Logradouro'])
 
             bairro = self.wait_for_element(h['bairro'])
 
-            if bairro.get_attribute('value') is not None:
+            if not bairro.get_attribute('value'):
 
-                self._update_elem(h['bairro'], dados.get("Bairro", 'N/A'))
+                if 'Bairro' not in dados:
+                    raise ValueError("É Obrigatório informar o Bairro")
+
+                self._update_elem(h['bairro'], dados["Bairro"])
 
             if 'Número' not in dados:
-                raise ValueError("É obrigatório informar o número na atualização\
-            do endereço")
+                raise ValueError("É obrigatório informar o número do endereço")
 
             self._update_elem(h['num'], dados['Número'])
 
@@ -525,7 +523,11 @@ class Sec(Sistema):
 
         self.driver.execute_script(h['submit_script'])
 
+        alert = self.alert_is_present(30)
 
+        if alert:
+
+            return alert.accept()
 
     def _extrai_inscritos_prova(self):
 
@@ -651,9 +653,6 @@ class Sigec(Sistema):
 
         self._navigate(ident, tipo_id, acoes)
 
-
-
-
 class Boleto(Sistema):
 
 
@@ -696,8 +695,6 @@ class Boleto(Sistema):
         self._click_button(h['marcar_todos'])
 
         self._click_button(h['btn_print'])
-#self.wait_for_new_window()
-
 
 
 def save_new_window(page, filename):

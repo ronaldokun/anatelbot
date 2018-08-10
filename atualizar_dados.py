@@ -10,7 +10,7 @@ import pandas as pd
 
 if __name__ == '__main__':
 
-    print("\nInsira o arquivo com os dados formatados de acordo com o Sapiens e o intervalo de linhas a serem lidas")
+    #print("\nInsira o arquivo com os dados formatados de acordo com o Sapiens e o intervalo de linhas a serem lidas")
 
     file = str(sys.argv[1])
 
@@ -20,33 +20,34 @@ if __name__ == '__main__':
 
     df = pd.read_excel(file, dtype=str, na_values='nan').fillna("")
 
-    df = df.iloc[start:end]
+    df['Ano do Óbito'] = df["Ano do Óbito"].str.replace('nan', "")
+
+    df['Complemento'] = df["Complemento"].str.replace('nan', "")
 
     df["Data de Nascimento"] = df["Data de Nascimento"].str.replace("-", '')
 
     df["Complemento"] = df["Complemento"].str.replace('nan', "")
 
-    df["Ano do Óbito"] = df["Ano do Óbito"].str.replace('nan', "")
+    df['Cidade'] = df["Cidade"].apply(lambda x: str(x).split("/")[0])
 
-    sec = sistemas.Sec(webdriver.Ie())
+    df = df.iloc[start:end]
 
-    df['Erros'] = []
+    sec = sistemas.Sec(webdriver.Firefox(), 'rsilva', "Savorthemom3nts")
 
-    for i in range(total):
+    df['Erros'] = ""
+
+    for i in range(df.shape[0]):
 
         try:
             sec.atualiza_cadastro(df.iloc[i])
 
         except:
 
-            df.iloc[i]["Erros"] = True
+            df.loc[i,"Erros"] = True
 
-        finally:
+        gc.collect()
 
-            next
-
-
-    df.to_excel("Relatório_de_Entidades_Alteradas")
+    df.to_excel("Relatório_de_Entidades_Alteradas.xlsx", index=False)
 
     sec.driver.close()
 

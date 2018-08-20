@@ -1,6 +1,7 @@
 # modules only
 import re
 import datetime as dt
+from contextlib import contextmanager
 
 import unidecode
 from bs4 import BeautifulSoup as Soup
@@ -45,7 +46,7 @@ def login_sei(driver, usr, pwd):
     SEI.
     """
 
-    links = helpers.Sei.Login
+    links = helpers.Sei_Base.Login
 
     browser = Page(driver)
     browser.driver.get(links.url)
@@ -74,7 +75,7 @@ class Sei(Page):
 
     def __init__(self, driver, processos = None):
         super().__init__(driver)
-        self._processos = processos if processos is not None else dict()
+        self._processos = processos if processos is not None else {}
 
     def _set_processos(self, processos):
 
@@ -304,7 +305,7 @@ class Sei(Page):
         """ Simplifies the navigation of href pages on sei.anatel.gov.br
         by pre-appending the required prefix NAV_URL       """
 
-        prefix = helpers.Sei.Base.url
+        prefix = helpers.Sei_Base.Base.url
 
         if prefix not in link:
 
@@ -333,19 +334,17 @@ class Sei(Page):
 
             self.go(self._processos[striped]['link'])
 
-            return Processo(self.driver, striped, tags=self._processos[striped])
+            return Processo(self.driver, numero=num, tags=self._processos[striped])
 
         try:
 
-            self._update_elem(helpers.Sei.Base.pesquisa, num + Keys.ENTER)
+            self._update_elem(helpers.Sei_Base.Base.pesquisa, num + Keys.ENTER)
 
         except NoSuchElementException:
 
             self.go_to_init_page()
 
-            self.go_to_processo(num)
-
-        return Processo(self.driver, striped, tags=None)
+        return Processo(self.driver, num, tags=None)
 
     def see_detailed(self):
         """
@@ -390,7 +389,7 @@ class Sei(Page):
 
         try:
 
-            self._click_button(helpers.Sei.Base.init)
+            self._click_button(helpers.Sei_Base.Base.init)
 
         except:
 
@@ -503,7 +502,7 @@ class Sei(Page):
 
         html = Soup(self.driver.page_source, 'lxml')
 
-        tag = html.find_all('td', string=re.compile(".*"+ name+ ".*"))
+        tag = html.find_all('td', string=re.compile(".*" + name + ".*"))
 
         print(tag)
 
@@ -568,42 +567,168 @@ class Processo(Sei):
         self.numero = numero
         self.tags = tags if tags is not None else dict()
         self.acoes = {}
-        self.tree = {}
+        self.arvore = {}
         self.link = self.driver.current_url
 
     def get_tags(self):
         return self.tags
+    @contextmanager
+    def _go_to_central_frame(self):
 
-    def _acoes_processo(self):
+        # Switch to central frame
+        self.driver.switch_to.frame("ifrVisualizacao")
+
+        try:
+            yield
+        finally:
+            # Return to main content
+            self.driver.switch_to_default_content()
+
+    def _acoes_central_frame(self):
 
         assert self.get_title() == helpers.Proc_incluir.TITLE, \
             "Erro ao navegar para o processo"
 
-        # Switch to central frame
-        self.driver.switch_to_frame("ifrVisualizacao")
+        with self._go_to_central_frame():
 
-        self.wait_for_element(helpers.Proc_central.ACOES)
+            self.wait_for_element(helpers.Proc_central.ACOES)
 
-        html_frame = Soup(self.driver.page_source, "lxml")
+            html_frame = Soup(self.driver.page_source, "lxml")
 
-        acoes = html_frame.find(id="divArvoreAcoes").contents
+            acoes = html_frame.find(id="divArvoreAcoes").contents
 
-        self.driver.switch_to_default_content()
+            return functions.cria_dict_acoes(acoes)
 
-        self.acoes = functions.cria_dict_acoes(acoes)
+    def _get_acoes(self, doc=None):
 
-    def get_acoes(self):
+        # O comportamento padrão é extrair as ações do Processo Pai
+        if doc is None:
 
-        if self.acoes == {}:
-            self._acoes_processo()
+            self._click_na_arvore(self.numero)
 
-        return self.acoes
+        else:
+
+            self._click_na_arvore(doc)
+
+        return self._acoes_central_frame()
 
     def is_open(self):
-        return 'Concluir Processo' in self.get_acoes()
+        return 'Concluir Processo' in self._get_acoes()
 
     def close_processo(self):
         self.driver.close()
+    @contextmanager
+    def _go_to_arvore(self):
+
+        # Switch to tree frame
+        self.driver.switch_to.frame("ifrArvore")
+
+        try:
+            # yield the iframe page source as a BeautifulSoup object
+            yield
+        finally:
+            # Return to main content
+            self.driver.switch_to_default_content()
+    @contextmanager
+    def _go_to_new_win(self, windows):
+
+        self.wait_for_new_window(windows)
+
+        # Check again since the # of windows increased
+        windows = self.driver.window_handles
+
+        main = windows[-2]
+
+        # Switch to the last window that appeared
+        self.driver.switch_to.window(windows[-1])
+
+        try:
+            # yield the state switched to the new window
+            yield
+
+        finally:
+            # return to the main window
+            self.driver.switch_to.window(main)
+
+    def armazena_arvore(self):
+
+        # Switch to the frame in which arvore is in, only inside the contextmanager
+        with self._go_to_arvore():
+
+            tree = Soup(self.driver.page_source, "lxml")
+
+            for tag in tree.find_all('a', target=True):
+
+                label = tag.contents[0].text.strip()
+
+                if label != "":
+
+                    self.arvore[label] = tag.attrs
+
+        return self.arvore
+
+    def _click_na_arvore(self, label):
+
+        tree = self.armazena_arvore()
+
+        # self.armazena_arvore updates self.arvore dict and return it
+        for k, v in tree.items():
+
+            if label in k:
+
+                with self._go_to_arvore():
+                    self._click_button((By.ID, v['id']))
+
+                return
+
+        try:
+
+            with self._go_to_arvore():
+
+                self._click_button((By.LINK_TEXT, self.numero))
+
+                return
+
+        except TimeoutException:
+
+            raise ValueError("Não foi encontrato o elemento {0} na árvore do Processo".format(label))
+
+    def send_doc_por_email(self, label, dados):
+
+        #script = self._get_acoes(num_doc)["Enviar Documento por Correio Eletrônico"]
+
+        helper = helpers.Email
+
+        self._click_na_arvore(label)
+
+        with self._go_to_central_frame():
+
+            #TODO: Why this is not working?
+            #self.driver.execute_script(script)
+
+            windows = self.driver.window_handles
+
+            self._click_button((By.XPATH, '//*[@id="divArvoreAcoes"]/a[6]'))
+
+            # This garantes that after we're done the driver will switch to the main content
+            with self._go_to_new_win(windows):
+
+                destinatario, assunto, mensagem = dados
+
+                self._update_elem(helper.destinatario, destinatario)
+
+                #ActionChains(self.driver).key_down(Keys.RETURN).perform()
+
+                #self._click_button((By.LINK_TEXT, destinatario))
+
+                self._update_elem(helper.assunto, assunto)
+
+                self._select_by_text(helper.mensagem, mensagem)
+
+                # After putting the email, we must validate ir by clicking it or pressing ENTER
+                self._update_elem(helper.destinatario, 2*Keys.ENTER)
+
+                self._click_button(helper.enviar)
 
     def info_oficio(self, num_doc):
 
@@ -611,7 +736,7 @@ class Processo(Sei):
             "Erro ao navegar para o processo"
 
         # Switch to tree frame
-        self.driver.switch_to.frame("ifrArvore")
+        self.go_to_arvore()
 
         with self.wait_for_page_load():
 
@@ -646,7 +771,7 @@ class Processo(Sei):
 
         self.driver.close()
 
-        self.driver.switch_to_window(proc_window)
+        self.driver.switch_to.window(proc_window)
 
     def send_proc_to_sede(self, buttons):
 
@@ -673,7 +798,7 @@ class Processo(Sei):
             janela_unidades = windows[-1]
 
             # Troca o foco do navegador
-            self.driver.switch_to_window(janela_unidades)
+            self.driver.switch_to.window(janela_unidades)
 
         assert self.get_title() == helpers.Envio.UNIDS, \
             "Erro ao clicar na lupa 'Selecionar Unidades'"
@@ -697,7 +822,7 @@ class Processo(Sei):
         self.driver.close()
 
         # Troca o foco do navegador
-        self.driver.switch_to_window(janela_enviar)
+        self.driver.switch_to.window(janela_enviar)
 
         self.wait_for_element_to_click(helpers.Envio.OPEN).click()
 
@@ -716,7 +841,7 @@ class Processo(Sei):
         # fecha a janela_enviar
         self.driver.close()
 
-        self.driver.switch_to_window(janela_processo)
+        self.driver.switch_to.window(janela_processo)
 
     def expedir_oficio(self, num_doc):
 
@@ -730,7 +855,7 @@ class Processo(Sei):
 
     def go_to_postit(self):
 
-        link = self.get_acoes().get('Anotações')
+        link = self._get_acoes().get('Anotações')
 
         if link is not None:
 
@@ -783,7 +908,7 @@ class Processo(Sei):
 
             self.close()
 
-            self.driver.switch_to_window(main)
+            self.driver.switch_to.window(main)
 
             if 'anotacao' and 'anotacao_link' in self.tags:
 
@@ -793,7 +918,7 @@ class Processo(Sei):
 
     def go_to_marcador(self):
 
-        link = self.get_acoes().get("Gerenciar Marcador")
+        link = self._get_acoes().get("Gerenciar Marcador")
 
         if link is not None:
 
@@ -807,7 +932,7 @@ class Processo(Sei):
 
     def go_to_acomp_especial(self):
 
-        link = self.get_acoes().get("Acompanhamento Especial")
+        link = self._get_acoes().get("Acompanhamento Especial")
 
         if link is not None:
 
@@ -849,7 +974,7 @@ class Processo(Sei):
 
                 self.close()
 
-                self.driver.switch_to_window(main)
+                self.driver.switch_to.window(main)
 
                 self.tags['Acompanhamento Especial'] = ""
 
@@ -869,7 +994,7 @@ class Processo(Sei):
 
             self.close()
 
-            self.driver.switch_to_window(main)
+            self.driver.switch_to.window(main)
 
     def _incluir_documento(self, tipo):
 
@@ -877,7 +1002,7 @@ class Processo(Sei):
 
             raise ValueError("Tipo de Documento inválido: {}".format(tipo))
 
-        link = self.get_acoes().get('Incluir Documento')
+        link = self._get_acoes().get('Incluir Documento')
 
         if link is not None:
 
@@ -941,15 +1066,13 @@ class Processo(Sei):
 
         if dados:
 
-            self.driver.switch_to_window(janela_oficio)
+            self.driver.switch_to.window(janela_oficio)
 
             self.editar_oficio(dados)
 
             #self.close()
 
-        self.driver.switch_to_window(janela_processo)
-
-        self.go(self.link)
+        self.driver.switch_to.window(janela_processo)
 
     def incluir_informe(self):
         pass
@@ -1000,7 +1123,7 @@ class Processo(Sei):
 
     def editar_oficio(self, dados, existing=False):
 
-        links = helpers.Sei.Oficio
+        links = helpers.Sei_Base.Oficio
 
         self.wait_for_element_to_be_visible(links.editor)
 
@@ -1029,17 +1152,16 @@ class Processo(Sei):
 
             action.perform()
 
-            sleep(0.5)
+            sleep(1)
 
             action.key_down(Keys.RETURN)
 
             action.perform()
 
-            action.key_down(Keys.DELETE)
+            #action.key_down(Keys.DELETE)
 
-            action.perform()
+            #action.perform()
 
-            sleep(0.5)
 
             script = "arguments[0].innerHTML = `{0}`;".format(value)
 
@@ -1064,7 +1186,7 @@ class Processo(Sei):
 
     def concluir_processo(self):
 
-        excluir = self.get_acoes().get('Concluir Processo').strip()
+        excluir = self._get_acoes().get('Concluir Processo').strip()
 
         assert excluir is not None, "A ação 'Concluir Processo não foi armazenada, verfique as ações do Processo"
 

@@ -40,7 +40,6 @@ class Page(object):
 
         self.driver = driver
 
-
     def reset_driver(self, driver):
         """ Reinitializes the webdriver and the timeout"""
 
@@ -75,7 +74,17 @@ class Page(object):
 
         alert = self.alert_is_present(timeout=timeout)
 
-        if alert: alert.accept()
+        if alert:
+
+            print(alert.text)
+
+            alert.accept()
+
+            return False
+
+        else:
+
+            return True
 
     def _update_elem(self, elem_id, dado, timeout=5):
 
@@ -106,7 +115,6 @@ class Page(object):
             if alert: alert.accept()
 
             print(repr(e))
-
 
     @contextmanager
     def wait_for_page_load(self, timeout=timeout):

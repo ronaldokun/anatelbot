@@ -40,7 +40,7 @@ class Rf_Sapiens(object):
 
     NAME = (By.ID, "textfield-1015-inputE1")
 
-class Sei(object):
+class Sei_Base(object):
 
     Login = namedtuple('Login', 'url, title, log, pwd')("https://sei.anatel.gov.br",
                                                         "SEI / ANATEL",
@@ -57,7 +57,7 @@ class Sei(object):
                                                                             (By.CLASS_NAME, "cke_wysiwyg_frame cke_reset"),
                                                                             (By.ID, "cke_129"))
 
-class Menu_lateral(object):
+class Sei_Menu(object):
 
     CLT_PROC = (By.LINK_TEXT, "Controle de Processos")
 
@@ -1318,9 +1318,10 @@ class Gerar_Doc(object):
                 'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)',
                 'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)']
 
-class Externo(object):
-
-    tipo = (By.ID, )
+Email = namedtuple('Email', 'destinatario assunto mensagem enviar')((By.ID, 's2id_autogen1'),
+                                                             (By.ID, 'txtAssunto'),
+                                                             (By.ID, 'selTextoPadrao'),
+                                                             (By.NAME, 'btnEnviar'))
 
 class Pesq_contato(object):
 
@@ -1398,7 +1399,14 @@ class Sec(object):
 
     Base = 'http://sistemasnet/SEC/'
 
-    Consulta = 'http://sistemasnet/SEC/Tela.asp?SISQSmodulo=9336'
+    consulta = {'link': 'http://sistemasnet/SEC/ConsultaDocumentos/Tela.asp',
+                'id_cpf': (By.ID, "pNumCnpjCpf"),
+                'id_fistel': (By.ID, "pNumFistel"),
+                'id_nome': (By.ID, "pNomeEntidade"),
+                'id_btn_exata': (By.ID, "pindTipoComparacao0"),
+                'id_btn_init': (By.ID, "pindTipoComparacao1"),
+                'submit': (By.ID, 'botaoFlatConfirmar')
+                }
 
     Histor = 'http://sistemasnet/SEC/Chamada/Historico.asp?SISQSmodulo=11380'
 
@@ -1434,29 +1442,39 @@ class Sec(object):
 
     Cert_2nVia = 'http://sistemasnet/SEC/Certificado/SegundaVia/Tela.asp?SISQSmodulo=4145'
 
-    Ent_Alt = {'link':'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=A',
-               'id_cpf': (By.ID, 'pNumCnpjCpf'),
-               'id_nome': (By.ID, 'pNomeEntidade'),
-               'submit': (By.ID, 'botaoFlatConfirmar'),
-               'email': (By.ID, 't_EndEletronico'),
-               'rg': (By.ID, 'pf_NumIdentidade'),
-               'orgexp': (By.ID, 'pf_SiglaOrgaoExp'),
-               'nasc': (By.ID, 'pf_DataNascimento'),
-               'ddd': (By.ID, 'tel_NumCodigoNacional0'),
-               'fone': (By.ID, 'tel_NumTelefone0'),
-               'cep': (By.ID, 'CodCep1'),
-               'bt_cep': (By.ID, 'buscarEndereco'),
-               'logr': (By.ID, 'EndLogradouro1'),
-               'num': (By.ID, 'EndNumero1'),
-               'comp': (By.ID, 'EndComplemento1'),
-               'bairro': (By.ID, 'EndBairro1'),
-               'cidade': (By.ID, 'CodMunicipio1'),
-               'uf': (By.ID, 'SiglaUf1'),
-               'bt_dados': (By.ID, 'botaoFlatDadosComplementares'),
-               'bt_fone': (By.ID, 'botaoFlatTelefones'),
-               'bt_end': (By.ID, 'botaoFlatEndereço'),
-               'submit_script' : "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')"
-               }
+    entidade = {'alterar': 'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=A',
+                'incluir': 'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=I',
+                'id_cpf': (By.ID, 'pNumCnpjCpf'),
+                'id_nome': (By.ID, 'pNomeEntidade'),
+                'input_nome': (By.ID, 't_NomeEntidade'),
+                'submit': (By.ID, 'botaoFlatConfirmar'),
+                'E-mail': (By.ID, 't_EndEletronico'),
+                'Identidade': (By.ID, 'pf_NumIdentidade'),
+                'Órgão Exp.': (By.ID, 'pf_SiglaOrgaoExp'),
+                'Data de Nascimento': (By.ID, 'pf_DataNascimento'),
+                'DDD': (By.ID, 'tel_NumCodigoNacional0'),
+                'Fone': (By.ID, 'tel_NumTelefone0'),
+                'Cep': (By.ID, 'CodCep1'),
+                'bt_cep': (By.ID, 'buscarEndereco'),
+                'Endereço': (By.ID, 'EndLogradouro1'),
+                'Número': (By.ID, 'EndNumero1'),
+                'Complemento': (By.ID, 'EndComplemento1'),
+                'Bairro': (By.ID, 'EndBairro1'),
+                'Cidade': (By.ID, 'CodMunicipio1'),
+                'UF': (By.ID, 'SiglaUf1'),
+                'bt_dados': (By.ID, 'botaoFlatDadosComplementares'),
+                'bt_fone': (By.ID, 'botaoFlatTelefones'),
+                'bt_end': (By.ID, 'botaoFlatEndereço'),
+                'submit_script' : "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')",
+                'submit': (By.ID, "botaoFlatConfirmar")
+                }
+
+    inscricao = {'incluir': {'link':'http://sistemasnet/SEC/Inscricao/Incluir/Tela.asp',
+                             'id_cpf': (By.ID, 'NumCnpjCpf'),
+                             'id_uf': (By.ID, 'SiglaUF'),
+                             'id_certificado': (By.ID, 'pCertCat'),
+                             'submit': (By.ID, 'botaoFlatConfirmar')}
+                 }
 
     Ent_AltRF = 'http://sistemasnet/SEC/Chamada/CadastroSRFRegularizado.asp?SISQSmodulo=16374'
 
@@ -1481,7 +1499,6 @@ class Sec(object):
         )
 
     Prova_Res = 'http://sistemasnet/SEC/Prova/Resultado/Tela.asp?SISQSmodulo=3872'
-
 
 class Agenda(object):
 
@@ -1643,18 +1660,32 @@ class Scpx(object):
 
 class Scra(object):
 
-    Consulta = dict(link='http://sistemasnet/SCRA/Consulta/Tela.asp')
+    consulta = dict(link='http://sistemasnet/SCRA/Consulta/Tela.asp',
+                    id_nome=(By.ID, 'pNomeEntidade'),
+                    id_cpf=(By.ID, 'pNumCnpjCpf'),
+                    id_fistel=(By.ID, 'pNumFistel'),
+                    id_indicativo=(By.ID, 'pIndicativo'),
+                    id_btn_estacao=(By.ID, "botaoFlatEstação"),
+                    submit=(By.ID, "botaoFlatConfirmar"),
+                    impressao_completa=(By.ID, 'botaoFlatVersãoparaImpressão'),
+                    impressao_resumida=(By.ID, 'botaoFlatVersãoResumida'),
+                    imprimir=(By.ID, 'botaoFlatCLIQUEAQUIPARAIMPRIMIR'),
+                    frame_impressao='imprime1')
 
     Ent =      dict(alterar_situacao="http://sistemasnet/scra/Chamada/CadastroSRFRegularizado.asp",
                     incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I")
 
-    Estacao =  dict(alterar="http://sistemasnet/acra/Chamada/Entidade.asp?OP=A",
+    Estacao =  dict(alterar="http://sistemasnet/scra/Chamada/Entidade.asp?OP=A",
                     alterar_indicativo='http://sistemasnet/SCRA/IndicativoAlterar/Tela.asp?OP=A',
                     excluir="http://sistemasnet/SCRA/Estacao/Tela.asp?OP=E",
                     incluir='http://sistemasnet/SCRA/Estacao/Tela.asp?OP=I',
                     licenciar='http://sistemasnet/SCRA/EstacaoLicenciar/Tela.asp')
 
-    Licenca =  dict(imprimir="http://sistemasnet/SCRA/Chamada/Licenca.asp")
+    licenca = {'imprimir': dict(link="http://sistemasnet/scra/Chamada/Licenca.asp",
+                                id_cpf=(By.ID, 'pnumCPFCNPJ'),
+                                submit=(By.ID, "botaoFlatConfirmar"),
+                                id_btn_imprimir=(By.ID, 'botaoFlatImprimirSelecionados'))
+               }
 
 class Slmm(object):
 
@@ -1679,9 +1710,6 @@ class Sigec(object):
                           'id_btn_exata': (By.ID, "indTipoComparacao0"),
                           'id_btn_init': (By.ID, "indTipoComparacao1")}
                 }
-
-
-
 
     cpf = (By.ID, "NumCNPJCPF")
 

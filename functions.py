@@ -9,6 +9,7 @@ import datetime as dt
 import re
 
 import gspread
+import gspread_dataframe as gs_to_df
 import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
 from selenium.webdriver.common.keys import Keys
@@ -87,7 +88,7 @@ def cria_dict_acoes(acoes):
 
         else:
 
-            dict_tags[key] = tag.attrs['onclick']
+            dict_tags[key] = str(tag.attrs['onclick'])
 
     return dict_tags
 
@@ -281,9 +282,10 @@ def init_browser(webdriver, login, senha, timeout=5):
 
         alert.accept()
 
-    return page
+    return page.driver
 
 def check_input(identificador, tipo):
+
     if (tipo == 'cpf' or tipo == 'fistel') and len(identificador) != 11:
         print("O número de dígitos do {0} deve ser 11".format(tipo))
 
@@ -336,7 +338,7 @@ def last_day_of_month():
 
     return date
 
-def authenticate_google(path_to_file):
+def authenticate_google(path_to_file="files/anatel.json"):
 
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
@@ -344,3 +346,70 @@ def authenticate_google(path_to_file):
     credentials = ServiceAccountCredentials.from_json_keyfile_name(path_to_file, scope)
 
     return gspread.authorize(credentials)
+
+def load_sheet_from_workbook(wkb, aba, skiprows=None):
+    """
+    Receives:
+        wkb: Spreadsheet object (gspread)
+        aba: string - name of the worksheet to load from wkb
+
+    Returns a tuple:
+
+       aba as a gspread Worksheet object
+       aba as Pandas DataFrame
+    """
+
+    wks = wkb.worksheet(aba)
+
+    #col_names = [col for col in wks.row_values(1) if col != '']
+
+    df = gs_to_df.get_as_dataframe(
+        wks, evaluate_formulas=True, skiprows=skiprows, dtype=str, ignore=False)
+
+    #df = df[col_names]
+
+    #df.fillna("", inplace=True)
+
+    #df.replace("NaN", "", inplace=True)
+
+    df.replace('nan', "", inplace=True)
+
+    return (wks, df)
+
+def load_workbooks_from_drive():
+    """
+    Receives: tuple of strings
+
+        Authenticate the access to Google Sheets Feed
+        Open all authorized Spreadsheets and puts in a list wkbs
+        Filter this list to contain only Spreadsheets with in tuple 'criteria'
+
+    Returns:
+
+        A list with Spreadsheet objects containing one of criteria in the title
+    """
+    gc = authenticate_google()
+
+    return gc.openall()
+
+def salva_aba_no_drive(dataframe, planilha_drive, aba_drive):
+
+    workbook = authenticate_google().open(planilha_drive)
+
+    worksheet = workbook.worksheet(aba_drive)
+
+    worksheet.clear()
+
+    gs_to_df.set_with_dataframe(
+        dataframe=dataframe, worksheet=worksheet, resize=True)
+
+def transform_date(date):
+
+    try:
+        formated = dt.datetime.strptime(str(date), "%d/%m/%Y").date()
+
+    except:
+
+        formated = dt.datetime.strptime(str(date), "%Y-%m-%d").date()
+
+    return formated

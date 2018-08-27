@@ -7,6 +7,8 @@ Created on Thu Aug 24 23:14:09 2017
 """
 import re
 import sys
+import os
+
 
 from bs4 import BeautifulSoup as soup
 # INITIALIZE DRIVER
@@ -18,9 +20,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
 import helpers
-from helpers import *
-from page import Page
-from time import sleep
+from ..helpers import *
+from ..page import Page
+from monitor import sleep
 
 
 class LoginPage(Page):

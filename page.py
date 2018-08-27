@@ -7,9 +7,9 @@ Created on Mon Aug 28 20:44:15 2017
 """
 
 from contextlib import contextmanager
+import selenium.webdriver as webdriver
 
 # Main package
-import selenium.webdriver as webdriver
 from selenium.common.exceptions import *
 # Utilities
 from selenium.webdriver.common.action_chains import ActionChains
@@ -30,13 +30,11 @@ class Page(object):
         navigation methods
         """
 
-    timeout = 60
+    timeout = 30
 
     def __init__(self, driver):
         """ Initializes the webdriver and the timeout"""
-        #if not isinstance(type(driver), type(webdriver.)):
-
-         #   raise ValueError("The object {0} must be of type{1}".format(type(driver), type(webdriver)))
+        assert isinstance(webdriver, driver)
 
         self.driver = driver
 
@@ -53,7 +51,7 @@ class Page(object):
         """ Basic implementation class"""
         self.driver.close()
 
-    def _click_button(self, btn_id, timeout=5):
+    def _click_button(self, btn_id, silent=True, timeout=timeout):
 
         try:
 
@@ -61,16 +59,15 @@ class Page(object):
 
             button.click()
 
-        except ElementClickInterceptedException:
-
-            #ActionChains(self.driver).move_to_element(button).click(button).perform()
-
-            self.driver.execute_script("arguments[0].click();", button)
-
-
         except NoSuchElementException as e:
 
             print(repr(e))
+
+        except ElementClickInterceptedException:
+
+            # ActionChains(self.driver).move_to_element(button).click(button).perform()
+
+            self.driver.execute_script("arguments[0].click();", button)
 
         alert = self.alert_is_present(timeout=timeout)
 
@@ -78,29 +75,24 @@ class Page(object):
 
             print(alert.text)
 
-            alert.accept()
+            if silent:
+                alert.accept()
 
-            return False
-
-        else:
-
-            return True
-
-    def _update_elem(self, elem_id, dado, timeout=5):
+    def _update_elem(self, elem_id, dado, timeout=timeout):
 
         try:
 
             elem = self.wait_for_element(elem_id, timeout=timeout)
 
+            elem.clear()
+
+            elem.send_keys(dado)
+
         except NoSuchElementException as e:
 
             print(e)
 
-        elem.clear()
-
-        elem.send_keys(dado)
-
-    def _select_by_text(self, select_id, text, timeout=5):
+    def _select_by_text(self, select_id, text, timeout=timeout):
 
         try:
 
@@ -112,9 +104,34 @@ class Page(object):
 
             alert = self.alert_is_present(timeout=timeout)
 
-            if alert: alert.accept()
+            if alert:
+                alert.accept()
 
             print(repr(e))
+
+    @contextmanager
+    def _go_to_new_win(self, windows=None):
+
+        if windows is None:
+            windows = self.driver.current_window_handle
+
+        self.wait_for_new_window(windows)
+
+        # Check again since the # of windows increased
+        windows = self.driver.window_handles
+
+        main = windows[-2]
+
+        # Switch to the last window that appeared
+        self.driver.switch_to.window(windows[-1])
+
+        try:
+            # yield the state switched to the new window
+            yield
+
+        finally:
+            # return to the main window
+            self.driver.switch_to.window(main)
 
     @contextmanager
     def wait_for_page_load(self, timeout=timeout):
@@ -162,11 +179,11 @@ class Page(object):
         return self.driver.current_url()
 
     def hover(self, *locator):
-        element = self.find_element(*locator)
+        element = self.wait_for_element(*locator)
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator, timeout=2):
+    def check_element_exists(self, *locator, timeout=timeout):
         try:
             self.wait_for_element_to_be_visible(*locator, timeout=timeout)
         except (TimeoutException, NoSuchElementException):

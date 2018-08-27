@@ -282,7 +282,7 @@ def init_browser(webdriver, login, senha, timeout=5):
 
         alert.accept()
 
-    return page.driver
+    return page
 
 def check_input(identificador, tipo):
 

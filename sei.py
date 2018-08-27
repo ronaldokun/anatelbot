@@ -1,26 +1,30 @@
 # modules only
-import re
 import datetime as dt
+import re
 from contextlib import contextmanager
+from time import sleep
 
 import unidecode
 from bs4 import BeautifulSoup as Soup
+# Main package
+from selenium.common.exceptions import *
+# Utilities
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+# Methods used from selenium submodules
+from selenium.webdriver.support.ui import *
 
 import functions
 import helpers
-from page import *
-from time import sleep
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-
+from page import Page
 
 SERVICOS = ('Outorga: Rádio do Cidadão',
-             'Outorga: Radioamador',
-             'Outorga: Limitado Móvel Aeronáutico',
-             'Outorga: Limitado Móvel Marítimo')
+            'Outorga: Radioamador',
+            'Outorga: Limitado Móvel Aeronáutico',
+            'Outorga: Limitado Móvel Marítimo')
 
-TRANSLATION = {".":"", "/":"", "-":""}
+TRANSLATION = {"." : "", "/" : "", "-" : ""}
 
 class make_xlat:
 
@@ -48,12 +52,12 @@ def login_sei(driver, usr, pwd):
 
     links = helpers.Sei_Base.Login
 
-    browser = Page(driver)
-    browser.driver.get(links.url)
+    page = Page(driver)
+    page.driver.get(links.url)
     # page.driver.maximize_window()
 
-    usuario = browser.wait_for_element_to_click(links.log)
-    senha = browser.wait_for_element_to_click(links.pwd)
+    usuario = page.wait_for_element_to_click(links.log)
+    senha = page.wait_for_element_to_click(links.pwd)
 
     # Clear any clutter on the form
     usuario.clear()
@@ -65,7 +69,7 @@ def login_sei(driver, usr, pwd):
     # Hit Enter
     senha.send_keys(Keys.RETURN)
 
-    return browser.driver
+    return Sei(page)
 
 class Sei(Page):
     """
@@ -401,7 +405,7 @@ class Sei(Page):
         links
         Assume que o link está presente em qualquer subpágina do SEI
         """
-        menu = self.wait_for_element(helpers.Base.menu)
+        menu = self.wait_for_element(helpers.Sei_Base.menu)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -515,7 +519,7 @@ class Sei(Page):
 
         self.show_lat_menu()
 
-        init_proc = self.wait_for_element_to_click(helpers.Menu.INIT_PROC)
+        init_proc = self.wait_for_element_to_click(helpers.Sei_Menu.INIT_PROC)
 
         init_proc.click()
 
@@ -843,7 +847,7 @@ class Processo(Sei):
 
         self.driver.switch_to.window(janela_processo)
 
-    def expedir_oficio(self, num_doc):
+    def expedir_oficio(self, num_doc: str):
 
         info = self.info_oficio(num_doc)
 
@@ -865,7 +869,7 @@ class Processo(Sei):
 
             main, new = self.driver.current_window_handle, None
 
-        return (main, new)
+        return main, new
 
     def edita_postit(self, content='', prioridade=False):
 
@@ -924,7 +928,7 @@ class Processo(Sei):
 
             main, new = self.nav_link_to_new_win(link)
 
-            return (main, new)
+            return main, new
 
         else:
 
@@ -938,7 +942,7 @@ class Processo(Sei):
 
             main, new = self.nav_link_to_new_win(link)
 
-            return (main, new)
+            return main, new
 
         else:
 
@@ -1016,7 +1020,7 @@ class Processo(Sei):
 
             raise ValueError("Problema com o link de ações do processo: 'Incluir Documento'")
 
-    def incluir_oficio(self, tipo, dados={}, anexo=False, acesso='publico', hipotese=None):
+    def incluir_oficio(self, tipo, dados=None, anexo=False, acesso='publico', hipotese=None):
 
         #TODO:Inclui anexo
 
@@ -1267,4 +1271,4 @@ def expedir_bloco(Sei, numero):
 
             processo = Processo(Sei.driver, proc_window)
 
-            processo.expedir_oficio(proc, num_doc, link)
+            processo.expedir_oficio(num_doc)

@@ -1,7 +1,7 @@
 import sys
 import os
 import gc
-from time import sleep
+from monitor import sleep
 # Change the directory to reflect the main repository
 os.chdir("C:/Users/rsilva/gdrive/projects/programming/automation")
 import sistemas

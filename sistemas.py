@@ -31,7 +31,6 @@ def strip_string(str_):
 
     return "".join(s for s in str_ if s not in STRIP)
 
-
 class Sistema(Page):
 
     def __init__(self, driver, login=None, senha=None, timeout=5):
@@ -88,7 +87,7 @@ class Scpx(Sistema):
     interativos da ANATEL
     """
 
-    def __init__(self, driver, login="", senha="", timeout=2):
+    def __init__(self, driver, login=None, senha=None, timeout=2):
 
         super().__init__(driver, login, senha, timeout)
 
@@ -112,7 +111,13 @@ class Scpx(Sistema):
 
             print("Não há mais de um registro de Outorga")
 
-        self._click_button(h['id_btn_estacao'], timeout=timeout)
+        try:
+
+            self._click_button(h['id_btn_estacao'], timeout=timeout)
+
+        except (NoSuchElementException, TimeoutException):
+
+            print("Não existe página de consulta")
 
     def imprime_consulta(self, identificador, tipo_id='id_cpf', resumida=False):
 
@@ -141,7 +146,7 @@ class Scpx(Sistema):
 
         self._click_button(btn_id)
 
-    def servico_incluir(self, identificador, num_processo, tipo_id='id_cpf', silent=False):
+    def servico_incluir(self, identificador, num_processo, tipo_id='id_cpf', silent=False, timeout=5):
 
         h = self.sis.servico
 
@@ -156,12 +161,12 @@ class Scpx(Sistema):
 
             print("Alerta Inesperado")
 
-        self._update_elem(h.get('id_num_proc'), num_processo)
+        self._update_elem(h.get('id_num_proc'), num_processo, timeout=timeout)
 
-        self._click_button(h.get('id_btn_corresp'))
+        self._click_button(h.get('id_btn_corresp'), timeout=timeout)
 
         if silent:
-            self._click_button(h.get('submit'))
+            self._click_button(h.get('submit'), timeout=timeout)
 
     def servico_excluir(self, identificador, documento, motivo='Renúncia', tipo_id='id_cpf'):
 
@@ -192,7 +197,8 @@ class Scpx(Sistema):
 
         if alert: alert.dismiss()
 
-    def incluir_estacao(self, identificador, tipo_estacao, indicativo, tipo_id='id_cpf', sede=True, sequencial='001',  uf='SP'):
+    def incluir_estacao(self, identificador, tipo_estacao, indicativo, tipo_id='id_cpf',
+                        sede=True, sequencial='001', uf='SP', timeout=5):
 
         if tipo_estacao not in ESTAÇÕES_RC:
             raise ValueError("Os tipos de estação devem ser: ".format(ESTAÇÕES_RC))
@@ -205,31 +211,27 @@ class Scpx(Sistema):
 
         self._navigate(identificador, tipo_id, acoes)
 
-        self._click_button(helper.get('id_btn_dados_estacao'))
+        self._click_button(helper.get('id_btn_dados_estacao'), timeout=timeout)
 
-        self._select_by_text(helper.get('id_uf'), uf)
+        self._select_by_text(helper.get('id_uf'), uf, timeout=timeout)
 
-        alert = self.alert_is_present(5)
+        alert = self.alert_is_present(timeout=1)
 
         if alert: alert.dismiss()
 
-        self._update_elem(helper.get('id_indicativo'), indicativo)
+        self._update_elem(helper.get('id_indicativo'), indicativo, timeout=timeout)
 
-        self._update_elem(helper.get('id_seq'), sequencial)
+        self._update_elem(helper.get('id_seq'), sequencial, timeout=timeout)
 
-        self._select_by_text(helper.get('id_tipo'), tipo_estacao)
+        self._select_by_text(helper.get('id_tipo'), tipo_estacao, timeout=timeout)
 
         if tipo_estacao == "Fixa" and sede:
 
-            self._click_button(helper.get('copiar_sede'))
+            self._click_button(helper.get('copiar_sede'), timeout=2*timeout)
 
-        self._click_button(helper.get('submit'), timeout=10)
+        self._click_button(helper.get('submit'), timeout=2*timeout)
 
-        alert = self.alert_is_present(2)
-
-        if alert: alert.dismiss()
-
-    def movimento_transferir(self, identificador, origem, dest, proc, tipo_id='id_cpf'):
+    def movimento_transferir(self, identificador, origem, dest, proc, tipo_id='id_cpf', timeout=5):
 
         helper = self.sis.movimento
 
@@ -263,35 +265,30 @@ class Scpx(Sistema):
 
             return
 
-        self._select_by_text(id_atual, text)
+        self._select_by_text(id_atual, text, timeout=timeout)
 
-        self._click_button(helper.get('submit'))
-
+        self._click_button(helper.get('submit'), timeout=timeout)
 
         if self.check_element_exists(helper.get('id_proc'), timeout=1):
 
             proc = re.sub('[.-/]', '', proc)
 
-            self._update_elem(helper.get('id_proc'), proc)
+            self._update_elem(helper.get('id_proc'), proc, timeout=timeout)
 
         id_posterior = helper.get('id_posterior')
 
         if dest.lower() == 'e':
 
-            self._select_by_text(id_posterior, "E - Aprovado / Licença")
+            self._select_by_text(id_posterior, "E - Aprovado / Licença", timeout=timeout)
 
         elif dest.lower() == 'g':
 
-            self._select_by_text(id_posterior, "G - Cadastro pelo usuário (auto-cadastramento)")
+            self._select_by_text(id_posterior, "G - Cadastro pelo usuário (auto-cadastramento)", timeout=timeout)
 
             self._update_elem(helper.get('id_txt_cancelar'),
-                              "Cadastro Incorreto. Estação será refeita com dados corretos")
+                              "Cadastro Incorreto. Estação será refeita com dados corretos", timeout=timeout)
 
-        self._click_button(helper.get('submit'))
-
-        alert = self.alert_is_present(5)
-
-        if alert: alert.accept()
+        self._click_button(helper.get('submit'), timeout=timeout)
 
     def movimento_cancelar(self, identificador, tipo_id='id_cpf'):
 
@@ -317,7 +314,7 @@ class Scpx(Sistema):
 
         self._click_button(helper['submit'])
 
-    def licenciar_estacao(self, identificador, tipo_id='id_cpf', ppdess=True, silent=False):
+    def licenciar_estacao(self, identificador, tipo_id='id_cpf', ppdess=True, silent=False, timeout=5):
 
         helper = self.sis.estacao
 
@@ -327,18 +324,21 @@ class Scpx(Sistema):
 
         if tipo_id == 'id_cpf':
 
-            self._click_button((By.LINK_TEXT, strip_string(identificador)))
+            self._click_button((By.LINK_TEXT, strip_string(identificador)), silent=silent, timeout=5*timeout)
 
         if not ppdess:
 
-            self._click_button(helper.get('id_btn_lista_estacoes'))
-            self._click_button(helper.get('id_btn_licenciar'))
+            self._click_button(helper.get('id_btn_lista_estacoes'), timeout=timeout, silent=silent)
 
-        if silent:
+            self._click_button(helper.get('id_btn_licenciar'), timeout=timeout, silent=silent)
 
-            alert = self.alert_is_present(5)
+            self._click_button(helper['submit'], timeout=2*timeout)
 
-            if alert: alert.accept()
+            with self._go_to_new_win():
+
+                self._click_button(helper['marcar_todos'], timeout=timeout)
+
+                self._click_button(helper['btn_print'], timeout=timeout)
 
     def prorrogar_rf(self, identificador, tipo_id='id_cpf'):
 
@@ -378,7 +378,7 @@ class Scpx(Sistema):
 
         self._click_button(helper['submit'])
 
-    def imprimir_licenca(self, identificador, tipo_id="id_cpf"):
+    def imprimir_licenca(self, identificador, tipo_id="id_cpf", timeout=5):
 
         helper = self.sis.licenca['imprimir']
 
@@ -386,7 +386,7 @@ class Scpx(Sistema):
 
         self._navigate(identificador, helper, acoes)
 
-        self._click_button(helper['id_btn_imprimir'])
+        self._click_button(helper['id_btn_imprimir'], timeout=timeout)
 
     def extrai_cadastro(self, id, tipo_id='id_cpf', timeout=5):
 
@@ -701,10 +701,6 @@ class Sec(Sistema):
 
         sleep(1)
 
-
-
-
-
     def imprimir_provas(self, data, horario, num_registros, cpf=None):
 
         h = self.sis.Prova.imprimir
@@ -823,13 +819,13 @@ class Sigec(Sistema):
 
 class Boleto(Sistema):
 
-
-    def __init__(self, driver, login="", senha="", timeout=2):
+    def __init__(self, driver, login=None, senha=None, timeout=5):
 
         super().__init__(driver, login, senha, timeout)
 
         self.sis = helpers.Boleto
-    def imprime_boleto(self, ident, tipo_id):
+
+    def imprime_boleto(self, ident, tipo_id='id_cpf', timeout=5):
 
         """ This function receives a webdriver object, navigates it to the
         helpers.Boleto page, inserts the identification 'ident' in the proper
@@ -840,29 +836,29 @@ class Boleto(Sistema):
 
         h = self.sis.imprimir
 
+        ident = strip_string(ident)
+
         self.driver.get(h['link'])
 
         if tipo_id == 'id_cpf':
 
-            self._click_button(h['id_cpf'])
-
             input_ = h['input_cpf']
 
-        else:
+            self._click_button(h[tipo_id], timeout=timeout)
 
-            self._click_button(h['id_fistel'])
+        elif tipo_id == 'id_fistel':
 
             input_ = h['input_fistel']
 
-        self._update_elem(input_, ident)
+        self._update_elem(input_, ident, timeout=timeout)
 
-        self._update_elem(h['input_data'], functions.last_day_of_month())
+        self._update_elem(h['input_data'], functions.last_day_of_month(), timeout=timeout)
 
-        self._click_button(h['submit'])
+        self._click_button(h['submit'], timeout=timeout)
 
-        self._click_button(h['marcar_todos'])
+        self._click_button(h['marcar_todos'], timeout=timeout)
 
-        self._click_button(h['btn_print'])
+        self._click_button(h['btn_print'], timeout=timeout)
 
 def save_new_window(page, filename):
 

@@ -30,11 +30,11 @@ class Page(object):
         navigation methods
         """
 
-    timeout = 30
+    timeout = 10
 
     def __init__(self, driver):
         """ Initializes the webdriver and the timeout"""
-        assert isinstance(webdriver, driver)
+        #assert isinstance(driver, type(webdriver))
 
         self.driver = driver
 
@@ -115,7 +115,7 @@ class Page(object):
         if windows is None:
             windows = self.driver.current_window_handle
 
-        self.wait_for_new_window(windows)
+        self.wait_for_new_window(windows, timeout=10)
 
         # Check again since the # of windows increased
         windows = self.driver.window_handles

@@ -1,8 +1,13 @@
 import re
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from bs4 import  BeautifulSoup as soup
-from collections import namedtuple, defaultdict
+from collections import namedtuple, OrderedDict
 import functions
-import helpers
+import sis_helpers
 from page import *
 from time import sleep
 from selenium.webdriver.common.by import By
@@ -26,6 +31,8 @@ SEC_DADOS = {'Dados do Usuário': ["E-mail"],
              'Endereço': ["Endereço", "Número", "Complemento", "Bairro", "Município", "UF", "Cep"]}
 
 STRIP = ("/", ".", "-")
+
+PATH = r"C:\Users\rsilva\Desktop\SEI"
 
 def strip_string(str_):
 
@@ -91,7 +98,7 @@ class Scpx(Sistema):
 
         super().__init__(driver, login, senha, timeout)
 
-        self.sis = helpers.Scpx
+        self.sis = sis_helpers.Scpx
 
     def consulta(self, id, tipo_id='id_cpf', timeout=5):
 
@@ -418,7 +425,7 @@ class Scra(Sistema):
 
         super().__init__(driver, login, senha, timeout)
 
-        self.sis = helpers.Scra
+        self.sis = sis_helpers.Scra
 
     def consulta(self, id, tipo_id='id_cpf', timeout=5):
 
@@ -490,7 +497,7 @@ class Sec(Sistema):
 
         super().__init__(driver, login, senha, timeout)
 
-        self.sis = helpers.Sec
+        self.sis = sis_helpers.Sec
 
     def consulta(self, id, tipo_id='id_cpf', timeout=5):
 
@@ -629,7 +636,7 @@ class Sec(Sistema):
 
     def _extrai_inscritos_prova(self):
 
-        dados = {}
+        dados = OrderedDict()
 
         source = soup(self.driver.page_source, "lxml")
 
@@ -656,6 +663,8 @@ class Sec(Sistema):
             impresso = hasattr(td[-1].label, 'text') and td[-1].label.text != ""
 
             dados[cpf] = Inscrito(link, cpf, nome, coer, impresso)
+
+
 
         return dados
 
@@ -701,55 +710,93 @@ class Sec(Sistema):
 
         sleep(1)
 
-    def imprimir_provas(self, data, horario, num_registros, cpf=None):
+    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1):
 
-        h = self.sis.Prova.imprimir
+        h = self.sis.Prova['imprimir']
 
-        self.driver.get(h['link'])
+        # self.driver.get(h['link'])
+        #
+        # if cpf is not None:
+        #
+        #     self._update_elem(h['id_cpf'], cpf)
+        #
+        # sleep(5)
+        #
+        # self._click_button(h['submit'])
+        #
+        # sleep(5)
+        #
+        # self._click_button((By.PARTIAL_LINK_TEXT, " ".join([data, horario])))
 
-        #"http://sistemasnet/SEC/Prova/BancaEspecialImpressao/DadosProva.asp?idtProvaAgenda=11513&NumCpfAvaliador=31888916877")
 
-        if cpf is not None:
+        link = h['link_direto'].format(num_prova, cpf)
 
-            self._update_elem(h['id_cpf'], cpf)
-
-        sleep(2)
-
-        #self._click_button(h['submit'])
-
-        sleep(2)
-
-        #self._click_button((By.LINK_TEXT, " ".join([data, horario])))
+        self.driver.get(link)
 
         self.driver.execute_script(h['alt_reg'])
 
         self._update_elem(h['num_reg'], str(num_registros) + Keys.RETURN)
 
-        sleep(5)
+        sleep(2)
 
         dados = self._extrai_inscritos_prova()
 
-        dados = sorted(list(dados.values()), key=lambda v: v.nome)
 
-        for v in dados:
+        for v in list(dados.values())[start:end]:
 
             self.driver.get(v.link)
 
-            sleep(5)
+            alert = self.alert_is_present(5)
 
-            clip.copy(v.nome)
+            if alert:
 
-            confirm = gui.confirm('Imprimir Prova?')
+                alert.accept()
 
-            if confirm == 'OK':
+                self._update_elem(h['justificativa'], "Erro de Impressão")
 
-                self._click_button(h['id_bt_imprimir'])
+                self.driver.execute_script("gravarReimprimirProva();")
+
+                alert = self.alert_is_present(5)
+
+                if alert:
+
+                    alert.accept()
+
+                sleep(2)
+
+                self.driver.execute_script("reimprimirprova();")
+
+                alert = self.alert_is_present(5)
+
+                if alert:
+
+                    alert.accept()
+
+                alert = self.alert_is_present(5)
+
+                if alert:
+
+                    alert.dismiss()
+
 
             else:
 
-                next
+            #self._click_button(h['id_bt_imprimir'], timeout=10)
 
-            clip.copy(v.nome)
+                self.driver.execute_script("imprimirprova();")
+
+                alert = self.alert_is_present(5)
+
+                if alert:
+                    alert.accept()
+
+            sleep(5)
+
+            files = sorted(os.listdir(PATH))
+
+            file = os.path.join(PATH, files[0])
+
+            os.rename(file, os.path.join(PATH, str(v.nome)+'.pdf'))
 
     def extrai_cadastro(self, id, tipo_id='id_cpf', timeout=5):
 
@@ -785,7 +832,7 @@ class Sigec(Sistema):
 
         super().__init__(driver, login, senha, timeout)
 
-        self.sis = helpers.Sigec
+        self.sis = sis_helpers.Sigec
 
     def extrai_cadastro(self, id, tipo_id='id_cpf'):
 
@@ -823,7 +870,7 @@ class Boleto(Sistema):
 
         super().__init__(driver, login, senha, timeout)
 
-        self.sis = helpers.Boleto
+        self.sis = sis_helpers.Boleto
 
     def imprime_boleto(self, ident, tipo_id='id_cpf', timeout=5):
 
@@ -901,72 +948,72 @@ def imprime_licenca(page, ident, serv, tipo):
 def abrir_agenda_prova(sec, datas):
 
     for data in datas:
-        sec.driver.get(helpers.Sec.Agenda_Incl)
+        sec.driver.get(sis_helpers.Sec.Agenda_Incl)
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.data)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.data)
         elem.send_keys(data[0])
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.hora)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.hora)
         elem.send_keys(data[1])
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.avaliador)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.avaliador)
         elem.send_keys("31888916877")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.local)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.local)
         elem.send_keys("ANATEL SP. Proibido Bermuda e Regata")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.ddd)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.ddd)
         elem.send_keys("11")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.fone)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.fone)
         elem.send_keys("Somente pelo Fale Conosco em www.anatel.gov.br")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.responsavel)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.responsavel)
         elem.send_keys("Ronaldo S.A. Batista")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.vagas)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.vagas)
         elem.send_keys("4")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.morse)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.morse)
         elem.click()
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.pc)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.pc)
         elem.click()
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.dias)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.dias)
         elem.send_keys("1")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.btn_endereco)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.btn_endereco)
         elem.click()
 
         sleep(1)
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.cep)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.cep)
         elem.send_keys("04101300")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.btn_buscar_end)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.btn_buscar_end)
         elem.click()
 
         sleep(5)
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.numero)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.numero)
         elem.send_keys("3073")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.btn_certificado)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.btn_certificado)
         elem.click()
 
         sleep(1)
 
-        elem = Select(sec.wait_for_element_to_click(helpers.Agenda.select_cert_1))
+        elem = Select(sec.wait_for_element_to_click(sis_helpers.Agenda.select_cert_1))
         elem.select_by_visible_text("Certificado de Operador de Estação de Radioamador-Classe A")
 
         sec.driver.execute_script("AdicionarCertificado('');")
         sleep(1)
 
-        elem = Select(sec.wait_for_element_to_click(helpers.Agenda.select_cert_2))
+        elem = Select(sec.wait_for_element_to_click(sis_helpers.Agenda.select_cert_2))
         elem.select_by_visible_text("Certificado de Operador de Estação de Radioamador-Classe C")
 
-        elem = sec.wait_for_element_to_click(helpers.Agenda.btn_confirmar)
+        elem = sec.wait_for_element_to_click(sis_helpers.Agenda.btn_confirmar)
         elem.click()
 
         try:

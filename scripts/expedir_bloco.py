@@ -6,9 +6,13 @@ Created on Thu Aug 24 23:14:09 2017
 @author: ronaldo
 """
 import re
-import sys
 import os
+import sys
 
+# Recomended way to insert the modules in parent folder in the path
+# Use a simple (but explicit) path modification to resolve the package properly.
+# https://docs.python-guide.org/writing/structure/
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from bs4 import BeautifulSoup as soup
 # INITIALIZE DRIVER
@@ -19,9 +23,12 @@ from selenium.webdriver.common.keys import Keys
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
 
-import helpers
-from ..helpers import *
-from ..page import Page
+import sei
+
+
+from sei.sei_helpers import *
+from sis_helpers import *
+from page import Page
 from monitor import sleep
 
 
@@ -31,7 +38,7 @@ class LoginPage(Page):
         """
         make login and return and instance of browser"""
 
-        helper = helpers.Sei_Base.Login
+        helper = Sei_Base.Login
 
         self.driver.get(helper.url)
         # self.driver.maximize_window()

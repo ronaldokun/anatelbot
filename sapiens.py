@@ -4,9 +4,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
 
-import helpers as h
+import sis_helpers as h
 
-from helpers import Rf_Sapiens
+from sis_helpers import Rf_Sapiens
 from page import Page
 import pandas as pd
 from collections import defaultdict

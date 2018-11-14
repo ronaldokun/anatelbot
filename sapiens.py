@@ -1,15 +1,12 @@
 
 from bs4 import BeautifulSoup as soup
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 
+from sistemas import sis_helpers as h
 
-import sis_helpers as h
-
-from sis_helpers import Rf_Sapiens
+from sistemas.sis_helpers import Rf_Sapiens
 from page import Page
 import pandas as pd
-from collections import defaultdict
 
 KEYS = ['CPF', 'Nome', 'Mãe', 'Data de Nascimento', 'Sexo',
         'Ano do Óbito','Nacionalidade','Título de Eleitor',
@@ -112,9 +109,9 @@ class Sapiens(Page):
             self.registros = registros
 
 
-    def reset_driver(self, driver):
+    def reiniciar_driver(self, driver):
 
-        self.close()
+        self.fechar()
 
         self.driver = driver
 
@@ -176,7 +173,7 @@ class Sapiens(Page):
 
             raise ValueError("Número identificador inválido {}".format(cpf))
 
-        self._update_elem(id_input, dado=str(cpf)+Keys.RETURN)
+        self._atualizar_elemento(id_input, dado=str(cpf) + Keys.RETURN)
 
         if self.check_element_exists(Rf_Sapiens.RESULTADO):
 

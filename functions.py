@@ -7,6 +7,8 @@ Created on Wed Nov  1 16:50:19 2017
 """
 import datetime as dt
 import re
+import itertools
+
 
 import gspread
 import gspread_dataframe as gs_to_df
@@ -33,6 +35,8 @@ PATTERNS = [r'^(P){1}(X){1}(\d){1}([A-Z]){1}(\d){4}$',
             r'^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$',
             r'^(P){1}([A-Z]){4}$',
             r'^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})']
+
+KEYS_END = ('Nome/Razão Social', 'Logradouro', 'Número', 'Complemento', 'Bairro', 'Cep', 'Município', 'UF', 'Número Fistel')
 
 
 def pode_expedir(linha):
@@ -319,7 +323,7 @@ def save_page(page, filename):
 
         # TODO; autoit
 
-    # driver.close()
+    # driver.fechar()
 
 def last_day_of_month():
     """ Use datetime module and manipulation to return the last day
@@ -413,3 +417,57 @@ def transform_date(date):
         formated = dt.datetime.strptime(str(date), "%Y-%m-%d").date()
 
     return formated
+
+def lastRow(ws, col=2):
+    """ Find the last row in the worksheet that contains data.
+
+    idx: Specifies the worksheet to select. Starts counting from zero.
+
+    workbook: Specifies the workbook
+
+    col: The column in which to look for the last cell containing data.
+    """
+
+    #ws = workbook.sheets[idx]
+
+    lwr_r_cell = ws.cells.last_cell      # lower right cell
+    lwr_row = lwr_r_cell.row             # row of the lower right cell
+    lwr_cell = ws.range((lwr_row, col))  # change to your specified column
+
+    if lwr_cell.value is None:
+        lwr_cell = lwr_cell.end('up')    # go up untill you hit a non-empty cell
+
+    return lwr_cell.row
+
+def string_endereço(dados):
+    d = {}
+
+    s = 'A(o)<br>'
+
+    s += dados["Nome/Razão Social"].title()
+
+    s += '<br>' + dados["Logradouro"].title() + ", " + dados["Número"] + " "
+
+    s += dados["Complemento"].title() + " "
+
+    s += dados["Bairro"].title() + '<br>'
+
+    s += "CEP: " + dados["Cep"] + " - " + dados["Município"].title() + " - " + dados["UF"]
+
+    s += "<br><br>" + "<b>FISTEL: " + dados["Número Fistel"] + "</b>"
+
+    d["A"] = s
+
+    return d
+
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return list(zip(a, b))
+
+
+
+
+
+

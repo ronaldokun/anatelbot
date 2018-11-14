@@ -7,40 +7,48 @@ Created on Mon Aug 28 20:44:15 2017
 """
 
 from contextlib import contextmanager
-import selenium.webdriver as webdriver
+
+import selenium
 
 # Main package
 from selenium.common.exceptions import *
+
 # Utilities
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+
 # Methods used from selenium submodules
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import *
 
-
-# Exceptions
-
-
 # Base Class
 class Page(object):
     # noinspection SpellCheckingInspection
-    """
-        This Base Class implements common Selenium Webdriver
-        navigation methods
-        """
+    """Esta classe Base implementa métodos de navegação comum em qualquer página
 
-    timeout = 10
+    """
+
+    timeout = 10 # default timeout base parameter used in the methods
 
     def __init__(self, driver):
-        """ Initializes the webdriver and the timeout"""
-        #assert isinstance(driver, type(webdriver))
+        """
+
+        :param driver: Selenium webdriver instance
+        :type driver: selenium.webdriver
+
+                Initializes the webdriver
+
+        """
 
         self.driver = driver
 
-    def reset_driver(self, driver):
-        """ Reinitializes the webdriver and the timeout"""
+    def reiniciar_driver(self, driver):
+        """
+        :param driver: selenium.webdriver
+        :return: None
 
+                 Reinicia a instância do webdriver
+        """
         self.__init__(driver)
 
     def __enter__(self):
@@ -48,16 +56,30 @@ class Page(object):
         return self
 
     def close(self):
-        """ Basic implementation class"""
+        """
+
+        :return: None
+
+        Fecha a instância atual do browser
+        """
         self.driver.close()
 
-    def _click_button(self, btn_id, silent=True, timeout=timeout):
+    def _click_button(self, btn_id: tuple, silencioso: bool=True, timeout: int=timeout):
+        """
+
+        :param btn_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
+        :param silencioso: se verdadeiro confirma o pop-up após o clique no botão
+        :param timeout: tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
+        :return: None
+
+        Clica no botão ou link definido pelo elemento btn_id
+        """
 
         try:
 
-            button = self.wait_for_element_to_click(btn_id, timeout=timeout)
+            botão = self.wait_for_element_to_click(btn_id, timeout=timeout)
 
-            button.click()
+            botão.click()
 
         except NoSuchElementException as e:
 
@@ -65,20 +87,34 @@ class Page(object):
 
         except ElementClickInterceptedException:
 
-            # ActionChains(self.driver).move_to_element(button).click(button).perform()
+            # noinspection PyUnboundLocalVariable
+            self.driver.execute_script("arguments[0].click();", botão)
 
-            self.driver.execute_script("arguments[0].click();", button)
+        alerta = self.alert_is_present(timeout=timeout)
 
-        alert = self.alert_is_present(timeout=timeout)
+        if alerta:
 
-        if alert:
+            text = alerta.text
 
-            print(alert.text)
+            if silencioso:
+                alerta.accept()
 
-            if silent:
-                alert.accept()
+            return str(text)
 
-    def _update_elem(self, elem_id, dado, timeout=timeout):
+
+        else:
+
+            return None
+
+    def _atualizar_elemento(self, elem_id: tuple, dado: str, timeout: int=timeout):
+        """
+
+        :param elem_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
+        :param dado: conteúdo a ser inserido no form definido pelo elem_id
+        :param timeout: tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
+        :return: None
+        Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
+        """
 
         try:
 
@@ -92,49 +128,54 @@ class Page(object):
 
             print(e)
 
-    def _select_by_text(self, select_id, text, timeout=timeout):
+    def _selecionar_por_texto(self, select_id, text, timeout: int=timeout):
+        """
+
+        :param select_id: localizador da página html que define um Select (menu drop-down):
+                          (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
+        :param text: texto da opção do menu a ser selecionada
+        :param timeout: tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
+        :return: None
+        Seleciona o menu drop-down definido pela tupla select_id e escolhe a opção cujo texto de amostra é igual a text
+        """
 
         try:
 
-            select = Select(self.wait_for_element_to_click(select_id))
+            lista = Select(self.wait_for_element_to_click(select_id))
 
-            select.select_by_visible_text(text)
+            lista.select_by_visible_text(text)
 
         except (NoSuchElementException, UnexpectedAlertPresentException) as e:
 
-            alert = self.alert_is_present(timeout=timeout)
+            alerta = self.alert_is_present(timeout=timeout)
 
-            if alert:
-                alert.accept()
+            if alerta:
+                alerta.accept()
 
             print(repr(e))
 
     @contextmanager
-    def _go_to_new_win(self, windows=None):
+    def _navega_nova_janela(self, main=None):
+        """
 
-        if windows is None:
-            windows = self.driver.current_window_handle
+        :param main: Caso seja fornecida uma instância do webdriver
+        :return:
+        """
 
-        self.wait_for_new_window(windows, timeout=10)
-
-        # Check again since the # of windows increased
-        windows = self.driver.window_handles
-
-        main = windows[-2]
-
-        # Switch to the last window that appeared
-        self.driver.switch_to.window(windows[-1])
+        if main is None:
+            main = self.driver.current_window_handle
 
         try:
-            # yield the state switched to the new window
+            # yield the state with the main window
             yield
+            # inside the context manager there is a window switch
 
         finally:
             # return to the main window
             self.driver.switch_to.window(main)
 
     @contextmanager
-    def wait_for_page_load(self, timeout=timeout):
+    def wait_for_page_load(self, timeout: int=timeout):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name('title')
 
@@ -142,7 +183,7 @@ class Page(object):
 
         WebDriverWait(self.driver, timeout).until(ec.staleness_of(old_page))
 
-    def alert_is_present(self, timeout=timeout):
+    def alert_is_present(self, timeout: int=timeout):
 
         try:
 
@@ -154,7 +195,7 @@ class Page(object):
 
         return alert
 
-    def elem_is_visible(self, *locator, timeout=timeout):
+    def elem_is_visible(self, *locator, timeout: int=timeout):
         """
         Check is locator is visible on page given the timeout
 
@@ -183,14 +224,14 @@ class Page(object):
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator, timeout=timeout):
+    def check_element_exists(self, *locator, timeout: int=timeout):
         try:
             self.wait_for_element_to_be_visible(*locator, timeout=timeout)
+            return True
         except (TimeoutException, NoSuchElementException):
             return False
-        return True
 
-    def wait_for_element_to_be_visible(self, *locator, timeout=timeout):
+    def wait_for_element_to_be_visible(self, *locator, timeout: int=timeout):
         return WebDriverWait(self.driver, timeout).until(
             ec.visibility_of_element_located(*locator))
 
@@ -198,11 +239,11 @@ class Page(object):
         return WebDriverWait(self.driver, timeout).until(
             ec.presence_of_element_located(*locator))
 
-    def wait_for_element_to_click(self, *locator, timeout=timeout):
+    def wait_for_element_to_click(self, *locator, timeout: int=timeout):
         return WebDriverWait(self.driver, timeout).until(
             ec.element_to_be_clickable(*locator))
 
-    def wait_for_new_window(self, windows, timeout=timeout):
+    def wait_for_new_window(self, windows, timeout: int=timeout):
         return WebDriverWait(self.driver, timeout).until(
             ec.new_window_is_opened(windows))
 
@@ -231,21 +272,41 @@ class Page(object):
         return main_window, windows[-1]
 
     def nav_link_to_new_win(self, link):
+
         # Guarda janela principal
         main_window = self.driver.current_window_handle
 
-        # Abre link no elem em uma nova janela
-        # body = self.driver.find_element_by_tag_name('body')
-
-        # body.send_keys(Keys.CONTROL + 'n')
-
         self.driver.execute_script("window.open()")
+
         # Guarda as janelas do navegador presentes
         windows = self.driver.window_handles
 
         # Troca o foco do navegador
-        self.driver.switch_to_window(windows[-1])
+        self.driver.switch_to.window(windows[-1])
 
         self.driver.get(link)
 
         return main_window, windows[-1]
+
+    def _click_button_new_win(self, btn_id: tuple, silencioso: bool=True, timeout: int=timeout):
+        """
+
+        :param btn_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
+        :param silencioso: se verdadeiro confirma o pop-up após o clique no botão
+        :param timeout: tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
+        :return: None
+
+            Método auxiliar para clicar num elemento da página que abre uma nova janela. Muda o foco para
+            a nova janela.
+        """
+
+        self._click_button(btn_id=btn_id, silencioso=silencioso, timeout=timeout)
+
+        # Guarda as janelas do navegador presentes
+        windows = self.driver.window_handles
+
+        # Troca o foco do navegador
+        self.driver.switch_to.window(windows[-1])
+
+
+

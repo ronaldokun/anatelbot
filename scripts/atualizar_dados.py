@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
         if counter > 50:
 
-            sec.close()
+            sec.fechar()
 
             gc.collect()
 
@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     df.to_excel("Relatório_de_Entidades_Alteradas.xlsx", index=False)
 
-    sec.driver.close()
+    sec.driver.fechar()
 
     gc.collect()
 

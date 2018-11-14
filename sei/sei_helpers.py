@@ -8,7 +8,7 @@ Email = namedtuple('Email', 'destinatario assunto mensagem enviar')((By.ID, 's2i
                                                              (By.NAME, 'btnEnviar'))
 
 
-class Sei_Base(object):
+class SeiBase(object):
 
     Login = namedtuple('Login', 'url, title, log, pwd')("https://sei.anatel.gov.br",
                                                         "SEI / ANATEL",
@@ -133,7 +133,7 @@ class Proc_central(object):
 
     ACOES = (By.ID, "divArvoreAcoes")
 
-    IN_POSTIT = (By.ID, "txaDescricao")
+    IN_AND = (By.ID, "txaDescricao")
 
     BT_POSTIT = (By.NAME, "sbmRegistrarAnotacao")
 
@@ -154,7 +154,7 @@ class Marcador(object):
 
     SELECT_MARCADOR = (By.ID, "selMarcador")
 
-    LISTA_MARCADORES = (By.CLASS_NAME, "dd-options dd-click-off-close")
+    LISTA_MARCADORES = (By.CLASS_NAME, "dd-options dd-click-off-fechar")
 
     TXT_MARCADOR = (By.ID, "txaTexto")
 

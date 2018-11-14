@@ -130,6 +130,7 @@ class Sec(object):
                              'id_cpf': (By.ID, 'NumCnpjCpf'),
                              'id_uf': (By.ID, 'SiglaUF'),
                              'id_certificado': (By.ID, 'pCertCat'),
+                             'protocolo': (By.ID, 'NumProtocolo'),
                              'submit': (By.ID, 'botaoFlatConfirmar')}
                  }
 
@@ -141,9 +142,9 @@ class Sec(object):
 
     Insc_Cons = 'http://sistemasnet/SEC/Consulta/Provamarcada/Tela.asp?SISQSmodulo=4090'
 
-    Insc_Inc = 'http://sistemasnet/SEC/Inscricao/Incluir/Tela.asp?SISQSmodulo=4029'
 
     Insc_Mnt = 'http://sistemasnet/SEC/Inscricao/Reativar/Tela.asp?SISQSmodulo=18333'
+
 
     Prova = {'imprimir' : {'link': 'http://sistemasnet/SEC/Prova/BancaEspecialImpressao/Tela.asp',
                            'link_direto': r'http://sistemasnet/SEC/Prova/BancaEspecialImpressao/DadosProva.asp?idtProvaAgenda={0}&NumCpfAvaliador={1}',
@@ -151,7 +152,7 @@ class Sec(object):
                            'submit': (By.ID, 'botaoFlatConfirmar'),
                            'alt_reg': "AlteraNumReg();",
                            'num_reg': (By.NAME, 'NumReg'),
-                           'id_bt_imprimir': (By.ID, r"botaoFlat  Imprimir"),
+                           'id_bt_imprimir': (By.ID, "botaoFlat  Imprimir"),
                            'justificativa': (By.ID, 'justificativa')}
              }
 

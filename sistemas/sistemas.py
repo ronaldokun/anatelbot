@@ -73,7 +73,6 @@ DADOS = OrderedDict({"Dados do Usuário":
 def strip_string(str_):
     return "".join(s for s in str_ if s not in STRIP)
 
-
 class Sistema(Page):
 
     def __init__(self, driver, login=None, senha=None, timeout=5):
@@ -123,7 +122,6 @@ class Sistema(Page):
 
     def _get_acoes(self, helper, keys):
         return tuple(helper.get(x, None) for x in keys)
-
 
 class Scpx(Sistema):
     """
@@ -274,7 +272,7 @@ class Scpx(Sistema):
 
         if tipo_estacao == "Fixa" and sede:
             self._click_button(helper.get('copiar_sede'), timeout=2 * timeout)
-
+            sleep(1)
         self._click_button(helper.get('submit'), timeout=2 * timeout)
 
     def movimento_transferir(self, identificador, origem, dest, proc, tipo_id='id_cpf', timeout=5):
@@ -449,7 +447,6 @@ class Scpx(Sistema):
                     dados[key] = value.text.strip()
 
         return dados
-
 
 class Scra(Sistema):
     """
@@ -733,7 +730,7 @@ class Sec(Sistema):
 
         Inscrito = namedtuple('Inscrito', 'link cpf nome coer impresso')
 
-        for tr in source.find_all('tr', id=('TRplus2', 'TRplus3', 'TRplus4')):
+        for tr in source.find_all('tr', id=re.compile("^TRplus.*| ^TRplus2.* | ^TRplus.* | ^TRplus4.*")):
             td = list(tr.find_all('td'))
 
             assert len(td) >= 5, "O identificador tabular retornado não é válido"
@@ -788,20 +785,6 @@ class Sec(Sistema):
 
         h = self.sis.Prova['imprimir']
 
-        # self.driver.get(h['link'])
-        #
-        # if cpf is not None:
-        #
-        #     self._atualizar_elemento(h['id_cpf'], cpf)
-        #
-        # sleep(5)
-        #
-        # self._click_button(h['submit'])
-        #
-        # sleep(5)
-        #
-        # self._click_button((By.PARTIAL_LINK_TEXT, " ".join([data, horario])))
-
         link = h['link_direto'].format(num_prova, cpf)
 
         self.driver.get(link)
@@ -814,7 +797,7 @@ class Sec(Sistema):
 
         dados = self._extrai_inscritos_prova()
 
-        for v in list(dados.values())[start:end]:
+        for v in sorted(list(dados.values()))[start:end]:
 
             self.driver.get(v.link)
 

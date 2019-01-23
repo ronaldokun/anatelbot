@@ -13,7 +13,6 @@ from selenium.webdriver.common.by import By
 SISTEMASNET = 'http://sistemasnet/'
 
 class Sapiens(object):
-
     URL = "https://sapiens.agu.gov.br/"
 
     TITLE = "SAPIENS"
@@ -218,7 +217,7 @@ class Scpx(object):
                fistel=((By.ID, 'pNumFistel'), (By.ID, 'pnumFistel')),
                indicativo=((By.ID, 'pIndicativo'),))
 
-    submit = ((By.ID, "botaoFlatConfirmar"),)
+    submit = (By.ID, "botaoFlatConfirmar")
 
     consulta = {'link': 'http://sistemasnet/scpx/Consulta/Tela.asp?SISQSmodulo=12714',
                 'id_nome': (By.ID, 'pNomeEntidade'),

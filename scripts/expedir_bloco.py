@@ -152,7 +152,7 @@ class PagInicial(Page):
             proc = {k: None for k in chaves}
 
             cols = [v for v in linha.contents if v != "\n"]
-
+     
             assert len(chaves) == len(cols), "Verifique as linhas do bloco!"
 
             for k, v in zip(chaves, cols):

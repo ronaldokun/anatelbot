@@ -8,7 +8,7 @@
 #       format_version: '1.2'
 #       jupytext_version: 0.8.6
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python [default]
 #     language: python
 #     name: python3
 # ---
@@ -48,7 +48,8 @@ get_ipython().run_line_magic('autoreload', '2')
 
 CPF = '33831640807'
 PASS_1 = "Fer465023@ur_"
-PASS_2 = "Fer465023"
+PASS_NET = 'Fer465023ur"
+PASS_2 = "Jussara23"
 
 
 # %%

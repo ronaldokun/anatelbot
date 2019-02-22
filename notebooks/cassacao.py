@@ -8,9 +8,9 @@
 #       format_version: '1.2'
 #       jupytext_version: 0.8.6
 #   kernelspec:
-#     display_name: Python [default]
+#     display_name: Python [conda env:automation]
 #     language: python
-#     name: python3
+#     name: conda-env-automation-py
 # ---
 
 # %%
@@ -32,7 +32,7 @@ import random
 os.chdir("C:/Users/rsilva/gdrive/projects/programming/automation")
 
 #import sistemas
-from sei import sei
+import sei.sei as sei
 from sei.sei_helpers import *
 import page
 from page import *
@@ -89,7 +89,7 @@ def string_endereço(dados):
     return d
 
 # %%
-processo = r'53504.008813/2018-71'
+processo = r'53504.000636/2019-65'
 
 # %%
 usr = 'rsilva'
@@ -109,6 +109,9 @@ sht = wb.worksheet(processo)
 df = gs.get_as_dataframe(sht, dtype=str)
 
 # %%
+df.shape
+
+# %%
 usr = "rsilva"
 pwd = "Savorthemom3nts"
 
@@ -116,50 +119,73 @@ page = webdriver.Ie()
 scpx = sistemas.Scpx(page)
 
 # %%
-validade_rf = sht.range('C2:C53')
-fistel = sht.range('c8:c53')
+nome = df['Nome da Entidade'][1:]
+cpf = df['CNPJ/CPF'][1:]
+fistel = df['Fistel'][1:]
+
+# %%
+#dados = pd.read_pickle("dados.pkl")
 
 # %%
 dados = pd.read_pickle("dados.pkl")
 
-# %%
-nomes = []
-for v in dados.values():
-    nomes.append(v['Nome/Razão Social'])
-    
-nomes = sorted(nomes)
-print(len(nomes), nomes)
 
-# %%
-for f in fistel:
+for i, (n, f, c) in enumerate(zip(nome, fistel, cpf)):
     
-    f = str(f.value)    
+    f = str(f)
+    
+    p = sei_.go_to_processo(processo)
+
+    sleep(5)
     
     while len(f) < 11:
         f = '0' + f
         
-    #dado = dados.get(f, None)
+    dado = dados.get(c, None)    
         
-    #if dado in (None, ""): 
+    if not dado: 
         
-    dado = scpx.extrai_cadastro(f, tipo_id='id_fistel', timeout=5)
+        dado = scpx.extrai_cadastro(f, tipo_id='id_fistel', timeout=5)
         
-    dados[f] = dado
+        dados[c] = dado
         
-    pd.to_pickle(dados, "dados.pkl")   
+        pd.to_pickle(dados, "dados.pkl")
         
-                
-    p.incluir_oficio("RC_Oficio de Cassação", dados=string_endereço(dados[f]), timeout=5)
+    val = dado['Validade Radiofreqüência']
+        
+    df.loc[df["CNPJ/CPF"] == c, "Validade"] = val
     
-    p = sei_.go_to_processo(processo)
-            
+    print(dado["Nome/Razão Social"], val)
+                
+    #tags = sei_.pesquisa_contato(n)
+    
+    #if tags is None:
+        
+    #    sei_._cria_contato(dado)
+        
+    #else:
+        
+    #    try:
+    #        sei_._mudar_dados_contato(dado)            
+    #    except: next
+    
+    p.incluir_oficio("RC_Oficio de Cassação", dados=string_endereço(dados[c]), timeout=5)
+    
+    sleep(5)
+    
     gc.collect()
 
 # %%
-dados[f]
+dados.keys()
 
 # %%
-dados
+df.Validade = pd.to_datetime(df['Validade'])
+
+# %%
+df.loc[df.Validade >= '2019', ['CNPJ/CPF', 'Nome da Entidade', 'Fistel', 'Validade']]
+
+# %%
+gs.set_with_dataframe(sht, df)
 
 # %%
 #pd.to_pickle(dados, "dados.pkl")

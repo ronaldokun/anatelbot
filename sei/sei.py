@@ -23,7 +23,7 @@ SERVICOS = ('Outorga: Rádio do Cidadão',
             'Outorga: Limitado Móvel Marítimo')
 
 TRANSLATION = {".": "", "/": "", "-": "", "_": ""}
-
+    
 
 class make_xlat:
 
@@ -156,7 +156,11 @@ class Sei(Page):
 
         self.wait_for_element_to_click(sei_helpers.Contato.PF).click()
 
-        self._atualizar_elemento(sei_helpers.Contato.SIGLA, dados.get('Cpf_RF', ''))
+        cpf = dados.get('CNPJ/CPF', '')
+
+        cpf = cpf[:3] + '.' + cpf[3:6] + '.' + cpf[6:9] + '-' + cpf[9:]
+
+        self._atualizar_elemento(sei_helpers.Contato.SIGLA, cpf)
 
         if dados.get('Sexo', "") == 'FEMININO':
 
@@ -166,9 +170,9 @@ class Sei(Page):
 
             self.wait_for_element_to_click(sei_helpers.Contato.MASCULINO).click()
 
-        self._atualizar_elemento(sei_helpers.Contato.NOME, dados.get('Nome', ''))
+        self._atualizar_elemento(sei_helpers.Contato.NOME, dados.get('Nome/Razão Social', ''))
 
-        self._atualizar_elemento(sei_helpers.Contato.END, dados.get('Logradouro', '') + ' ' + dados.get('Num', ''))
+        self._atualizar_elemento(sei_helpers.Contato.END, dados.get('Logradouro', '') + ' ' + dados.get('Número', ''))
 
         self._atualizar_elemento(sei_helpers.Contato.COMP, dados.get('Complemento', ''))
 
@@ -274,28 +278,31 @@ class Sei(Page):
         processos = {}
 
         for k, v in kwargs:
-            processos = {p: q for p, q in self._processos.items() if p.get(k) == v}
+            processos = {p:q for p, q in self._processos.items() if p.get(k) == v}
 
         return processos
 
     def go_to_processo(self, num):
 
+        p = self._processos.get(num, None)
 
-        if num in self._processos.keys():
+        if p is not None:
 
-            self.go(self._processos[num]['link'])
+            self.go(p['link'])
 
             return Processo(self.driver, numero=num, tags=self._processos[num])
 
-        try:
+        else:
 
-            self._atualizar_elemento(sei_helpers.SeiBase.Base.pesquisa, num + Keys.ENTER)
+            try:
 
-        except NoSuchElementException:
+                self._atualizar_elemento(sei_helpers.SeiBase.Base.pesquisa, num + Keys.ENTER)
 
-            self.go_to_init_page()
+            except NoSuchElementException:
 
-        return Processo(self.driver, num, tags=None)
+                self.go_to_init_page()
+
+            return Processo(self.driver, num, tags=None)
 
     def see_detailed(self):
         """
@@ -607,17 +614,17 @@ class Processo(Sei):
 
                 return
 
-        try:
-
-            with self._go_to_arvore():
-
-                self._click_button((By.LINK_TEXT, self.numero), timeout=timeout)
-
-                return
-
-        except TimeoutException:
-
+        else:
             raise ValueError("Não foi encontrato o elemento {0} na árvore do Processo".format(label))
+
+            
+        #finally:
+            
+       #     with self._go_to_arvore():
+
+       #         self._click_button((By.LINK_TEXT, self.numero), timeout=timeout)
+
+       #         return
 
     def send_doc_por_email(self, label, dados, timeout=5):
 

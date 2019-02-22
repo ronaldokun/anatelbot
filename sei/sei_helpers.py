@@ -76,12 +76,16 @@ class Blocos(object):
 
     TITLE = "SEI - Blocos de Assinatura"
 
+    BTN_CONCLUIR = (By.ID, "btnConcluir")
+
 
 class Bloco(object):
 
     TITLE = "SEI - Documentos do Bloco de Assinatura"
 
-    RET_BLOCO = ((By.ID, 'btnExcluir'))
+    PESQUISA = (By.ID, "txtPalavrasPesquisaBloco")
+
+    RET_BLOCO = (By.ID, 'btnExcluir')
 
 
 class Proc_incluir(object):
@@ -1084,6 +1088,7 @@ class Gerar_Doc(object):
                      'Of_Modelo_1',
                      'Of_SLP_Exigência_CCadastro',
                      'Of_SLP_Exigência_CCadastro',
+                     'RA_Oficio de Cassação',
                      'RA_Boletos_Emissão_Licença',
                      'RA_Boletos_Emissão_Licença',
                      'RA_Cancelamento_Serviço',

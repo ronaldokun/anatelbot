@@ -98,8 +98,7 @@ class Sec(object):
 
     Cert_2nVia = 'http://sistemasnet/SEC/Certificado/SegundaVia/Tela.asp?SISQSmodulo=4145'
 
-    entidade = {'alterar': 'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=A',
-                'incluir': 'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=I',
+    entidade = {'alterar': {'link' : 'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=A',
                 'id_cpf': (By.ID, 'pNumCnpjCpf'),
                 'id_nome': (By.ID, 'pNomeEntidade'),
                 'input_nome': (By.ID, 't_NomeEntidade'),
@@ -123,7 +122,12 @@ class Sec(object):
                 'bt_end': (By.ID, 'botaoFlatEndereço'),
                 'submit_script' : "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')",
                 'submit': (By.ID, "botaoFlatConfirmar")
-                }
+                },
+                'incluir': {'link': 'http://sistemasnet/SEC/Chamada/Entidade.asp?OP=I',
+                'alterar_nome': (By.ID, 'alteraRazao'),
+                'nome_novo': (By.ID, 't_nNomeEntidade'),
+                'num_doc' : (By.ID, 't_NumProcessoAlteracaoNome')}}
+                
 
     inscricao = {'incluir': {'link':'http://sistemasnet/SEC/Inscricao/Incluir/Tela.asp',
                              'id_cpf': (By.ID, 'NumCnpjCpf'),

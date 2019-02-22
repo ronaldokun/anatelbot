@@ -7,19 +7,18 @@ Created on Mon Aug 28 20:44:15 2017
 """
 
 from contextlib import contextmanager
+from typing import Dict, List
 
 import selenium
-
-# Main package
-from selenium.common.exceptions import *
-
+from selenium.common.exceptions import (TimeoutException, NoSuchElementException, 
+                         UnexpectedAlertPresentException, ElementClickInterceptedException, 
+                         WebDriverException)
 # Utilities
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-
-# Methods used from selenium submodules
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import *
+
 
 # Base Class
 class Page(object):
@@ -28,15 +27,10 @@ class Page(object):
 
     """
 
-    timeout = 10 # default timeout base parameter used in the methods
-
     def __init__(self, driver):
-        """
-
+        """Initializes the webdriver
         :param driver: Selenium webdriver instance
-        :type driver: selenium.webdriver
-
-                Initializes the webdriver
+        :type driver: selenium.webdriver                
 
         """
 
@@ -64,7 +58,7 @@ class Page(object):
         """
         self.driver.close()
 
-    def _click_button(self, btn_id: tuple, silencioso: bool=True, timeout: int=timeout):
+    def _click_button(self, btn_id: tuple, silencioso: bool=True, timeout: int=10):
         """
 
         :param btn_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
@@ -106,7 +100,7 @@ class Page(object):
 
             return None
 
-    def _atualizar_elemento(self, elem_id: tuple, dado: str, timeout: int=timeout):
+    def _atualizar_elemento(self, elem_id: tuple, dado: str, timeout: int=10):
         """
 
         :param elem_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
@@ -124,11 +118,11 @@ class Page(object):
 
             elem.send_keys(dado)
 
-        except NoSuchElementException as e:
+        except (NoSuchElementException, UnexpectedAlertPresentException) as e:
 
-            print(e)
+            return repr(e)
 
-    def _selecionar_por_texto(self, select_id, text, timeout: int=timeout):
+    def _selecionar_por_texto(self, select_id, text, timeout: int=10):
         """
 
         :param select_id: localizador da página html que define um Select (menu drop-down):
@@ -175,7 +169,7 @@ class Page(object):
             self.driver.switch_to.window(main)
 
     @contextmanager
-    def wait_for_page_load(self, timeout: int=timeout):
+    def wait_for_page_load(self, timeout: int = 10):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name('title')
 
@@ -183,7 +177,7 @@ class Page(object):
 
         WebDriverWait(self.driver, timeout).until(ec.staleness_of(old_page))
 
-    def alert_is_present(self, timeout: int=timeout):
+    def alert_is_present(self, timeout: int=10):
 
         try:
 
@@ -195,7 +189,7 @@ class Page(object):
 
         return alert
 
-    def elem_is_visible(self, *locator, timeout: int=timeout):
+    def elem_is_visible(self, *locator, timeout: int=10):
         """
         Check is locator is visible on page given the timeout
 
@@ -206,7 +200,7 @@ class Page(object):
         try:
 
             WebDriverWait(self.driver, timeout).until(
-                ec.visibility_of_element_located(*locator))
+                ec.visibility_of_element_located(locator))
 
         except TimeoutException:
             return False
@@ -224,26 +218,26 @@ class Page(object):
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator, timeout: int=timeout):
+    def check_element_exists(self, *locator, timeout: int=10):
         try:
             self.wait_for_element_to_be_visible(*locator, timeout=timeout)
             return True
         except (TimeoutException, NoSuchElementException):
             return False
 
-    def wait_for_element_to_be_visible(self, *locator, timeout: int=timeout):
+    def wait_for_element_to_be_visible(self, *locator, timeout: int=10):
         return WebDriverWait(self.driver, timeout).until(
-            ec.visibility_of_element_located(*locator))
+            ec.visibility_of_element_located(locator))
 
-    def wait_for_element(self, *locator, timeout=timeout):
+    def wait_for_element(self, *locator, timeout=10):
         return WebDriverWait(self.driver, timeout).until(
-            ec.presence_of_element_located(*locator))
+            ec.presence_of_element_located(locator))
 
-    def wait_for_element_to_click(self, *locator, timeout: int=timeout):
+    def wait_for_element_to_click(self, *locator, timeout: int=10):
         return WebDriverWait(self.driver, timeout).until(
-            ec.element_to_be_clickable(*locator))
+            ec.element_to_be_clickable(locator))
 
-    def wait_for_new_window(self, windows, timeout: int=timeout):
+    def wait_for_new_window(self, windows, timeout: int=10):
         return WebDriverWait(self.driver, timeout).until(
             ec.new_window_is_opened(windows))
 
@@ -288,7 +282,7 @@ class Page(object):
 
         return main_window, windows[-1]
 
-    def _click_button_new_win(self, btn_id: tuple, silencioso: bool=True, timeout: int=timeout):
+    def _click_button_new_win(self, btn_id: tuple, silencioso: bool=True, timeout: int=10):
         """
 
         :param btn_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
@@ -307,6 +301,3 @@ class Page(object):
 
         # Troca o foco do navegador
         self.driver.switch_to.window(windows[-1])
-
-
-

@@ -26,7 +26,7 @@ from selenium.webdriver.support.ui import Select
 from sei.sei_helpers import *
 from sistemas.sis_helpers import *
 from page import Page
-from monitor import sleep
+from time import sleep
 
 
 class LoginPage(Page):
@@ -191,15 +191,27 @@ class PagInicial(Page):
                 counter += 1
 
 
-        #if counter == len(processos):
+        if counter == len(processos):
 
-            #concluir_bl = self.wait_for_element_to_click(Bloco)
+            self.go_to_blocos()
 
-            #concluir_bl.click()
+            self.driver.execute_script("acaoConcluir('{0}');".format(numero))
 
-            #alert = self.alert_is_present(5)
+            #pesquisa = self.wait_for_element_to_click(Bloco.PESQUISA)
 
-            #alert.accept()
+            #pesquisa.send_keys(numero + Keys.RETURN)
+
+            #sleep(5)
+
+            #checkbox = self.wait_for_element_to_click((By.LINK_TEXT, "chkInfraItem0"), timeout=10)
+
+            #checkbox = self.wait_for_element_to_click((By.XPATH, '//*[@id="chkInfraItem0"]'), timeout=5)
+            
+            #checkbox.click(Blocos.BTN_CONCLUIR)
+
+            alert = self.alert_is_present(5)
+
+            alert.accept()
 
         # ret = self.wait_for_element_to_click(Bloco.RET_BLOCO)
 

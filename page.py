@@ -7,7 +7,7 @@ Created on Mon Aug 28 20:44:15 2017
 """
 
 from contextlib import contextmanager
-from typing import Dict, List
+from typing import Dict, List, Tuple, Callable
 
 import selenium
 from selenium.common.exceptions import (
@@ -24,30 +24,30 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import *
 
-
+Selenium_id = Tuple(object, str)
 # Base Class
 class Page(object):
-    # noinspection SpellCheckingInspection
     """Esta classe Base implementa métodos de navegação comum em qualquer página
 
     """
 
-    def __init__(self, driver):
-        """Initializes the webdriver
-        :param driver: Selenium webdriver instance
-        :type driver: selenium.webdriver                
 
+    def __init__(self, driver: selenium.webdriver):
+        """Initializes the webdriver
+        
+        Args:
+            driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc. 
         """
 
         self.driver = driver
 
-    def reiniciar_driver(self, driver):
-        """
-        :param driver: selenium.webdriver
-        :return: None
-
-                 Reinicia a instância do webdriver
-        """
+    def reiniciar_driver(self, driver: selenium.webdriver):
+        """Reinicia a instância do webdriver
+        
+        Args:
+            driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc.
+        """      
+                 
         self.__init__(driver)
 
     def __enter__(self):
@@ -63,17 +63,15 @@ class Page(object):
         """
         self.driver.close()
 
-    def _click_button(self, btn_id: tuple, silencioso: bool = True, timeout: int = 10):
+    def _click_button(self, btn_id: Selenium_id, silencioso: bool = True, timeout: int = 10):
+        """Clica no botão ou link definido pelo elemento btn_id
+        
+        Args:
+            btn_id (tuple): localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
+            silencioso (bool, optional): Defaults to True. Se verdadeiro confirma o pop-up após o clique no botão
+            timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
         """
-
-        :param btn_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
-        :param silencioso: se verdadeiro confirma o pop-up após o clique no botão
-        :param timeout: tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
-        :return: None
-
-        Clica no botão ou link definido pelo elemento btn_id
-        """
-
+       
         try:
 
             botão = self.wait_for_element_to_click(btn_id, timeout=timeout)
@@ -104,15 +102,14 @@ class Page(object):
 
             return None
 
-    def _atualizar_elemento(self, elem_id: tuple, dado: str, timeout: int = 10):
-        """
-
-        :param elem_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
-        :param dado: conteúdo a ser inserido no form definido pelo elem_id
-        :param timeout: tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
-        :return: None
-        Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
-        """
+    def _atualizar_elemento(self, elem_id: Selenium_id, dado: str, timeout: int = 10):
+        """Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
+        
+        Args:
+            elem_id (tuple): localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
+            dado (str): conteúdo a ser inserido no form definido pelo elem_id
+            timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
+        """       
 
         try:
 
@@ -126,7 +123,7 @@ class Page(object):
 
             return repr(e)
 
-    def _selecionar_por_texto(self, select_id, text, timeout: int = 10):
+    def _selecionar_por_texto(self, select_id: Selenium_id, text: str, timeout: int = 10):
         """
 
         :param select_id: localizador da página html que define um Select (menu drop-down):
@@ -193,7 +190,7 @@ class Page(object):
 
         return alert
 
-    def elem_is_visible(self, *locator, timeout: int = 10):
+    def elem_is_visible(self, *locator: Selenium_id, timeout: int = 10):
         """
         Check is locator is visible on page given the timeout
 
@@ -218,39 +215,39 @@ class Page(object):
     def get_url(self):
         return self.driver.current_url()
 
-    def hover(self, *locator):
+    def hover(self, *locator: Selenium_id):
         element = self.wait_for_element(*locator)
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator, timeout: int = 10):
+    def check_element_exists(self, *locator: Selenium_id, timeout: int = 10):
         try:
             self.wait_for_element_to_be_visible(*locator, timeout=timeout)
             return True
         except (TimeoutException, NoSuchElementException):
             return False
 
-    def wait_for_element_to_be_visible(self, *locator, timeout: int = 10):
+    def wait_for_element_to_be_visible(self, *locator: Selenium_id, timeout: int = 10):
         return WebDriverWait(self.driver, timeout).until(
             ec.visibility_of_element_located(*locator)
         )
 
-    def wait_for_element(self, *locator, timeout=10):
+    def wait_for_element(self, *locator: Selenium_id, timeout=10):
         return WebDriverWait(self.driver, timeout).until(
             ec.presence_of_element_located(*locator)
         )
 
-    def wait_for_element_to_click(self, *locator, timeout: int = 10):
+    def wait_for_element_to_click(self, *locator: Selenium_id, timeout: int = 10):
         return WebDriverWait(self.driver, timeout).until(
             ec.element_to_be_clickable(*locator)
         )
 
-    def wait_for_new_window(self, windows, timeout: int = 10):
+    def wait_for_new_window(self, windows: Sequence, timeout: int = 10):
         return WebDriverWait(self.driver, timeout).until(
             ec.new_window_is_opened(windows)
         )
 
-    def nav_elem_to_new_win(self, elem):
+    def nav_elem_to_new_win(self, elem: Selenium_id):
         """ navigate the link present in element to a new window
             focus the page on the new window
             Assumes the is a link present in the html element 'elem'
@@ -274,7 +271,7 @@ class Page(object):
 
         return main_window, windows[-1]
 
-    def nav_link_to_new_win(self, link):
+    def nav_link_to_new_win(self, link: str):
 
         # Guarda janela principal
         main_window = self.driver.current_window_handle
@@ -292,7 +289,7 @@ class Page(object):
         return main_window, windows[-1]
 
     def _click_button_new_win(
-        self, btn_id: tuple, silencioso: bool = True, timeout: int = 10
+        self, btn_id: Selenium_id, silencioso: bool = True, timeout: int = 10
     ):
         """
 

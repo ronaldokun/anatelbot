@@ -1,0 +1,35 @@
+# pycharm folders
+.idea/
+
+# datasets
+*.xlsx
+*.csv
+*.xlsm
+*.xls
+*.gsheet
+
+# Config Files from Visual Studio Code
+*.vscode
+
+# text files
+*.json
+*.log
+*.pkl
+monitor.py
+
+# python binaries
+*.pyo
+*.pyc
+*~
+
+# Jupyter Notebook
+*checkpoint.ipynb
+*checkpoint.py
+*.ipynb
+*.ipynb_checkpoints
+# Environments 
+.env 
+.venv 
+env/
+
+

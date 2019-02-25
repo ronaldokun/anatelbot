@@ -707,7 +707,7 @@ class Sec(Sistema):
         It assumes all values are correctly pre-formatted
         """
 
-        #if not set(dados.keys()).issubset(self.SEC_ALT.keys()):
+        # if not set(dados.keys()).issubset(self.SEC_ALT.keys()):
         #    raise ValueError(
         #        "The dictionary keys doesn't match the keys used in the system"
         #    )

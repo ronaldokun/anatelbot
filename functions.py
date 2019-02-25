@@ -52,7 +52,7 @@ KEYS_END = (
 )
 
 
-def pode_expedir(linha: dict)-> bool:
+def pode_expedir(linha: dict) -> bool:
     """Verifica a linha do Bloco de Assinatura
 
     
@@ -92,7 +92,8 @@ def tag_mouseover(tag, tipo: str):
         raise ValueError("O tipo de tag repassado não é válido: {}".format(tipo))
 
 
-def cria_dict_acoes(acoes: list)-> dict:
+def cria_dict_acoes(acoes: list) -> dict:
+
     """Recebe uma lista de html tags 'a' e retorna um dicionário dessas tags
     
     Args:
@@ -118,9 +119,16 @@ def cria_dict_acoes(acoes: list)-> dict:
     return dict_tags
 
 
-def armazena_tags(lista_tags):
-    """ Recebe uma lista de tags de cada linha do processo  da página inicial
+def armazena_tags(lista_tags: list) -> dict:
+    """Recebe uma lista de tags de cada linha do processo  da página inicial
     do Sei, retorna um dicionário dessas tags
+    
+    Args:
+        lista_tags (list): Lista de Tags contida na tag tabular definida por 
+        cada linha de processo da página inicial do SEI
+    
+    Returns:
+        dict: dicionário - key=Nome da Tag, value=string ou objeto tag
     """
 
     assert (

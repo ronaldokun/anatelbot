@@ -31,7 +31,6 @@ class Page(object):
 
     """
 
-
     def __init__(self, driver: selenium.webdriver):
         """Initializes the webdriver
         
@@ -46,8 +45,8 @@ class Page(object):
         
         Args:
             driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc.
-        """      
-                 
+        """
+
         self.__init__(driver)
 
     def __enter__(self):
@@ -63,7 +62,9 @@ class Page(object):
         """
         self.driver.close()
 
-    def _click_button(self, btn_id: Selenium_id, silencioso: bool = True, timeout: int = 10):
+    def _click_button(
+        self, btn_id: Selenium_id, silencioso: bool = True, timeout: int = 10
+    ):
         """Clica no botão ou link definido pelo elemento btn_id
         
         Args:
@@ -71,7 +72,7 @@ class Page(object):
             silencioso (bool, optional): Defaults to True. Se verdadeiro confirma o pop-up após o clique no botão
             timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
         """
-       
+
         try:
 
             botão = self.wait_for_element_to_click(btn_id, timeout=timeout)
@@ -109,7 +110,7 @@ class Page(object):
             elem_id (tuple): localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
             dado (str): conteúdo a ser inserido no form definido pelo elem_id
             timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
-        """       
+        """
 
         try:
 
@@ -123,7 +124,9 @@ class Page(object):
 
             return repr(e)
 
-    def _selecionar_por_texto(self, select_id: Selenium_id, text: str, timeout: int = 10):
+    def _selecionar_por_texto(
+        self, select_id: Selenium_id, text: str, timeout: int = 10
+    ):
         """
 
         :param select_id: localizador da página html que define um Select (menu drop-down):

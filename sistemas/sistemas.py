@@ -19,8 +19,6 @@ SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"
 
 ESTAÇÕES_RC = ["Fixa", "Móvel", "Telecomando"]
 
-STRIP = ("/", ".", "-")
-
 PATH = r"C:\Users\rsilva\Desktop\SEI"
 
 DADOS = OrderedDict(
@@ -76,10 +74,6 @@ DADOS = OrderedDict(
 )
 
 
-def strip_string(str_):
-    return "".join(s for s in str_ if s not in STRIP)
-
-
 class Sistema(Page):
     def __init__(self, driver, login=None, senha=None, timeout=5):
 
@@ -101,19 +95,11 @@ class Sistema(Page):
         :param page_id: tuple (link to page, element id to fill, submit button)
         :return: None
         """
-        if not functions.check_input(identificador=identificador, tipo=tipo_id):
-            raise ValueError(
-                "Identificador deve ser do tipo cpf, cnpj ou indicativo: "
-                % identificador
-            )
-
-        identificador = strip_string(identificador)
+        identificador = functions.check_input(identificador=identificador, tipo=tipo_id)
 
         link, _id, submit = acoes
 
-        with self.wait_for_page_load():
-
-            self.driver.get(link)
+        self.driver.get(link)
 
         if silent:
 
@@ -676,25 +662,27 @@ class Sec(Sistema):
 
         self.sis = sis_helpers.Sec
 
-    def consulta(self, id: str, tipo_id: str = "id_cpf", timeout=5):
-        """
-        """
-
+    def consulta(self, identificador: str, tipo_id: str = "id_cpf", timeout=5):
+        
         h = self.sis.consulta
 
         acoes = self._get_acoes(h, ("link", tipo_id, "submit"))  # 'submit'))
 
-        self._navigate(id, tipo_id, acoes)
+        self._navigate(identificador, tipo_id, acoes)
 
-        id = strip_string(id)
+        identificador = functions.check_input(identificador, tipo_id)
 
-        try:
+        if tipo_id == "id_cpf":
 
-            self._click_button((By.LINK_TEXT, id), timeout=timeout)
+            if self.check_element_exists((By.LINK_TEXT, identificador), timeout=timeout):
 
-        except (NoSuchElementException, TimeoutException):
+                try:
 
-            pass
+                    self._click_button((By.LINK_TEXT, identificador), timeout=timeout)
+
+                except (NoSuchElementException, TimeoutException):
+
+                    pass
 
     def atualiza_cadastro(
         self, dados: dict, alt_nome: bool = False, novo: bool = False
@@ -714,20 +702,14 @@ class Sec(Sistema):
 
         h = self.sis.entidade
 
-        cpf = dados["CPF"].replace("-", "").replace(".", "")
-
-        # Add leading zeros for older cpf
-        while len(cpf) < 11:
-            cpf = "0" + cpf
-
         if novo:
             acoes = self._get_acoes(h, ("incluir", "id_cpf", "submit"))
-            self._navigate(cpf, h, acoes)
+            self._navigate(dados['CNPJ/CPF'], h, acoes)
             self._atualizar_elemento(h["input_nome"], dados["Nome"])
 
         else:
             acoes = self._get_acoes(h, ("alterar", "id_cpf", "submit"))
-            self._navigate(cpf, h, acoes)
+            self._navigate(dados['CNPJ/CPF'], h, acoes)
 
         for key in self.SEC_ALT["Dados do Usuário"]:
 
@@ -939,6 +921,7 @@ class Sec(Sistema):
             os.rename(file, os.path.join(PATH, str(v.nome).title() + ".pdf"))
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
+
         def soup_clean(source):
 
             ids = [
@@ -961,31 +944,24 @@ class Sec(Sistema):
             is_estrangeiro = hasattr(is_estrangeiro_sim, "CHECKED")
 
             if is_estrangeiro:
-                labels.remove(is_estrangeiro_nao)
+
+                labels.pop(is_estrangeiro_nao)
             else:
-                dados.remove(is_estrangeiro_sim)
+                labels.pop(is_estrangeiro_sim)
+
+            return [l.text.strip().strip(":") for l in labels]
+                
 
         self.consulta(id, tipo_id, timeout=timeout)
-
-        # self.wait_for_element_to_be_visible((By.ID, 'divusuario'), timeout =timeout)
-
+        
         source = soup(self.driver.page_source, "lxml")
 
-        dados = [
-            l.text.strip().strip(":") for l in source.find_all("label", soup_clean)
-        ]
+        sem_cadastro = r"Não foi encontrado nenhum registro com os critérios informados!"
 
-        is_estrangeiro = source.find("IndCertificadoEstrangeiro0")
+        if source.find(string=re.compile(sem_cadastro)):
+            return {}
 
-        is_estrangeiro = hasattr(is_estrangeiro, "CHECKED")
-
-        if is_estrangeiro:
-
-            dados.remove("Não")
-
-        else:
-
-            dados.remove("Sim")
+        dados = soup_clean(source)        
 
         cadastro = OrderedDict()
 

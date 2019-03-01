@@ -39,17 +39,11 @@ PATTERNS = [
     r"^(P){1}([A-Z]{3}|[A-Z]{1}\d{3})",
 ]
 
-KEYS_END = (
-    "Nome/Razão Social",
-    "Logradouro",
-    "Número",
-    "Complemento",
-    "Bairro",
-    "Cep",
-    "Município",
-    "UF",
-    "Número Fistel",
-)
+STRIP = ("/", ".", "-")
+
+
+def strip_string(identificador: str) -> str:
+    return "".join(s for s in identificador if s not in STRIP)
 
 
 def pode_expedir(linha: dict) -> bool:
@@ -336,29 +330,51 @@ def init_browser(webdriver, login, senha, timeout=5):
     return page
 
 
-def check_input(identificador, tipo):
+def check_input(identificador: str, tipo: str) -> str:
+    """Checa se o identificador do tipo informado é válido
 
-    if (tipo == "cpf" or tipo == "fistel") and len(identificador) != 11:
-        print("O número de dígitos do {0} deve ser 11".format(tipo))
+    Raises:
+        ValueError: ValueError caso o nº de caracteres informado exceda o padrão para cpf, fistel e cnpj
+        ValueError: Caso o indicativo consultado não siga o padrão da legislação
 
-        return False
 
-    elif tipo == "cnpj" and len(identificador) != 14:
-        print("O número de dígitos do {0} deve ser 14".format(tipo))
+    Returns:
+        str: identificador opcionalmente adicionado zeros caso seja menor que o tamanho padrão.
+    """
 
-        return False
+    identificador = strip_string(str(identificador))
 
-    elif tipo == "indicativo":
+    size = 11
 
+    if tipo == "indicativo":
+        
         for pattern in PATTERNS:
 
             if re.match(pattern, identificador, re.I):
-                return True
+                return identificador
         else:
 
-            return False
+            raise ValueError(
+                f"O identificador {identificador} do tipo {tipo} é inválido"
+            )
 
-    return True
+    elif tipo == "cpf" or tipo == "fistel":
+        if len(identificador) > size:
+            raise ValueError(
+                f"O identificador {identificador} do tipo {tipo} deve ter 11 dígitos"
+            )
+
+    elif tipo == "cnpj":
+        size = 14
+        if len(identificador) > size:
+            raise ValueError(
+                f"O identificador {identificador} do {tipo} deve ter 14 dígitos"
+            )
+
+    while len(identificador) < size:
+        identificador += "0" + identificador
+
+    return identificador
 
 
 def save_page(page, filename):
@@ -430,7 +446,7 @@ def load_gsheet(title: str) -> gspread.Spreadsheet:
     return sheet
 
 
-def load_workbook_from_sheet(title: str, aba: str):
+def load_wb_from_sheet(title: str, aba: str):
     """Carrega a Planilha Google title e retorna aba
     
     Arguments:
@@ -465,13 +481,18 @@ def load_df_from_sheet(title: str, aba: str, skiprows: list = None):
         skiprows (list, optional): Defaults to None. Opcionalmente ignora essas linhas. 
     """
 
-    wb = load_workbook_from_sheet(title=title, aba=aba)
+    wb = load_wb_from_sheet(title=title, aba=aba)
 
     df = gs_to_df.get_as_dataframe(
-        wb, evaluate_formulas=True, skiprows=skiprows, dtype=str, ignore=False
+        wb,
+        evaluate_formulas=True,
+        skiprows=skiprows,
+        dtype=str,
+        na_values=["nan", ""],
+        allow_formulas=True,
     )
 
-    df.replace("nan", "", inplace=True)
+    df = df.dropna(axis=0, how="all")
 
     return df
 

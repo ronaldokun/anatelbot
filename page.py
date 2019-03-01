@@ -7,7 +7,7 @@ Created on Mon Aug 28 20:44:15 2017
 """
 
 from contextlib import contextmanager
-from typing import Dict, List, Tuple, Callable
+from typing import Dict, List, Tuple, Callable, Sequence
 
 import selenium
 from selenium.common.exceptions import (
@@ -24,7 +24,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import *
 
-Selenium_id = Tuple(object, str)
+Selenium_id = Tuple
 # Base Class
 class Page(object):
     """Esta classe Base implementa métodos de navegação comum em qualquer página

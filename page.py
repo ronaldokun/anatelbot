@@ -49,10 +49,6 @@ class Page(object):
 
         self.__init__(driver)
 
-    def __enter__(self):
-        """ Implementation class """
-        return self
-
     def close(self):
         """
 
@@ -91,16 +87,12 @@ class Page(object):
         alerta = self.alert_is_present(timeout=timeout)
 
         if alerta:
-
-            text = alerta.text
-
             if silencioso:
                 alerta.accept()
-
-            return str(text)
-
+                return None
+            else:
+                return alerta
         else:
-
             return None
 
     def _atualizar_elemento(self, elem_id: Selenium_id, dado: str, timeout: int = 10):
@@ -143,7 +135,10 @@ class Page(object):
 
             lista.select_by_visible_text(text)
 
-        except (NoSuchElementException, UnexpectedAlertPresentException) as e:
+        except NoSuchElementException as e:
+            raise ValueError(f"Não existe a opção {text} no Menu mencionado") from e
+
+        except UnexpectedAlertPresentException as e:
 
             alerta = self.alert_is_present(timeout=timeout)
 

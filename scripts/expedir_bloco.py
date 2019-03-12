@@ -55,7 +55,6 @@ class LoginPage(Page):
 
         return PagInicial(self.driver)
 
-
 class PagInicial(Page):
     """
     This class is a subclass of page, this class is a logged page

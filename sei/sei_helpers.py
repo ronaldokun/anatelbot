@@ -1264,7 +1264,6 @@ class Gerar_Doc(object):
                 'Fiscalização / Investigação da Anatel (Art. 174 da Lei nº 9.472/1997)',
                 'Fiscalização / Investigação da Anatel (Art. 174 da Lei nº 9.472/1997)',
                 'Informação Pessoal (Art. 31 da Lei nº 12.527/2011)',
-                'Informação Pessoal (Art. 31 da Lei nº 12.527/2011)',
                 'Informações Contábeis de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
                 'Informações Contábeis de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',
                 'Informações Econômico-Financeiras de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)',

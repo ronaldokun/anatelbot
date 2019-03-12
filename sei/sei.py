@@ -609,6 +609,7 @@ class Processo(Sei):
         for k, v in tree.items():
 
             if label in k:
+
                 with self._go_to_arvore():
                     self._click_button((By.ID, v['id']), timeout=timeout)
 
@@ -1013,7 +1014,7 @@ class Processo(Sei):
 
             self._click_button(helper.get('id_restrito'), timeout=timeout)
 
-            if hipotese not in helper.HIPOTESES:
+            if hipotese not in sei_helpers.Gerar_Doc.HIPOTESES:
                 raise ValueError("Hipótese Legal Inválida: ", hipotese)
 
             self._selecionar_por_texto(helper.get('id_hip_legal'), hipotese, timeout=timeout)

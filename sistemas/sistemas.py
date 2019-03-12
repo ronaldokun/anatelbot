@@ -76,6 +76,7 @@ DADOS = OrderedDict(
 
 class Sistema(Page):
     def __init__(self, driver, login=None, senha=None, timeout=5):
+        
 
         if login and senha:
 
@@ -111,15 +112,26 @@ class Sistema(Page):
 
                 self._atualizar_elemento(_id, identificador)
 
-                return self._click_button(submit)
+                self._click_button(submit, silencioso=False)
+
+            alert = self.alert_is_present()
+
+            if alert:
+                txt = alert.text
+                alert.accept()
+                return txt
+
+            else:
+                return None
 
         else:
 
             self._atualizar_elemento(_id, identificador)
 
+            return None
+
     def _get_acoes(self, helper, keys):
         return tuple(helper.get(x, None) for x in keys)
-
 
 class Scpx(Sistema):
     """
@@ -488,7 +500,6 @@ class Scpx(Sistema):
 
         return dados
 
-
 class Scra(Sistema):
     """
         Esta subclasse da classe Page define métodos de execução de funções nos sistemas
@@ -578,7 +589,6 @@ class Scra(Sistema):
 
         self._click_button(helper["id_btn_imprimir"])
 
-
 class Sec(Sistema):
 
     KEYS = [
@@ -619,16 +629,16 @@ class Sec(Sistema):
         "Observação",
     ]
 
-    SEC_ALT = {
+    SEC_ALT = OrderedDict({
         "Dados do Usuário": [
-            "CNPJ/CPF",
-            "Nome/Razão Social",
-            "Nacionalidade",
-            "Usuário Alteração",
-            "Tipo Usuário",
+            # "CNPJ/CPF",
+            # "Nome/Razão Social",
+            # "Nacionalidade",
+            # "Usuário Alteração",
+            # "Tipo Usuário",
             "E-mail",
-            "Home Page",
-            "Observação",
+            # "Home Page",
+            # "Observação",
         ],
         "Dados Complementares": [
             "Identidade",
@@ -636,12 +646,14 @@ class Sec(Sistema):
             "Sexo",
             "Estado Civil",
             "Data de Nascimento",
-            "Num CREA" "Sigla UF_CREA",
+            "Num CREA", 
+            "Sigla UF_CREA",
+            "CNPJ/CPF_Responsável"
         ],
-        "Dados de Telefones": ["Principal", "Celular"],
+        "Dados de Telefones": ["DDD", "Principal", "DDD2", "Principal2"],
         "Endereço Sede": [
             "País",
-            "Cep",
+            "CEP",
             "Logradouro",
             "Número",
             "Complemento",
@@ -651,7 +663,7 @@ class Sec(Sistema):
             "Distrito",
             "Subdistrito",
         ],
-    }  # type: Dict[str, List[str]]
+    })  # type: Dict[str, List[str]]
 
     def __init__(
         self, driver: selenium.webdriver, login: str = "", senha: str = "", timeout=2
@@ -663,7 +675,7 @@ class Sec(Sistema):
         self.sis = sis_helpers.Sec
 
     def consulta(self, identificador: str, tipo_id: str = "id_cpf", timeout=5):
-        
+
         h = self.sis.consulta
 
         acoes = self._get_acoes(h, ("link", tipo_id, "submit"))  # 'submit'))
@@ -674,7 +686,9 @@ class Sec(Sistema):
 
         if tipo_id == "id_cpf":
 
-            if self.check_element_exists((By.LINK_TEXT, identificador), timeout=timeout):
+            if self.check_element_exists(
+                (By.LINK_TEXT, identificador), timeout=timeout
+            ):
 
                 try:
 
@@ -684,108 +698,262 @@ class Sec(Sistema):
 
                     pass
 
-    def atualiza_cadastro(
-        self, dados: dict, alt_nome: bool = False, novo: bool = False
-    ):
+    def incluir_cadastro(self, dados: dict, menor: bool = False) -> bool:
+        """[summary]
+        
+        Args:
+            dados (dict): [description]
+            menor (bool, optional): Defaults to False. [description]
+        
+        Returns:
+            bool: [description]
         """
-
-        :param dados: dictionary of all the fiels in the (Sec -> Entidade -> Alterar) page
-        :return: None
-
-        It assumes all values are correctly pre-formatted
-        """
-
-        # if not set(dados.keys()).issubset(self.SEC_ALT.keys()):
-        #    raise ValueError(
-        #        "The dictionary keys doesn't match the keys used in the system"
-        #    )
 
         h = self.sis.entidade
 
-        if novo:
-            acoes = self._get_acoes(h, ("incluir", "id_cpf", "submit"))
-            self._navigate(dados['CNPJ/CPF'], h, acoes)
-            self._atualizar_elemento(h["input_nome"], dados["Nome"])
+        h = h["incluir"]
+        acoes = self._get_acoes(h, ("link", "id_cpf", "submit"))
+        response = self._navigate(dados["CNPJ/CPF"], h, acoes)
 
-        else:
-            acoes = self._get_acoes(h, ("alterar", "id_cpf", "submit"))
-            self._navigate(dados['CNPJ/CPF'], h, acoes)
+        if response is not None:
+            return response
+        
+        buttons = (h["bt_dados"], h["bt_fone"], h["bt_end"])
 
-        for key in self.SEC_ALT["Dados do Usuário"]:
+        telas = self.SEC_ALT.copy()
+        telas.pop("Endereço Sede")
+        
+        if menor:
+            cpf_resp = dados.get("CNPJ/CPF_Responsável", None) 
+            #telas["Dados do Usuário"]["cpf_resp"] = cpf_resp
+            assert cpf_resp, "É obrigatório informar o CPF do Responsável para menores de 18 anos"
 
-            value = dados.get(key, "")
+        self._atualizar_elemento(h["input_nome"], dados["Nome/Razão Social"]  + Keys.TAB)
+        
+        for i, (tela, campos) in enumerate(telas.items()):            
+            for campo in campos:
+                value = dados.get(campo, None)
+                if value:
+                    self._atualizar_elemento(h[campo], value + Keys.TAB)
+                
+            self._click_button(buttons[i])
 
-            if value:
-                self._atualizar_elemento(h[key], value)
+        cep = dados.get("CEP", "").replace("-", "")        
 
-        self._click_button(h["bt_dados"])
+        assert cep, "É Obrigatório informar o CEP para inclusão de Cadastro"
+        response = self._carrega_cep(dados, cep, h)
+        if response is not None:
+            return response            
+        try:
 
-        for key in self.SEC_ALT["Dados Complementares"]:
+            self._click_button(h["submit"], timeout=5)
 
-            value = dados.get(key, "")
+        except TimeoutException:
 
-            if value:
-                self._atualizar_elemento(h[key], value)
-
-        self._click_button(h["bt_fone"])
-
-        for key in self.SEC_ALT["Dados de Telefones"]:
-
-            value = dados.get(key, "")
-
-            if value:
-                self._atualizar_elemento(h[key], value)
-
-        self._click_button(h["bt_end"])
-
-        cep = dados.get("Cep", "").replace("-", "")
-
-        if cep:
-
-            self._atualizar_elemento(h["Cep"], cep)
-
-            self._click_button(h["bt_cep"])
-
-            alert = self.alert_is_present(5)
-
-            if alert:
-                return alert.get_text
-
-            uf = self.wait_for_element_to_be_visible(h["UF"])
-
-            # After clicking the 'bt_cep' button it takes a while until the uf.value attribute is set
-            # until then there is no uf.value
-            while not uf.get_attribute("value"):
-                uf = self.wait_for_element_to_be_visible(h["UF"])
-
-            logr = self.wait_for_element_to_be_visible(h["Endereço"])
-
-            # if the CEP loading didn't retrieve the logradouro, update it manually
-            if not logr.get_attribute("value"):
-                self._atualizar_elemento(h["Endereço"], dados["Endereço"].title())
-
-            bairro = self.wait_for_element(h["Bairro"])
-
-            if not bairro.get_attribute("value"):
-                self._atualizar_elemento(h["Bairro"], dados["Bairro"].title())
-
-            if "Número" not in dados:
-                raise ValueError("É obrigatório informar o número do endereço")
-
-            self._atualizar_elemento(h["Número"], dados["Número"])
-
-            comp = dados.get("Complemento", "").title()
-
-            self._atualizar_elemento(h["Complemento"], comp)
-
-        # self.driver.execute_script(h['submit_script'])
-
-        self._click_button(h["submit"])
+            self.driver.execute_script(h["submit_script"])
 
         alert = self.alert_is_present(30)
 
         if alert:
-            return alert.accept()
+            if alert.text == h["atualizar_ok"]:
+                alert.accept()
+                return None
+            else:
+                return alert.text
+
+        return None
+
+    def regularizar_RF(self, cpf: str, situacao: str, timeout: int = 10) -> bool:
+        """[summary]
+        
+        Args:
+            cpf (str): [description]
+        
+        Returns:
+            bool: [description]
+        """
+        h = self.sis.entidade["regularizar_RF"]
+
+        acoes = self._get_acoes(h, ("link", "id_cpf", "submit"))
+
+        response = self._navigate(cpf, h, acoes)
+
+        if response is not None:
+            return response
+
+        source = soup(self.driver.page_source, "lxml")
+
+        if source.find_all("label", string="0 - Regular"):
+            return True
+
+        self._selecionar_por_texto(h["nova_situacao"], text=situacao, timeout=timeout)
+
+        btn = self.wait_for_element_to_click(h["nova_situacao"])
+
+        btn.send_keys(2 * Keys.TAB + Keys.RETURN)
+
+        alert = self.alert_is_present(30)
+
+        if alert:
+            if alert.text == h["atualizar_ok"]:
+                alert.accept()
+                return None
+            else:
+                return alert.text
+
+        # self._click_button(h["submit"], timeout=timeout)
+
+        # self._click_button((By.PARTIAL_LINK_TEXT, "Confirmar"), timeout=timeout)
+
+        return None
+
+    def _carrega_cep(self, dados: dict, cep: str, h: dict)-> bool:
+        
+        self._atualizar_elemento(h["CEP"], cep)
+
+        self._click_button(h["bt_cep"])
+
+        alert = self.alert_is_present(10)
+
+        if alert:
+            return alert.text
+
+        uf = self.wait_for_element(h["UF"])
+
+        # After clicking the 'bt_cep' button it takes a while until the uf.value attribute is set
+        # until then there is no uf.value
+        while uf.get_attribute("value") == "":
+            sleep(1)
+            uf = self.wait_for_element(h["UF"])
+
+        logr = self.wait_for_element_to_be_visible(h["Logradouro"])
+
+        # if the CEP loading didn't retrieve the logradouro, update it manually
+        if not logr.get_attribute("value"):
+            self._atualizar_elemento(h["Endereço"], dados["Endereço"].title())
+
+        bairro = self.wait_for_element(h["Bairro"])
+
+        if not bairro.get_attribute("value"):
+            self._atualizar_elemento(h["Bairro"], dados["Bairro"].title())
+
+        if "Número" not in dados:
+            raise ValueError("É obrigatório informar o número do endereço")
+
+        self._atualizar_elemento(h["Número"], dados["Número"])
+
+        comp = dados.get("Complemento", "").title()
+
+        self._atualizar_elemento(h["Complemento"], comp)
+
+        return None
+
+    def atualiza_cadastro(
+        self,
+        dados: dict,
+        alt_nome: bool = False,
+        p_alt: str = None,
+        menor: bool = False,
+    ):
+        """
+        Atualiza os campos retornados pelo dicionário `dados`.
+        :param dados: Dicionário com todos os campos  da página (Sec -> Entidade -> Alterar)
+        :return: None
+
+
+        Assuma que as chaves do dicionário casa com os campos da página
+        """       
+
+        h = self.sis.entidade
+    
+        h = h["alterar"]
+        acoes = self._get_acoes(h, ("link", "id_cpf", "submit"))
+        response = self._navigate(dados["CNPJ/CPF"], h, acoes)
+
+        if response is not None:
+            return response
+        
+        buttons = (h["bt_dados"], h["bt_fone"], h["bt_end"])
+
+        telas = self.SEC_ALT.copy()
+        telas.pop("Endereço Sede")
+        
+        if menor:
+            cpf_resp = dados.get("CNPJ/CPF_Responsável", None) 
+            #telas["Dados do Usuário"]["cpf_resp"] = cpf_resp
+            assert cpf_resp, "É obrigatório informar o CPF do Responsável para menores de 18 anos"
+
+        if alt_nome:
+            self._click_button(h["bt_alt_razao"])
+            self._atualizar_elemento(h["id_novo_nome"], dados["Nome/Razão Social"]  + Keys.TAB)
+            if p_alt is None:
+                p_alt = dados["CNPJ/CPF"]
+            self._atualizar_elemento(h["id_p_altera"], p_alt + Keys.TAB)
+
+        
+        for i, (_, campos) in enumerate(telas.items()):
+            for campo in campos:
+                value = dados.get(campo, None)
+                if value:
+                    self._atualizar_elemento(h[campo], value + Keys.TAB)
+                    
+
+            self._click_button(buttons[i])
+
+        cep = dados.get("CEP", "").replace("-", "")        
+
+        if cep:
+            response = self._carrega_cep(dados, cep, h)
+            if response is not None:
+                return response            
+        try:
+
+            self._click_button(h["submit"], timeout=5)
+
+        except TimeoutException:
+
+            self.driver.execute_script(h["submit_script"])
+
+        alert = self.alert_is_present(30)
+
+        if alert:
+            if alert.text == h["atualizar_ok"]:
+                alert.accept()
+                return None
+            else:
+                return alert.text
+
+    def consulta_inscrição(self, cpf: str)-> None:
+        h = self.sis.inscricao["consultar"]
+
+        acoes = self._get_acoes(h, ("link", "id_cpf", "submit"))  # 'submit'))
+
+        response = self._navigate(cpf, h, acoes)
+
+        alert = self.alert_is_present()
+
+        if alert:
+            print(alert.text)
+            alert.accept()
+            return False
+
+
+        #if hasattr(response, "text") and response.text == h["not_found"]:
+        #    return False
+
+        else:
+            #self._click_button(h["imprimir"])
+
+            imprimir = self.wait_for_element_to_click(h["imprimir"])
+
+            imprimir.send_keys(Keys.CONTROL + "p")
+
+        alert = self.alert_is_present()
+
+        if alert:
+            alert.accept()
+
+        return True
 
     def _extrai_inscritos_prova(self):
 
@@ -844,13 +1012,14 @@ class Sec(Sistema):
 
             self._atualizar_elemento(h["protocolo"], protocolo)
 
-        self._click_button((By.LINK_TEXT, data))
+        result = self._click_button((By.LINK_TEXT, data), False)
 
-        alert = self.alert_is_present(timeout=10)
+        assert (
+            result.text
+            == "Confirma inscrição para a agenda selecionada (Data/UF/Certificado) ?"
+        ), f"Candidato não foi inscrito, erro: {result}"
 
-        alert.accept()
-
-        sleep(1)
+        result.accept()
 
     def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1):
 
@@ -921,7 +1090,6 @@ class Sec(Sistema):
             os.rename(file, os.path.join(PATH, str(v.nome).title() + ".pdf"))
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
-
         def soup_clean(source):
 
             ids = [
@@ -950,18 +1118,19 @@ class Sec(Sistema):
                 labels.pop(is_estrangeiro_sim)
 
             return [l.text.strip().strip(":") for l in labels]
-                
 
         self.consulta(id, tipo_id, timeout=timeout)
-        
+
         source = soup(self.driver.page_source, "lxml")
 
-        sem_cadastro = r"Não foi encontrado nenhum registro com os critérios informados!"
+        sem_cadastro = (
+            r"Não foi encontrado nenhum registro com os critérios informados!"
+        )
 
         if source.find(string=re.compile(sem_cadastro)):
             return {}
 
-        dados = soup_clean(source)        
+        dados = soup_clean(source)
 
         cadastro = OrderedDict()
 
@@ -1005,7 +1174,6 @@ class Sec(Sistema):
     def alterar_nome(self, cpf, novo):
 
         pass
-
 
 class Sigec(Sistema):
     def __init__(self, driver, login="", senha="", timeout=2):

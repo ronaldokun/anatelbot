@@ -334,11 +334,11 @@ class Sei(Page):
 
     def is_init_page(self):
         """Retorna True se a página estiver na página inicial do SEI, False
-        caso contrário"""
+        caso contrário
+        """
         return self.get_title() == sei_helpers.Sei_Inicial.TITLE
 
     # noinspection PyProtectedMember
-
     def go_to_init_page(self):
         """
         Navega até a página inicial do SEI caso já esteja nela
@@ -348,7 +348,7 @@ class Sei(Page):
 
         try:
 
-            self._click_button(sei_helpers.SeiBase.Base.init)
+            self._clicar(sei_helpers.SeiBase.Base.init)
 
         except:
 
@@ -611,7 +611,7 @@ class Processo(Sei):
             if label in k:
 
                 with self._go_to_arvore():
-                    self._click_button((By.ID, v['id']), timeout=timeout)
+                    self._clicar((By.ID, v['id']), timeout=timeout)
 
                 return
 
@@ -656,7 +656,7 @@ class Processo(Sei):
                 # After putting the email, we must validate ir by clicking it or pressing ENTER
                 self._atualizar_elemento(helper.destinatario, 2 * Keys.ENTER, timeout=timeout)
 
-                self._click_button(helper.enviar, timeout=timeout)
+                self._clicar(helper.enviar, timeout=timeout)
 
     def info_oficio(self, num_doc):
 
@@ -664,7 +664,7 @@ class Processo(Sei):
             "Erro ao navegar para o processo"
 
         # Switch to tree frame
-        self.go_to_arvore()
+        self._go_to_arvore()
 
         with self.wait_for_page_load():
             html_tree = Soup(self.driver.page_source, "lxml")
@@ -774,7 +774,7 @@ class Processo(Sei):
 
         info = self.info_oficio(num_doc)
 
-        buttons = self.acoes_processo()
+        buttons = self._get_acoes()
 
         self.update_andamento(buttons, info)
 
@@ -831,7 +831,7 @@ class Processo(Sei):
 
             sleep(1)
 
-            self.close()
+            self.fechar()
 
             self.driver.switch_to.window(main)
 
@@ -876,7 +876,7 @@ class Processo(Sei):
 
                 try:
 
-                    self._click_button(sei_helpers.Acompanhamento_Especial.EXCLUIR)
+                    self._clicar(sei_helpers.Acompanhamento_Especial.EXCLUIR)
 
                 except TimeoutException:
 
@@ -893,7 +893,7 @@ class Processo(Sei):
 
                     print("Não houve pop-up de confirmação")
 
-                self.close()
+                self.fechar()
 
                 self.driver.switch_to.window(main)
 
@@ -904,19 +904,56 @@ class Processo(Sei):
         with self._navega_nova_janela():
             self.go_to_marcador()
 
-            self._click_button(sei_helpers.Marcador.SELECT_MARCADOR, timeout=timeout)
+            self._clicar(sei_helpers.Marcador.SELECT_MARCADOR, timeout=timeout)
 
-            self._click_button((By.LINK_TEXT, tipo), timeout=timeout)
+            self._clicar((By.LINK_TEXT, tipo), timeout=timeout)
 
             self._atualizar_elemento(sei_helpers.Marcador.TXT_MARCADOR, content, timeout=timeout)
 
-            self._click_button(sei_helpers.Marcador.SALVAR, timeout=timeout)
+            self._clicar(sei_helpers.Marcador.SALVAR, timeout=timeout)
 
-            self.close()
+            self.fechar()
 
         self.driver.get(self.link)
 
-    def _incluir_documento(self, tipo, timeout=5):
+    def incluir_interessado(self, nome, checagem=False):
+
+        h = sei_helpers.Selecionar_Contatos
+
+        contato = self.pesquisa_contato(nome=nome) if checagem else True
+
+        if contato is not None:
+
+            with self.wait_for_page_load():
+                Sei.go_to_processo(self, self.numero)
+
+            link = self._get_acoes().get("Consultar/Alterar Processo")
+
+            if link is not None:
+
+                self.go(link)
+
+                with self._navega_nova_janela():
+
+                    self._click_button_new_win(h.LUPA)
+
+                    self._atualizar_elemento(h.INPUT_PESQUISAR, nome + Keys.RETURN)
+
+                    self._clicar(h.BTN_PESQUISAR)
+
+                    self._clicar((By.ID, "chkInfraItem0"))
+
+                    self._clicar(h.B_TRSP)
+
+                    self.fechar()
+
+                self._clicar(h.SALVAR)
+
+                self.go(self.link)
+
+                self = super().go_to_processo(self.numero)
+
+    def incluir_documento(self, tipo, timeout=5):
 
         if tipo not in sei_helpers.Gerar_Doc.TIPOS:
             raise ValueError("Tipo de Documento inválido: {}".format(tipo))
@@ -929,7 +966,7 @@ class Processo(Sei):
 
                 self.go(link)
 
-            self._click_button((By.LINK_TEXT, tipo), timeout=timeout)
+            self._clicar((By.LINK_TEXT, tipo), timeout=timeout)
 
         else:
 
@@ -944,23 +981,23 @@ class Processo(Sei):
         if tipo not in sei_helpers.Gerar_Doc.TEXTOS_PADRAO:
             raise ValueError("Tipo de Ofício inválido: {}".format(tipo))
 
-        self._incluir_documento("Ofício", timeout=timeout/2)
+        self.incluir_documento("Ofício", timeout=timeout/2)
 
-        self._click_button(helper.get('id_txt_padrao'), timeout=timeout/2)
+        self._clicar(helper.get('id_txt_padrao'), timeout=timeout/2)
 
         self._selecionar_por_texto(helper.get('id_modelos'), tipo, timeout=timeout/2)
 
         if acesso == 'publico':
 
-            self._click_button(helper.get('id_pub'), timeout=timeout/2)
+            self._clicar(helper.get('id_pub'), timeout=timeout/2)
 
         elif acesso == 'restrito':
 
-            self._click_button(helper.get('id_restrito'), timeout=timeout)
+            self._clicar(helper.get('id_restrito'), timeout=timeout)
 
             hip = Select(self.wait_for_element_to_click(helper.get('id_hip_legal'), timeout=timeout))
 
-            if hipotese not in helper.HIPOTESES:
+            if hipotese not in sei_helpers.Gerar_Doc.HIPOTESES:
                 raise ValueError("Hipótese Legal Inválida: ", hipotese)
 
             hip.select_by_visible_text(hipotese)
@@ -978,10 +1015,9 @@ class Processo(Sei):
 
                 self.editar_oficio(dados, timeout=timeout)
 
-                self.close()
+                self.fechar()
 
         self.driver.get(self.link)
-
 
     def incluir_informe(self):
         pass
@@ -994,7 +1030,7 @@ class Processo(Sei):
 
         #    raise ValueError("Tipo de Documento Externo Inválido: {}".format(tipo))
 
-        self._incluir_documento("Externo", timeout=timeout)
+        self.incluir_documento("Externo", timeout=timeout)
 
         self._selecionar_por_texto(helper.get('id_tipo'), tipo, timeout=timeout)
 
@@ -1004,15 +1040,15 @@ class Processo(Sei):
 
         if arvore: self._atualizar_elemento(helper.get('id_txt_tree'), arvore, timeout=timeout)
 
-        if formato.lower() == 'nato': self._click_button(helper.get('id_nato'), timeout=timeout)
+        if formato.lower() == 'nato': self._clicar(helper.get('id_nato'), timeout=timeout)
 
         if acesso == 'publico':
 
-            self._click_button(helper.get('id_pub'), timeout=timeout)
+            self._clicar(helper.get('id_pub'), timeout=timeout)
 
         elif acesso == 'restrito':
 
-            self._click_button(helper.get('id_restrito'), timeout=timeout)
+            self._clicar(helper.get('id_restrito'), timeout=timeout)
 
             if hipotese not in sei_helpers.Gerar_Doc.HIPOTESES:
                 raise ValueError("Hipótese Legal Inválida: ", hipotese)
@@ -1025,7 +1061,7 @@ class Processo(Sei):
 
         self._atualizar_elemento(helper.get('id_file_upload'), path, timeout=timeout)
 
-        self._click_button(helper.get('submit'), timeout=timeout)
+        self._clicar(helper.get('submit'), timeout=timeout)
 
         self.go(self.link)
 
@@ -1077,7 +1113,7 @@ class Processo(Sei):
 
         self.driver.switch_to.parent_frame()
 
-        self._click_button(links.submit, timeout=timeout)
+        self._clicar(links.submit, timeout=timeout)
 
         # Necessary steps to save
         # self.driver.execute_script('arguments[0].removeAttribute("aria-disabled")', salvar)
@@ -1166,7 +1202,7 @@ def expedir_bloco(sei, numero):
 
             link = sei.go(p['processo'].a.attrs['href'])
 
-            (bloco_window, proc_window) = functions.nav_link_to_new_win(
+            (bloco_window, proc_window) = Page.nav_link_to_new_win(
                 sei.driver, link)
 
             processo = Processo(sei.driver, proc_window)

@@ -139,6 +139,7 @@ class Proc_central(object):
 
     IN_AND = (By.ID, "txaDescricao")
 
+
     BT_POSTIT = (By.NAME, "sbmRegistrarAnotacao")
 
     CHK_PRIOR = (By.ID, "chkSinPrioridade")
@@ -957,6 +958,20 @@ class Criar_Processo(object):
              'Viagem: No País - Prestação de Contas',
              'Viagem: Publicação de Boletim'
              }
+
+class Selecionar_Contatos:
+
+    B_TRSP = (By.ID, "btnTransportarSelecao")
+
+    ALT_INTERESSADO = (By.ID, "imgAlterarInteressado")
+
+    INPUT_PESQUISAR = (By.ID, "txtPalavrasPesquisaContatos")
+
+    BTN_PESQUISAR = (By.ID, "btnPesquisar")
+
+    SALVAR = (By.ID, "btnSalvar")
+
+    LUPA = (By.ID, "imgSelecionarGrupo")
 
 
 class Gerar_Doc(object):

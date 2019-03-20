@@ -12,13 +12,16 @@ import sys
 # Recomended way to insert the modules in parent folder in the path
 # Use a simple (but explicit) path modification to resolve the package properly.
 # https://docs.python-guide.org/writing/structure/
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from bs4 import BeautifulSoup as soup
+
 # INITIALIZE DRIVER
 from selenium import webdriver
+
 # METHODS
 from selenium.webdriver.common.keys import Keys
+
 # WAIT AND CONDITIONS METHODS
 # available since 2.26.0
 from selenium.webdriver.support.ui import Select
@@ -30,7 +33,6 @@ from time import sleep
 
 
 class LoginPage(Page):
-
     def login(self, usr, pwd):
         """
         make login and return and instance of browser"""
@@ -55,6 +57,7 @@ class LoginPage(Page):
 
         return PagInicial(self.driver)
 
+
 class PagInicial(Page):
     """
     This class is a subclass of page, this class is a logged page
@@ -64,10 +67,9 @@ class PagInicial(Page):
         # example use
 
         try:
-            ver_todos_processos = self.wait_for_element_to_click(
-                Sei_Inicial.ATR)
+            ver_todos_processos = self.wait_for_element_to_click(Sei_Inicial.ATR)
 
-            if ver_todos_processos.text == 'Ver todos os processos':
+            if ver_todos_processos.text == "Ver todos os processos":
                 ver_todos_processos.click()
         except:
 
@@ -75,21 +77,19 @@ class PagInicial(Page):
 
         # Verifica se está na visualização detalhada senão muda para ela
         try:
-            visualizacao_detalhada = self.wait_for_element_to_click(
-                Sei_Inicial.VISUAL)
+            visualizacao_detalhada = self.wait_for_element_to_click(Sei_Inicial.VISUAL)
 
-            if visualizacao_detalhada.text == 'Visualização detalhada':
+            if visualizacao_detalhada.text == "Visualização detalhada":
                 visualizacao_detalhada.click()
 
         except:
             print("Falha na visualização detalhada dos processos")
 
     def isPaginaInicial(self):
-        return self.get_title() == 'SEI - Controle de Processos'
+        return self.get_title() == "SEI - Controle de Processos"
 
     def go_to_initial_page(self):
-        self.wait_for_element_to_click(
-            Base.init).click()
+        self.wait_for_element_to_click(Base.init).click()
 
     def exibir_menu_lateral(self):
 
@@ -114,7 +114,7 @@ class PagInicial(Page):
             contador = Select(self.wait_for_element(Sei_Inicial.CONT))
             contador.select_by_visible_text(pag)
             html_sei = soup(self.driver.page_source, "lxml")
-            processos += html_sei("tr", {"class": 'infraTrClara'})
+            processos += html_sei("tr", {"class": "infraTrClara"})
 
         return processos
 
@@ -138,11 +138,19 @@ class PagInicial(Page):
             self.exibir_bloco(numero)
 
         html_bloco = soup(self.driver.page_source, "lxml")
-        linhas = html_bloco.find_all(
-            "tr", class_=['infraTrClara', 'infraTrEscura'])
+        linhas = html_bloco.find_all("tr", class_=["infraTrClara", "infraTrEscura"])
 
-        chaves = ['checkbox', 'seq', "processo", 'documento', 'data', 'tipo',
-                  'assinatura', 'anotacoes', 'acoes']
+        chaves = [
+            "checkbox",
+            "seq",
+            "processo",
+            "documento",
+            "data",
+            "tipo",
+            "assinatura",
+            "anotacoes",
+            "acoes",
+        ]
 
         lista_processos = []
 
@@ -151,14 +159,13 @@ class PagInicial(Page):
             proc = {k: None for k in chaves}
 
             cols = [v for v in linha.contents if v != "\n"]
-     
+
             assert len(chaves) == len(cols), "Verifique as linhas do bloco!"
 
             for k, v in zip(chaves, cols):
                 proc[k] = v
 
-            proc['checkbox'] = proc['checkbox'].find(
-                'input', class_='infraCheckbox')
+            proc["checkbox"] = proc["checkbox"].find("input", class_="infraCheckbox")
 
             lista_processos.append(proc)
 
@@ -174,21 +181,19 @@ class PagInicial(Page):
 
             if podeExpedir(p):
 
-                proc = p['processo'].a.string
+                proc = p["processo"].a.string
 
-                num_doc = p['documento'].a.string
+                num_doc = p["documento"].a.string
 
-                link = SeiBase.Base.url + p['processo'].a.attrs['href']
+                link = SeiBase.Base.url + p["processo"].a.attrs["href"]
 
                 self.expedir_oficio(num_doc, link)
 
-                chk = self.wait_for_element_to_click(
-                    (By.ID, p['checkbox'].attrs['id']))
+                chk = self.wait_for_element_to_click((By.ID, p["checkbox"].attrs["id"]))
 
                 chk.click()
 
                 counter += 1
-
 
         if counter == len(processos):
 
@@ -196,17 +201,17 @@ class PagInicial(Page):
 
             self.driver.execute_script("acaoConcluir('{0}');".format(numero))
 
-            #pesquisa = self.wait_for_element_to_click(Bloco.PESQUISA)
+            # pesquisa = self.wait_for_element_to_click(Bloco.PESQUISA)
 
-            #pesquisa.send_keys(numero + Keys.RETURN)
+            # pesquisa.send_keys(numero + Keys.RETURN)
 
-            #sleep(5)
+            # sleep(5)
 
-            #checkbox = self.wait_for_element_to_click((By.LINK_TEXT, "chkInfraItem0"), timeout=10)
+            # checkbox = self.wait_for_element_to_click((By.LINK_TEXT, "chkInfraItem0"), timeout=10)
 
-            #checkbox = self.wait_for_element_to_click((By.XPATH, '//*[@id="chkInfraItem0"]'), timeout=5)
-            
-            #checkbox.click(Blocos.BTN_CONCLUIR)
+            # checkbox = self.wait_for_element_to_click((By.XPATH, '//*[@id="chkInfraItem0"]'), timeout=5)
+
+            # checkbox.click(Blocos.BTN_CONCLUIR)
 
             alert = self.alert_is_present(5)
 
@@ -233,24 +238,23 @@ class PagInicial(Page):
 
         self.atualiza_andamento(buttons, info)
 
-        self.enviar_processo_sede(buttons)
+        # self.enviar_processo_sede(buttons)
 
-        self.close()
+        self.fechar()
 
         self.driver.switch_to_window(main_window)
 
     def enviar_processo_sede(self, buttons):
 
-        assert self.get_title() == Proc_incluir.TITLE, \
-            "Erro ao navegar para o processo"
-
+        assert self.get_title() == Proc_incluir.TITLE, "Erro ao navegar para o processo"
 
         enviar = buttons[3]
 
         link = SeiBase.Base.url + enviar.attrs["href"]
 
         (janela_processo, janela_andamento) = navigate_link_to_new_window(
-                self.driver, link)
+            self.driver, link
+        )
 
         self.driver.execute_script(Envio.LUPA)
 
@@ -309,12 +313,11 @@ class PagInicial(Page):
         self.driver.switch_to_window(janela_processo)
 
         # fecha a janela processo
-        #self.driver.()()
+        # self.driver.()()
 
     def acoes_oficio(self):
 
-        assert self.get_title() == Proc_incluir.TITLE, \
-            "Erro ao navegar para o processo"
+        assert self.get_title() == Proc_incluir.TITLE, "Erro ao navegar para o processo"
 
         # Switch to central frame
         self.driver.switch_to_frame("ifrVisualizacao")
@@ -333,8 +336,7 @@ class PagInicial(Page):
 
     def info_oficio(self, num_doc):
 
-        assert self.get_title() == Proc_incluir.TITLE, \
-            "Erro ao navegar para o processo"
+        assert self.get_title() == Proc_incluir.TITLE, "Erro ao navegar para o processo"
 
         # Switch to tree frame
         self.driver.switch_to_frame("ifrArvore")
@@ -344,7 +346,7 @@ class PagInicial(Page):
 
             info = html_tree.find(title=re.compile(num_doc)).string
 
-            assert info != '', "Falha ao retornar Info do Ofício da Árvore"
+            assert info != "", "Falha ao retornar Info do Ofício da Árvore"
 
             # return to parent frame
             self.driver.switch_to_default_content()
@@ -353,12 +355,11 @@ class PagInicial(Page):
 
     def atualiza_andamento(self, buttons, info):
 
-        assert self.get_title() == Proc_incluir.TITLE, \
-            "Erro ao navegar para o processo"
+        assert self.get_title() == Proc_incluir.TITLE, "Erro ao navegar para o processo"
 
         andamento = buttons[4]
 
-        link = SeiBase.Base.url + andamento.attrs['href']
+        link = SeiBase.Base.url + andamento.attrs["href"]
 
         (proc_window, new_window) = navigate_link_to_new_window(self.driver, link)
 
@@ -376,13 +377,13 @@ class PagInicial(Page):
 
 
 def podeExpedir(p):
-    t1 = p['processo'].find_all('a', class_="protocoloAberto")
+    t1 = p["processo"].find_all("a", class_="protocoloAberto")
 
-    t2 = p['tipo'].find_all(string="Ofício")
+    t2 = p["tipo"].find_all(string="Ofício")
 
-    t3 = p['assinatura'].find_all(string=re.compile("Coordenador"))
+    t3 = p["assinatura"].find_all(string=re.compile("Coordenador"))
 
-    t4 = p['assinatura'].find_all(string=re.compile("Gerente"))
+    t4 = p["assinatura"].find_all(string=re.compile("Gerente"))
 
     return bool(t1) and bool(t2) and (bool(t3) or bool(t4))
 
@@ -436,7 +437,7 @@ def main(blocos):
 
     driver = webdriver.Firefox()
 
-    sei = LoginPage(driver).login('rsilva', 'Savorthemom3nts')
+    sei = LoginPage(driver).login("rsilva", "Savorthemom3nts")
 
     for bloco in blocos:
 
@@ -444,11 +445,10 @@ def main(blocos):
 
         sei.expedir_bloco(bloco)
 
+    sei.fechar()
 
-    sei.close()
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     print("Blocos a expedir: {}".format(sys.argv[1:]))
 

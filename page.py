@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Aug 28 20:44:15 2017
+Esta é a classe principal que adiciona funcionalidades aos driver do Selenium.
 
+As demais classes inicialmente herdavam esta, no entanto futuramente deverá ser alterado como esta sendo um Atributo de Classe 
 @author: ronaldo
 """
 
 from contextlib import contextmanager
-from typing import Dict, List, Tuple, Callable, Sequence
+from typing import Union, Dict, List, Tuple, Callable, Sequence, Optional
 
 import selenium
 from selenium.common.exceptions import (
@@ -24,12 +25,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import *
 
-Selenium_id = Tuple
 # Base Class
-class Page(object):
-    """Esta classe Base implementa métodos de navegação comum em qualquer página
+class Page:
+    """Esta classe Base implementa métodos de navegação comum em qualquer página. 
+    Adiciona funcionalidades úteis à navegação Selenium.
 
     """
+
+    timeout = 10
 
     def __init__(self, driver: selenium.webdriver):
         """Initializes the webdriver
@@ -37,10 +40,9 @@ class Page(object):
         Args:
             driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc. 
         """
-
         self.driver = driver
 
-    def reiniciar_driver(self, driver: selenium.webdriver):
+    def reiniciar_driver(self, driver: selenium.webdriver) -> None:
         """Reinicia a instância do webdriver
         
         Args:
@@ -49,18 +51,17 @@ class Page(object):
 
         self.__init__(driver)
 
-    def close(self):
-        """
-
-        :return: None
-
-        Fecha a instância atual do browser
+    def fechar(self) -> None:
+        """Fecha a instância atual do browser
+        
+        Returns:
+            None
         """
         self.driver.close()
 
-    def _click_button(
-        self, btn_id: Selenium_id, silencioso: bool = True, timeout: int = 10
-    ):
+    def _clicar(
+        self, btn_id: Tuple, silent: bool = True, timeout: int = timeout
+    ) -> Optional[str]:
         """Clica no botão ou link definido pelo elemento btn_id
         
         Args:
@@ -87,15 +88,17 @@ class Page(object):
         alerta = self.alert_is_present(timeout=timeout)
 
         if alerta:
-            if silencioso:
+            if silent:
                 alerta.accept()
                 return None
             else:
-                return alerta
+                return alerta.text
         else:
             return None
 
-    def _atualizar_elemento(self, elem_id: Selenium_id, dado: str, timeout: int = 10):
+    def _atualizar_elemento(
+        self, elem_id: Tuple, dado: str, timeout: int = timeout
+    ) -> Optional[str]:
         """Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
         
         Args:
@@ -117,8 +120,8 @@ class Page(object):
             return repr(e)
 
     def _selecionar_por_texto(
-        self, select_id: Selenium_id, text: str, timeout: int = 10
-    ):
+        self, select_id: Tuple, text: str, timeout: int = timeout
+    ) -> Optional[str]:
         """
 
         :param select_id: localizador da página html que define um Select (menu drop-down):
@@ -131,26 +134,25 @@ class Page(object):
 
         try:
 
-            lista = Select(self.wait_for_element_to_click(select_id))
+            lista = Select(self.wait_for_element_to_click(select_id, timeout=timeout))
 
             lista.select_by_visible_text(text)
 
         except NoSuchElementException as e:
             raise ValueError(f"Não existe a opção {text} no Menu mencionado") from e
 
-        except UnexpectedAlertPresentException as e:
+        # except UnexpectedAlertPresentException as e:
 
-            alerta = self.alert_is_present(timeout=timeout)
+        alerta = self.alert_is_present(timeout=timeout)
 
-            if alerta:
-                alerta.accept()
-
-            print(repr(e))
+        if alerta:
+            txt = alerta.text
+            alerta.accept()
+            return txt
 
     @contextmanager
     def _navega_nova_janela(self, main=None):
         """
-
         :param main: Caso seja fornecida uma instância do webdriver
         :return:
         """
@@ -168,7 +170,7 @@ class Page(object):
             self.driver.switch_to.window(main)
 
     @contextmanager
-    def wait_for_page_load(self, timeout: int = 10):
+    def wait_for_page_load(self, timeout: int = timeout):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name("title")
 
@@ -176,7 +178,7 @@ class Page(object):
 
         WebDriverWait(self.driver, timeout).until(ec.staleness_of(old_page))
 
-    def alert_is_present(self, timeout: int = 10):
+    def alert_is_present(self, timeout: int = timeout):
 
         try:
 
@@ -188,7 +190,7 @@ class Page(object):
 
         return alert
 
-    def elem_is_visible(self, *locator: Selenium_id, timeout: int = 10):
+    def elem_is_visible(self, *locator: Tuple, timeout: int = timeout):
         """
         Check is locator is visible on page given the timeout
 
@@ -199,7 +201,7 @@ class Page(object):
         try:
 
             WebDriverWait(self.driver, timeout).until(
-                ec.visibility_of_element_located(*locator)
+                ec.visibility_of_element_located(locator)
             )
 
         except TimeoutException:
@@ -213,50 +215,53 @@ class Page(object):
     def get_url(self):
         return self.driver.current_url()
 
-    def hover(self, *locator: Selenium_id):
+    def hover(self, *locator: Tuple):
         element = self.wait_for_element(*locator)
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator: Selenium_id, timeout: int = 10):
+    def check_element_exists(self, *locator: Tuple, timeout: int = timeout):
         try:
             self.wait_for_element_to_be_visible(*locator, timeout=timeout)
             return True
         except (TimeoutException, NoSuchElementException):
             return False
 
-    def wait_for_element_to_be_visible(self, *locator: Selenium_id, timeout: int = 10):
+    def wait_for_element_to_be_visible(self, *locator: Tuple, timeout: int = timeout):
         return WebDriverWait(self.driver, timeout).until(
             ec.visibility_of_element_located(*locator)
         )
 
-    def wait_for_element(self, *locator: Selenium_id, timeout=10):
+    def wait_for_element(self, *locator: Tuple, timeout=10):
         return WebDriverWait(self.driver, timeout).until(
             ec.presence_of_element_located(*locator)
         )
 
-    def wait_for_element_to_click(self, *locator: Selenium_id, timeout: int = 10):
+    def wait_for_element_to_click(self, *locator: Tuple, timeout: int = timeout):
         return WebDriverWait(self.driver, timeout).until(
             ec.element_to_be_clickable(*locator)
         )
 
-    def wait_for_new_window(self, windows: Sequence, timeout: int = 10):
+    def wait_for_new_window(self, windows: Sequence, timeout: int = timeout):
         return WebDriverWait(self.driver, timeout).until(
             ec.new_window_is_opened(windows)
         )
 
-    def nav_elem_to_new_win(self, elem: Selenium_id):
-        """ navigate the link present in element to a new window
-            focus the page on the new window
-            Assumes the is a link present in the html element 'elem'
+    # TODO: generalize this method
+    def nav_elem_to_new_win(self, elem: Tuple):
+        """ Abre o link `elem` em uma nova janela e retorna o foco para esta nova janela 
+            Assume que há um link presente no elemento html `elem`.
+            Se usado dentro do gerenciador de contexto `self._navega_nova_janela`
+            o foco é retornado para a janela original após a saída do contexto
             Args:
-               elem: html element with navigable link
+               elem: elemento html com link navegável
             Return:
-                tuple with both webdriver windows objects
-                with the browser focused on the new one.
+                None
         """
-        # Guarda janela principal
-        main_window = self.driver.current_window_handle
+        if not self.check_element_exists(elem):
+            raise NoSuchElementException(
+                f"O elemento html {elem} não foi encontrado na página atual"
+            )
 
         # Abre link no elem em uma nova janela
         elem.send_keys(Keys.SHIFT + Keys.RETURN)
@@ -267,13 +272,19 @@ class Page(object):
         # Troca o foco do navegador
         self.driver.switch_to_window(windows[-1])
 
-        return main_window, windows[-1]
+        return None
 
+    # TODO: generalize this method
     def nav_link_to_new_win(self, link: str):
-
-        # Guarda janela principal
-        main_window = self.driver.current_window_handle
-
+        """ Abre o link `link` em uma nova janela e retorna o foco para esta nova janela 
+            Assume que há um link presente no elemento html `elem`.
+            Se usado dentro do gerenciador de contexto `self._navega_nova_janela`
+            o foco é retornado para a janela original após a saída do contexto
+            Args:
+               link: elemento html com link navegável
+            Return:
+                None
+        """
         self.driver.execute_script("window.open()")
 
         # Guarda as janelas do navegador presentes
@@ -284,10 +295,10 @@ class Page(object):
 
         self.driver.get(link)
 
-        return main_window, windows[-1]
+        return None
 
     def _click_button_new_win(
-        self, btn_id: Selenium_id, silencioso: bool = True, timeout: int = 10
+        self, btn_id: Tuple, silencioso: bool = True, timeout: int = timeout
     ):
         """
 
@@ -300,7 +311,7 @@ class Page(object):
             a nova janela.
         """
 
-        self._click_button(btn_id=btn_id, silencioso=silencioso, timeout=timeout)
+        self._clicar(btn_id=btn_id, silent=silencioso, timeout=timeout)
 
         # Guarda as janelas do navegador presentes
         windows = self.driver.window_handles

@@ -2,6 +2,11 @@ from collections.__init__ import namedtuple
 
 from selenium.webdriver.common.by import By
 
+SERVICOS = ('Outorga: Rádio do Cidadão',
+            'Outorga: Radioamador',
+            'Outorga: Limitado Móvel Aeronáutico',
+            'Outorga: Limitado Móvel Marítimo')
+
 Email = namedtuple('Email', 'destinatario assunto mensagem enviar')((By.ID, 's2id_autogen1'),
                                                              (By.ID, 'txtAssunto'),
                                                              (By.ID, 'selTextoPadrao'),
@@ -968,6 +973,8 @@ class Selecionar_Contatos:
     INPUT_PESQUISAR = (By.ID, "txtPalavrasPesquisaContatos")
 
     BTN_PESQUISAR = (By.ID, "btnPesquisar")
+
+    BTN_FECHAR = (By.ID, "btnFecharSelecao")
 
     SALVAR = (By.ID, "btnSalvar")
 

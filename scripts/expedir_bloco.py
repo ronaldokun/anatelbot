@@ -181,7 +181,7 @@ class PagInicial(Page):
 
             if podeExpedir(p):
 
-                proc = p["processo"].a.string
+                # proc = p["processo"].a.string
 
                 num_doc = p["documento"].a.string
 
@@ -197,9 +197,14 @@ class PagInicial(Page):
 
         if counter == len(processos):
 
-            self.go_to_blocos()
+            with self.wait_for_page_load():
+                self.go_to_blocos()
 
-            self.driver.execute_script("acaoConcluir('{0}');".format(numero))
+            sleep(5)
+
+            self.driver.execute_script(rf"acaoConcluir('{numero}');")
+
+            # sleep(5)
 
             # pesquisa = self.wait_for_element_to_click(Bloco.PESQUISA)
 
@@ -207,13 +212,17 @@ class PagInicial(Page):
 
             # sleep(5)
 
-            # checkbox = self.wait_for_element_to_click((By.LINK_TEXT, "chkInfraItem0"), timeout=10)
+            # checkbox = self.wait_for_element_to_click(
+            #    (By.LINK_TEXT, "chkInfraItem0"), timeout=10
+            # )
 
-            # checkbox = self.wait_for_element_to_click((By.XPATH, '//*[@id="chkInfraItem0"]'), timeout=5)
+            # checkbox = self.wait_for_element_to_click(
+            #   (By.XPATH, '//*[@id="chkInfraItem0"]'), timeout=5
+            # )
 
             # checkbox.click(Blocos.BTN_CONCLUIR)
 
-            alert = self.alert_is_present(5)
+            alert = self.alert_is_present(10)
 
             alert.accept()
 
@@ -238,7 +247,7 @@ class PagInicial(Page):
 
         self.atualiza_andamento(buttons, info)
 
-        # self.enviar_processo_sede(buttons)
+        self.enviar_processo_sede(buttons)
 
         self.fechar()
 
@@ -357,6 +366,8 @@ class PagInicial(Page):
 
         assert self.get_title() == Proc_incluir.TITLE, "Erro ao navegar para o processo"
 
+        sleep(2)
+
         andamento = buttons[4]
 
         link = SeiBase.Base.url + andamento.attrs["href"]
@@ -437,7 +448,9 @@ def main(blocos):
 
     driver = webdriver.Firefox()
 
-    sei = LoginPage(driver).login("rsilva", "Savorthemom3nts")
+    sei = LoginPage(driver).login("rsilva", "$@V05!tntlaaE")
+
+    sleep(10)
 
     for bloco in blocos:
 

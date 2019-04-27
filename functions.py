@@ -347,7 +347,7 @@ def check_input(identificador: str, tipo: str) -> str:
     size = 11
 
     if tipo == "indicativo":
-        
+
         for pattern in PATTERNS:
 
             if re.match(pattern, identificador, re.I):
@@ -559,12 +559,12 @@ def lastRow(ws, col=2):
     return lwr_cell.row
 
 
-def string_endereço(dados):
+def string_endereço(dados, extra=True):
     d = {}
 
     s = "A(o)<br>"
 
-    s += dados["Nome/Razão Social"].title()
+    s += f'<b>{dados["Nome/Razão Social"].upper()}</b>'
 
     s += "<br>" + dados["Logradouro"].title() + ", " + dados["Número"] + " "
 
@@ -581,9 +581,24 @@ def string_endereço(dados):
         + dados["UF"]
     )
 
-    s += "<br><br>" + "<b>FISTEL: " + dados["Número Fistel"] + "</b>"
+    if extra:
 
-    d["A"] = s
+        s += "<br><br>" + "<b>FISTEL: " + dados["Fistel"] + "</b>"
+
+        s += "<br>" + "<b>Validade: " + dados["Validade"] + "</b>"
+
+        s += "<br>" + "<b>Indicativo: " + dados["Indicativo"] + "</b>"
+
+        debitos = dados["Entidade Devedora"].upper()
+
+        if debitos == "SIM":
+            color = r"#FF0000"
+        else:
+            color = r"#0000FF"
+
+        s += f'<br><b>Possui débitos? : <span style="color:{color};">{debitos}</span></b>'
+
+    d["À"] = s
 
     return d
 
@@ -593,4 +608,26 @@ def pairwise(iterable):
     a, b = itertools.tee(iterable)
     next(b, None)
     return list(zip(a, b))
+
+
+def extrai_pares_tabulação(source):
+    trs = source.find_all("tr")
+    dados = {}
+    i = 1
+    for tr in trs:
+        td = tr.find_all("td", string=True)
+        label = tr.find_all("label", string=True)
+
+        i = 1
+        for field, result in zip(td, label):
+            field, result = field.text[:-1], result.text
+            if field in dados:
+                field = field + "_" + str(i + 1)
+            dados[field] = result
+
+    return dados
+
+
+def add_point(c):
+    return c[:3] + "." + c[3:6] + "." + c[6:9] + "-" + c[9:]
 

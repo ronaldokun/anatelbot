@@ -203,7 +203,7 @@ class Scpx(Sistema):
 
         h = self.sis.servico
 
-        num_processo = strip_string(num_processo)
+        num_processo = functions.strip_string(num_processo)
 
         acoes = self._get_acoes(h, ("incluir", tipo_id, "submit"))
 
@@ -520,7 +520,7 @@ class Scra(Sistema):
 
         self._navigate(id, tipo_id, acoes)
 
-        id = strip_string(id)
+        id = functions.strip_string(id)
 
         try:
 
@@ -542,6 +542,125 @@ class Scra(Sistema):
             return None
 
         return True
+
+    def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
+
+        self.consulta(id, tipo_id, timeout=timeout)
+
+        dados = {}
+
+        source = soup(self.driver.page_source, "lxml")
+
+        for tr in source.find_all("tr"):
+
+            for td in tr.find_all("td", string=True):
+
+                key = td.text.strip(" :")
+                value = td.find_next_sibling("td")
+
+                if key not in dados and hasattr(value, "text"):
+                    dados[key] = value.text.strip()
+
+        return dados
+
+    def servico_incluir(
+        self, identificador, num_processo, tipo_id="id_cpf", silent=False, timeout=5
+    ):
+
+        h = self.sis.servico
+
+        num_processo = functions.strip_string(num_processo)
+
+        acoes = self._get_acoes(h, ("incluir", tipo_id, "submit"))
+
+        try:
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            print("Alerta Inesperado")
+
+        self._atualizar_elemento(h.get("id_num_proc"), num_processo, timeout=timeout)
+
+        self._clicar(h.get("id_btn_corresp"), timeout=timeout)
+
+        if silent:
+            self._clicar(h.get("submit"), timeout=timeout)
+
+    def movimento_transferir(
+        self, identificador, origem, dest, proc, tipo_id="id_cpf", timeout=5
+    ):
+
+        helper = self.sis.movimento
+
+        links = ("transferir", tipo_id, "submit")
+
+        acoes = self._get_acoes(helper, links)
+
+        try:
+
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            alert = self.alert_is_present(2)
+
+            if alert:
+                alert.accept()
+
+        id_atual = helper.get("id_atual")
+
+        if origem.lower() == "a":
+
+            text = "A - Em análise"
+
+        elif origem.lower() == "b":
+
+            text = "B - Cadastro pela Anatel"
+
+        else:
+
+            print(
+                "A transferência de movimento é somente à partir dos Movimentos A ou B"
+            )
+
+            return
+
+        self._selecionar_por_texto(id_atual, text, timeout=timeout)
+
+        self._clicar(helper.get("submit"), timeout=timeout)
+
+        if self.check_element_exists(helper.get("id_proc"), timeout=1):
+            proc = re.sub("[.-/]", "", proc)
+
+            self._atualizar_elemento(helper.get("id_proc"), proc, timeout=timeout)
+
+        id_posterior = helper.get("id_posterior")
+
+        if dest.lower() == "e":
+
+            self._selecionar_por_texto(
+                id_posterior, "E - Aprovado / Licença", timeout=timeout
+            )
+
+        elif dest.lower() == "g":
+
+            self._selecionar_por_texto(
+                id_posterior,
+                "G - Cadastro pelo usuário (auto-cadastramento)",
+                timeout=timeout,
+            )
+
+            self._atualizar_elemento(
+                helper.get("id_txt_cancelar"),
+                "Cadastro Incorreto. Estação será refeita com dados corretos",
+                timeout=timeout,
+            )
+
+        self._clicar(helper.get("submit"), timeout=timeout)
+
+    
+    
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
 

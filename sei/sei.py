@@ -110,7 +110,7 @@ class Sei(Page):
 
         self.wait_for_element_to_click(sei_helpers.Contato.BTN_PESQUISAR, timeout=timeout).click()
 
-        sleep(2)
+        #sleep(2)
 
         # if not self.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
 
@@ -506,7 +506,6 @@ class Sei(Page):
             nivel = self.wait_for_element(sei_helpers.Proc_incluir.SIG)
 
         nivel.click()
-
 class Processo(Sei):
 
     def __init__(self, driver, numero, tags=None):
@@ -916,42 +915,53 @@ class Processo(Sei):
 
         self.driver.get(self.link)
 
-    def incluir_interessado(self, nome, checagem=False):
+    def incluir_interessados(self, dados, checagem=False, timeout=5):
 
         h = sei_helpers.Selecionar_Contatos
 
-        contato = self.pesquisa_contato(nome=nome) if checagem else True
+        if not isinstance(dados, list):
+            dados = [dados]
 
-        if contato is not None:
+        if checagem:             
+            dados = [self.pesquisa_contato(dado) for dado in dados]
+            dados = [d for d in dados if d is not None]
 
-            with self.wait_for_page_load():
-                Sei.go_to_processo(self, self.numero)
+        #with self.wait_for_page_load():
+        #    Sei.go_to_processo(self, self.numero)
 
-            link = self._get_acoes().get("Consultar/Alterar Processo")
+        link = self._get_acoes().get("Consultar/Alterar Processo")
 
-            if link is not None:
+        if link is not None:
 
-                self.go(link)
+            self.go(link)
 
-                with self._navega_nova_janela():
+            with self._navega_nova_janela():
 
-                    self._click_button_new_win(h.LUPA)
+                self._click_button_new_win(h.LUPA)
 
-                    self._atualizar_elemento(h.INPUT_PESQUISAR, nome + Keys.RETURN)
+                for dado in dados:
 
-                    self._clicar(h.BTN_PESQUISAR)
+                    self._atualizar_elemento(h.INPUT_PESQUISAR, dado + Keys.RETURN, timeout=timeout)
 
-                    self._clicar((By.ID, "chkInfraItem0"))
+                    self._clicar(h.BTN_PESQUISAR, timeout=timeout/2)
 
-                    self._clicar(h.B_TRSP)
+                    try:
+                        self._clicar((By.ID, "chkInfraItem0"), timeout=timeout)
 
-                    self.fechar()
+                        self._clicar(h.B_TRSP, timeout=timeout/2)
+                    
+                    except TimeoutException:
+                        next
 
-                self._clicar(h.SALVAR)
+                #self.fechar()
+                self._clicar(h.BTN_FECHAR, timeout=timeout/2)
 
-                self.go(self.link)
 
-                self = super().go_to_processo(self.numero)
+        self._clicar(h.SALVAR, timeout=timeout)
+
+        self.go(self.link)
+
+        self = super().go_to_processo(self.numero)    
 
     def incluir_documento(self, tipo, timeout=5):
 
@@ -976,6 +986,7 @@ class Processo(Sei):
 
         # TODO:Inclui anexo
 
+        
         helper = sei_helpers.Gerar_Doc.oficio
 
         if tipo not in sei_helpers.Gerar_Doc.TEXTOS_PADRAO:
@@ -986,6 +997,8 @@ class Processo(Sei):
         self._clicar(helper.get('id_txt_padrao'), timeout=timeout/2)
 
         self._selecionar_por_texto(helper.get('id_modelos'), tipo, timeout=timeout/2)
+
+        #self._atualizar_elemento(helper.get('id_dest'), dados["CNPJ/CPF"] + Keys.TAB + Keys.RETURN )
 
         if acesso == 'publico':
 
@@ -1013,7 +1026,7 @@ class Processo(Sei):
 
             if dados:
 
-                self.editar_oficio(dados, timeout=timeout)
+                self.editar_oficio(functions.string_endereço(dados), timeout=timeout)
 
                 self.fechar()
 
@@ -1061,7 +1074,7 @@ class Processo(Sei):
 
         self._atualizar_elemento(helper.get('id_file_upload'), path, timeout=timeout)
 
-        self._clicar(helper.get('submit'), timeout=timeout)
+        self._clicar(helper.get('submit'), timeout= 2 * timeout)
 
         self.go(self.link)
 

@@ -5,14 +5,20 @@ Created on Wed Nov  1 16:50:19 2017
 
 @author: rsilva
 """
+# Basic Bultins
 import datetime as dt
 import re
 import itertools
 
+# Google Spreadsheet and DataFrame tools
 import gspread
 import gspread_dataframe as gs_to_df
 import pandas as pd
+
+# Authentication @Google
 from oauth2client.service_account import ServiceAccountCredentials
+
+
 from selenium.webdriver.common.keys import Keys
 
 from page import Page
@@ -32,7 +38,7 @@ KEYS = [
     "interessado",
 ]
 
-PATTERNS = [
+PADRAO_IND = [
     r"^(P){1}(X){1}(\d){1}([A-Z]){1}(\d){4}$",
     r"^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$",
     r"^(P){1}([A-Z]){4}$",
@@ -42,19 +48,33 @@ PATTERNS = [
 STRIP = ("/", ".", "-")
 
 
-def strip_string(identificador: str) -> str:
-    return "".join(s for s in identificador if s not in STRIP)
+def strip_string(identificador: str, strip: tuple = STRIP) -> str:
+    """Remove os caracteres contidos em strip do identificador
+    
+    Args:
+        identificador (str): String a ser processada
+        strip (tuple, optional): Tupla com caracteres a serem removidos. Defaults to STRIP.
+    
+    Returns:
+        str: String `identificador` formatada.
+    """
+    return "".join(s for s in identificador if s not in strip)
 
 
 def pode_expedir(linha: dict) -> bool:
-    """Verifica a linha do Bloco de Assinatura
-
+    """Verifica se a linha do Bloco de Assinatura do Sei está assinada
     
     Args:
         linha (dict): Dicionário com as informações da Linha do Bloco: Processo, tipo, assinatura, 
     
     Returns:
-        bool: True se o Processo está Aberto, se o Tipo é Ofício e se está assinado por Coordenador ou Gerente
+        bool
+        True, 
+            * Se o Processo está Aberto,
+            * Se Tipo = Ofício
+            * Contém assinatura Coordenador/Gerente
+        False,
+        Se um dos casos acima falhar
     """
 
     t1 = linha["processo"].find_all("a", class_="protocoloAberto")
@@ -205,7 +225,6 @@ def tag_controle(tag):
 
     img = str(tag.img["src"])
 
-    # TODO: change to tag.attrs.get(onmouseover)
     pattern = re.search("\((.*)\)", tag.attrs.get("onmouseover"))
 
     if "imagens/sei_anotacao" in img:
@@ -313,7 +332,7 @@ def dict_to_df(processos):
     return df
 
 
-def init_browser(webdriver, login, senha, timeout=5):
+def init_browser(webdriver, login, senha, timeout=10):
 
     page = Page(webdriver)
 
@@ -322,6 +341,8 @@ def init_browser(webdriver, login, senha, timeout=5):
     alert = page.alert_is_present(timeout=timeout)
 
     if alert:
+
+        # page.driver.switch_to.alert()
 
         alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
 
@@ -348,7 +369,7 @@ def check_input(identificador: str, tipo: str) -> str:
 
     if tipo == "indicativo":
 
-        for pattern in PATTERNS:
+        for pattern in PADRAO_IND:
 
             if re.match(pattern, identificador, re.I):
                 return identificador
@@ -472,7 +493,7 @@ def load_wb_from_sheet(title: str, aba: str):
     return wb
 
 
-def load_df_from_sheet(title: str, aba: str, skiprows: list = None):
+def load_df_from_sheet(title: str, aba: str, skiprows: list = None, **kwargs):
     """Carrega a Planilha Google title e retorna a aba como um Dataframe
     
     Args:
@@ -629,5 +650,12 @@ def extrai_pares_tabulação(source):
 
 
 def add_point(c):
-    return c[:3] + "." + c[3:6] + "." + c[6:9] + "-" + c[9:]
+    while len(c) < 11:
+        c += "0" + c
+
+    if len(c) == 11:
+        return c[:3] + "." + c[3:6] + "." + c[6:9] + "-" + c[9:]
+
+    if len(c) == 14:
+        return c[:2] + "." + c[2:5] + "." + c[5:8] + "/" + c[8:12] + "-" + c[12:]
 

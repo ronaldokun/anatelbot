@@ -1,3 +1,4 @@
+import re
 from collections.__init__ import namedtuple
 
 from selenium.webdriver.common.by import By
@@ -7,18 +8,41 @@ SERVICOS = ('Outorga: Rádio do Cidadão',
             'Outorga: Limitado Móvel Aeronáutico',
             'Outorga: Limitado Móvel Marítimo')
 
-Email = namedtuple('Email', 'destinatario assunto mensagem enviar')((By.ID, 's2id_autogen1'),
-                                                             (By.ID, 'txtAssunto'),
-                                                             (By.ID, 'selTextoPadrao'),
-                                                             (By.NAME, 'btnEnviar'))
+Email = dict(destinatario=(By.ID, 's2id_autogen1'),             
+             assunto=(By.ID, 'txtAssunto'),
+             mensagem=(By.ID, 'selTextoPadrao'),
+             enviar=(By.NAME, 'btnEnviar'))
+
+TRANSLATION = {".": "", "/": "", "-": "", "_": ""}
+
+
+# In practice this obscure class has no difference than just striping a string
+class make_xlat:
+    def __init__(self, *args, **kwds):
+        self.adict = dict(*args, **kwds)
+        self.rx = self.make_rx()
+
+    def make_rx(self):
+        return re.compile("|".join(map(re.escape, self.adict)))
+
+    def one_xlat(self, match):
+        return self.adict[match.group(0)]
+
+    def __call__(self, text):
+        return self.rx.sub(self.one_xlat, text)
+
+
+strip_processo = make_xlat(TRANSLATION)
 
 
 class SeiBase(object):
 
-    Login = namedtuple('Login', 'url, title, log, pwd')("https://sei.anatel.gov.br",
-                                                        "SEI / ANATEL",
-                                                        (By.ID, "txtUsuario"),
-                                                        (By.ID, "pwdSenha"))
+    Login = dict(url="https://seihm.anatel.gov.br",
+                 title="SEI / ANATEL",
+                 log=(By.ID, "txtUsuario"),
+                 pwd=(By.ID, "pwdSenha"),
+                 submit=(By.ID, "sbmLogin"))
+
 
     Base = namedtuple('Base', 'init, menu, url, pesquisa')((By.ID, "lnkControleProcessos"),
                                                            (By.ID, "lnkInfraMenuSistema"),
@@ -1068,8 +1092,10 @@ class Gerar_Doc(object):
                      'MA_Envio_de_Licença',
                      'MA_Exigência',
                      'MA_Exigência',
+                     'MA_Ofício_de_Cassação',
                      'MA_PPDESS',
                      'MA_PPDESS',
+                     'MM_Ofício_de_Cassação',
                      'MM_Boletos_Emissão_Licença',
                      'MM_Boletos_Emissão_Licença',
                      'MM_Cancelamento_Serviço',
@@ -1384,3 +1410,7 @@ class Contato(object):
     SALVAR_NOVO = (By.NAME, 'sbmCadastrarContato')
 
     OBS = (By.ID, 'txtaObservacao')
+
+class Arvore:
+
+    ABRIR_PASTAS = (By.XPATH, '//*[@title="Abrir todas as Pastas"]')

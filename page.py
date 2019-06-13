@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Esta é a classe principal que adiciona funcionalidades aos driver do Selenium.
+Esta é a classe principal que adiciona funcionalidades ao webdriver do Selenium.
 
 As demais classes inicialmente herdavam esta, no entanto futuramente deverá ser alterado como esta sendo um Atributo de Classe 
-@author: ronaldo
+@author: Ronaldo da Silva Alves Batista
 """
 
 from contextlib import contextmanager
@@ -24,6 +24,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import *
+from selenium import webdriver
+
+Browser = webdriver
+
 
 # Base Class
 class Page:
@@ -34,15 +38,22 @@ class Page:
 
     timeout = 10
 
-    def __init__(self, driver: selenium.webdriver):
+    def __init__(self, driver: Browser = None):
         """Initializes the webdriver
         
         Args:
             driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc. 
         """
-        self.driver = driver
+        if driver:
+            self.driver = driver
 
-    def reiniciar_driver(self, driver: selenium.webdriver) -> None:
+        else:
+            self.driver = webdriver.Firefox(
+                log_path="files/browser.log",
+                firefox_binary="C:/Users/rsilva/Firefox_ESR/firefox.exe",
+            )
+
+    def reiniciar_driver(self, driver: Browser = None) -> None:
         """Reinicia a instância do webdriver
         
         Args:

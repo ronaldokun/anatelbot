@@ -73,7 +73,6 @@ DADOS = OrderedDict(
     }
 )
 
-
 class Sistema(Page):
     def __init__(self, driver, login=None, senha=None, timeout=5):
         
@@ -373,7 +372,7 @@ class Scpx(Sistema):
 
         self._clicar(helper.get("submit"), timeout=timeout)
 
-    def movimento_cancelar(self, identificador, tipo_id="id_cpf"):
+    def movimento_cancelar(self, identificador, tipo_id="id_cpf", timeout: int=10)-> None:
 
         helper = self.sis.movimento
 
@@ -392,11 +391,11 @@ class Scpx(Sistema):
             if alert:
                 alert.accept()
 
-        self._clicar(helper["id_btn_lista_estacoes"])
+        self._clicar(helper["id_btn_lista_estacoes"], timeout=timeout/2)
 
-        self._clicar(helper["id_btn_marcar_todos"])
+        self._clicar(helper["id_btn_marcar_todos"], timeout=timeout/2)
 
-        self._clicar(helper["submit"])
+        self._clicar(helper["submit"], timeout=timeout)
 
     def licenciar_estacao(
         self, identificador, tipo_id="id_cpf", ppdess=True, silent=False, timeout=5

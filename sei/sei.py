@@ -25,11 +25,12 @@ import functions
 from . import sei_helpers
 from page import Page
 
+
 Browser = webdriver
 
 
-
-#TODO: Add password Encryption
+# TODO: Add password Encryption
+# TODO: Select Normal/Teste
 def login_sei(usr: str, pwd: str, driver: Browser=None, timeout: int=10)-> 'Sei':
     """
     Esta função recebe um objeto Webdrive e as credenciais
@@ -37,7 +38,7 @@ def login_sei(usr: str, pwd: str, driver: Browser=None, timeout: int=10)-> 'Sei'
     SEI.
     """
 
-    helper = sei_helpers.SeiBase.Login
+    helper = sei_helpers.Sei_Login.Login
 
     page = Page(driver)
     page.driver.get(helper.get('url'))
@@ -62,8 +63,6 @@ def login_sei(usr: str, pwd: str, driver: Browser=None, timeout: int=10)-> 'Sei'
 
     return Sei(page)
 
-
-
 class Sei:
     """
     Esta subclasse da classe Page define métodos de execução de ações na
@@ -73,6 +72,10 @@ class Sei:
     def __init__(self, page: Page, processos=None):
         self.page = page
         self._processos = processos if processos is not None else {}
+
+    def _mudar_lotação(lotação: str)->None:
+        pass
+
 
     def _set_processos(self, processos):
         self._processos = {p["numero"]: p for p in processos}
@@ -87,13 +90,13 @@ class Sei:
 
         termo = unidecode._unidecode(termo)
 
-        if self.get_title() != sei_helpers.Contato.TITLE:
-            with self.wait_for_page_load():
+        if self.page.get_title() != sei_helpers.Contato.TITLE:
+            with self.page.wait_for_page_load():
                 self._vai_para_pag_contato()
 
         try:
 
-            contato = self.wait_for_element_to_click(
+            contato = self.page.wait_for_element_to_click(
                 sei_helpers.Pesq_contato.ID_SEARCH, timeout=timeout
             )
 
@@ -107,17 +110,17 @@ class Sei:
 
         contato.send_keys(termo)
 
-        self.wait_for_element_to_click(
+        self.page.wait_for_element_to_click(
             sei_helpers.Contato.BTN_PESQUISAR, timeout=timeout
         ).click()
 
         # sleep(2)
 
-        # if not self.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
+        # if not self.page.elem_is_visible((By.LINK_TEXT, "Nenhum Registro Encontrado")):
 
-        # self.wait_for_element_to_be_visible((By.PARTIAL_LINK_TEXT, "//*[contains(text(), {}]".format(nome)), timeout=10)
+        # self.page.wait_for_element_to_be_visible((By.PARTIAL_LINK_TEXT, "//*[contains(text(), {}]".format(nome)), timeout=10)
 
-        html = soup(self.driver.page_source, "lxml")
+        html = soup(self.page.driver.page_source, "lxml")
 
         tags = html.find_all("tr", class_="infraTrClara")
 
@@ -136,9 +139,9 @@ class Sei:
 
     def _cria_contato(self, dados: Dict)-> None:
 
-        novo_contato = self.wait_for_element_to_click(sei_helpers.Contato.BTN_NOVO)
+        novo_contato = self.page.wait_for_element_to_click(sei_helpers.Contato.BTN_NOVO)
 
-        with self.wait_for_page_load():
+        with self.page.wait_for_page_load():
             novo_contato.click()
 
         self._mudar_dados_contato(dados, novo=True)
@@ -149,72 +152,72 @@ class Sei:
 
         dados["UF"] = dados["UF"].upper()
 
-        tipo = self.wait_for_element_to_be_visible(sei_helpers.Contato.TIPO)
+        tipo = self.page.wait_for_element_to_be_visible(sei_helpers.Contato.TIPO)
 
         tipo = Select(tipo)
 
         tipo.select_by_visible_text("Pessoa Física")
 
-        self.wait_for_element_to_click(sei_helpers.Contato.PF).click()
+        self.page.wait_for_element_to_click(sei_helpers.Contato.PF).click()
 
         cpf = dados.get("CNPJ/CPF", "")
 
         cpf = functions.add_point(cpf)
 
-        self._atualizar_elemento(sei_helpers.Contato.SIGLA, cpf)
+        self.page._atualizar_elemento(sei_helpers.Contato.SIGLA, cpf)
 
         if dados.get("Sexo", "") == "FEMININO":
 
-            self.wait_for_element_to_click(sei_helpers.Contato.FEMININO).click()
+            self.page.wait_for_element_to_click(sei_helpers.Contato.FEMININO).click()
 
         else:
 
-            self.wait_for_element_to_click(sei_helpers.Contato.MASCULINO).click()
+            self.page.wait_for_element_to_click(sei_helpers.Contato.MASCULINO).click()
 
-        self._atualizar_elemento(
+        self.page._atualizar_elemento(
             sei_helpers.Contato.NOME, dados.get("Nome/Razão Social", "")
         )
 
-        self._atualizar_elemento(
+        self.page._atualizar_elemento(
             sei_helpers.Contato.END,
             dados.get("Logradouro", "") + " " + dados.get("Número", ""),
         )
 
-        self._atualizar_elemento(sei_helpers.Contato.COMP, dados.get("Complemento", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.COMP, dados.get("Complemento", ""))
 
-        self._atualizar_elemento(sei_helpers.Contato.BAIRRO, dados.get("Bairro", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.BAIRRO, dados.get("Bairro", ""))
 
-        pais = self.wait_for_element(sei_helpers.Contato.PAIS)
+        pais = self.page.wait_for_element(sei_helpers.Contato.PAIS)
 
         pais = Select(pais)
 
         pais.select_by_visible_text("Brasil")
 
-        uf = self.wait_for_element(sei_helpers.Contato.UF)
+        uf = self.page.wait_for_element(sei_helpers.Contato.UF)
 
         uf = Select(uf)
 
         uf.select_by_visible_text(dados.get("UF", ""))
 
-        self._atualizar_elemento(sei_helpers.Contato.CEP, dados.get("Cep", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.CEP, dados.get("Cep", ""))
 
-        self._atualizar_elemento(sei_helpers.Contato.CPF, dados.get("Cpf_RF", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.CPF, dados.get("Cpf_RF", ""))
 
-        self._atualizar_elemento(sei_helpers.Contato.RG, dados.get("Rg", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.RG, dados.get("Rg", ""))
 
-        self._atualizar_elemento(sei_helpers.Contato.ORG, dados.get("Org", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.ORG, dados.get("Org", ""))
 
-        self._atualizar_elemento(sei_helpers.Contato.NASC, dados.get("Nasc", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.NASC, dados.get("Nasc", ""))
 
-        self._atualizar_elemento(sei_helpers.Contato.FONE, dados.get("Fone", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.FONE, dados.get("Fone", ""))
 
-        self._atualizar_elemento(sei_helpers.Contato.CEL, dados.get("Cel", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.CEL, dados.get("Cel", ""))
 
-        self._atualizar_elemento(sei_helpers.Contato.EMAIL, dados.get("Email", ""))
+        self.page._atualizar_elemento(sei_helpers.Contato.EMAIL, dados.get("Email", ""))
 
         # Cidade por último para dar Tempo de Carregamento
 
-        cidade = Select(self.wait_for_element_to_be_visible(sei_helpers.Contato.CIDADE))
+        cidade = Select(self.page.wait_for_element_to_be_visible(sei_helpers.Contato.CIDADE))
 
         for option in cidade.options:
 
@@ -229,7 +232,7 @@ class Sei:
 
             try:
 
-                salvar = self.wait_for_element_to_click(sei_helpers.Contato.SALVAR)
+                salvar = self.page.wait_for_element_to_click(sei_helpers.Contato.SALVAR)
 
             except TimeoutException:
 
@@ -241,7 +244,7 @@ class Sei:
 
             try:
 
-                salvar = self.wait_for_element_to_click(
+                salvar = self.page.wait_for_element_to_click(
                     sei_helpers.Contato.SALVAR_NOVO, timeout=5
                 )
 
@@ -250,13 +253,13 @@ class Sei:
 
                 return
 
-        with self.wait_for_page_load():
+        with self.page.wait_for_page_load():
 
             salvar.click()
 
     def _vai_para_pag_contato(self):
 
-        html = soup(self.driver.page_source, "lxml")
+        html = soup(self.page.driver.page_source, "lxml")
 
         tag = html.find("li", string="Listar")
 
@@ -275,12 +278,12 @@ class Sei:
         """ Simplifies the navigation of href pages on sei.anatel.gov.br
         by pre-appending the required prefix NAV_URL       """
 
-        prefix = sei_helpers.SeiBase.Base.url
+        prefix = sei_helpers.Sei_Login.Base.url
 
         if prefix not in link:
             link = prefix + link
 
-        self.driver.get(link)
+        self.page.driver.get(link)
 
     def get_processos(self):
         return self._processos
@@ -302,28 +305,28 @@ class Sei:
 
             self.go(p["link"])
 
-            return Processo(self.driver, numero=num, tags=self._processos[num])
+            return Processo(self.page, numero=num, tags=self._processos[num])
 
         else:
 
             try:
 
-                self._atualizar_elemento(
-                    sei_helpers.SeiBase.Base.pesquisa, num + Keys.ENTER
+                self.page._atualizar_elemento(
+                    sei_helpers.Sei_Login.Base.pesquisa, num + Keys.ENTER
                 )
 
             except NoSuchElementException:
 
                 self.go_to_init_page()
 
-            return Processo(self.driver, num, tags=None)
+            return Processo(self.page, num, tags=None)
 
     def see_detailed(self):
         """
         Expands the visualization from the main page in SEI
         """
         try:
-            ver_todos = self.wait_for_element_to_click(sei_helpers.Sei_Inicial.ATR)
+            ver_todos = self.page.wait_for_element_to_click(sei_helpers.Sei_Inicial.ATR)
 
             if ver_todos.text == "Ver todos os processos":
                 ver_todos.click()
@@ -337,7 +340,7 @@ class Sei:
 
         try:
 
-            visual_detalhado = self.wait_for_element_to_click(
+            visual_detalhado = self.page.wait_for_element_to_click(
                 sei_helpers.Sei_Inicial.VISUAL
             )
 
@@ -355,7 +358,7 @@ class Sei:
         """Retorna True se a página estiver na página inicial do SEI, False
         caso contrário
         """
-        return self.get_title() == sei_helpers.Sei_Inicial.TITLE
+        return self.page.get_title() == sei_helpers.Sei_Inicial.TITLE
 
     # noinspection PyProtectedMember
     def go_to_init_page(self):
@@ -367,7 +370,7 @@ class Sei:
 
         try:
 
-            self._clicar(sei_helpers.SeiBase.Base.init)
+            self.page._clicar(sei_helpers.Sei_Login.Base.init)
 
         except:
 
@@ -379,7 +382,7 @@ class Sei:
         links
         Assume que o link está presente em qualquer subpágina do SEI
         """
-        menu = self.wait_for_element(sei_helpers.SeiBase.Base.menu)
+        menu = self.page.wait_for_element(sei_helpers.Sei_Login.Base.menu)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -400,13 +403,13 @@ class Sei:
         # Mostra página com informações detalhadas
         self.see_detailed()
 
-        html_sei = soup(self.driver.page_source, "lxml")
+        html_sei = soup(self.page.driver.page_source, "lxml")
 
         processos += html_sei("tr", {"class": "infraTrClara"})
 
         try:
 
-            contador = self.wait_for_element(sei_helpers.Sei_Inicial.CONT, timeout=30)
+            contador = self.page.wait_for_element(sei_helpers.Sei_Inicial.CONT, timeout=30)
 
         except TimeoutException:
 
@@ -425,14 +428,14 @@ class Sei:
         for pag in paginas:
             print("Registrando processos: página {}".format(pag))
             # One simple repetition to avoid more complex code
-            contador = Select(self.wait_for_element(sei_helpers.Sei_Inicial.CONT))
+            contador = Select(self.page.wait_for_element(sei_helpers.Sei_Inicial.CONT))
             contador.select_by_visible_text(pag)
 
             sleep(10)
 
             # pattern = re.compile("Lista de Processos\s{1}\((\d+).*\)")
 
-            html_sei = soup(self.driver.page_source, "lxml")
+            html_sei = soup(self.page.driver.page_source, "lxml")
 
             processos += html_sei("tr", {"class": "infraTrClara"})
 
@@ -470,7 +473,7 @@ class Sei:
                             link = tag.get("href")
 
                             if link:
-                                with self.wait_for_page_load():
+                                with self.page.wait_for_page_load():
                                     self.go(link)
 
                                 self._mudar_dados_contato(dados, novo=False)
@@ -487,11 +490,11 @@ class Sei:
 
         self.show_lat_menu()
 
-        init_proc = self.wait_for_element_to_click(sei_helpers.Sei_Menu.INIT_PROC)
+        init_proc = self.page.wait_for_element_to_click(sei_helpers.Sei_Menu.INIT_PROC)
 
         init_proc.click()
 
-        filtro = self.wait_for_element_to_click(sei_helpers.Criar_Processo.FILTRO)
+        filtro = self.page.wait_for_element_to_click(sei_helpers.Criar_Processo.FILTRO)
 
         filtro.send_keys(tipo)
 
@@ -501,12 +504,12 @@ class Sei:
 
         # select = Select(Sei.wait_for_element(loc.Tipos.SL_TIP_PROC))
 
-        tipo = self.wait_for_element_to_click((By.LINK_TEXT, tipo))
+        tipo = self.page.wait_for_element_to_click((By.LINK_TEXT, tipo))
 
         tipo.click()
 
         if desc:
-            espec = self.wait_for_element(sei_helpers.Proc_incluir.ESPEC)
+            espec = self.page.wait_for_element(sei_helpers.Proc_incluir.ESPEC)
 
             espec.send_keys(desc)
 
@@ -517,28 +520,27 @@ class Sei:
 
         if nivel == "público":
 
-            nivel = self.wait_for_element(sei_helpers.Proc_incluir.PUBL)
+            nivel = self.page.wait_for_element(sei_helpers.Proc_incluir.PUBL)
 
         elif nivel == "restrito":
 
-            nivel = self.wait_for_element(sei_helpers.Proc_incluir.REST)
+            nivel = self.page.wait_for_element(sei_helpers.Proc_incluir.REST)
 
         else:
 
-            nivel = self.wait_for_element(sei_helpers.Proc_incluir.SIG)
+            nivel = self.page.wait_for_element(sei_helpers.Proc_incluir.SIG)
 
         nivel.click()
 
-
 class Processo(Sei):
-    def __init__(self, driver, numero, tags=None):
-        super().__init__(driver)
-        self.driver = driver
+    def __init__(self, page, numero, tags=None):
+        super().__init__(page)
+        #self.page = page
         self.numero = numero
         self.tags = tags if tags is not None else dict()
         self.acoes = {}
         self.arvore = OrderedDict()
-        self.link = self.driver.current_url
+        self.link = self.page.driver.current_url
 
     def get_tags(self):
         return self.tags
@@ -547,24 +549,24 @@ class Processo(Sei):
     def _go_to_central_frame(self):
 
         # Switch to central frame
-        self.driver.switch_to.frame("ifrVisualizacao")
+        self.page.driver.switch_to.frame("ifrVisualizacao")
 
         try:
             yield
         finally:
             # Return to main content
-            self.driver.switch_to_default_content()
+            self.page.driver.switch_to_default_content()
 
     def _acoes_central_frame(self):
 
         assert (
-            self.get_title() == sei_helpers.Proc_incluir.TITLE
+            self.page.get_title() == sei_helpers.Proc_incluir.TITLE
         ), "Erro ao navegar para o processo"
 
         with self._go_to_central_frame():
-            self.wait_for_element(sei_helpers.Proc_central.ACOES)
+            self.page.wait_for_element(sei_helpers.Proc_central.ACOES)
 
-            html_frame = soup(self.driver.page_source, "lxml")
+            html_frame = soup(self.page.driver.page_source, "lxml")
 
             acoes = html_frame.find(id="divArvoreAcoes").contents
 
@@ -583,31 +585,39 @@ class Processo(Sei):
 
         return self._acoes_central_frame()
 
-    def is_open(self):
-        return "Concluir Processo" in self._get_acoes()
+    def _info_unidades(self):
+        #return "Concluir Processo" in self._get_acoes()
+        with self._go_to_central_frame():
+            source = soup(self.page.driver.page_source, "lxml")
+            return source.find("div", id="divInformacao")
+
+    def is_open(self, setor):
+        return self._info_unidades().find(string=setor)
+
+    
 
     def close_processo(self):
-        self.driver.fechar()
+        self.page.fechar()
 
     @contextmanager
     def _go_to_arvore(self):
 
         # Switch to tree frame
-        self.driver.switch_to.frame("ifrArvore")
+        self.page.driver.switch_to.frame("ifrArvore")
 
         try:
             # yield the iframe page source as a BeautifulSoup object
             yield
         finally:
             # Return to main content
-            self.driver.switch_to_default_content()
+            self.page.driver.switch_to_default_content()
 
     def armazena_arvore(self):
 
         # Switch to the frame in which arvore is in, only inside the contextmanager
         with self._go_to_arvore():
 
-            tree = soup(self.driver.page_source, "lxml")
+            tree = soup(self.page.driver.page_source, "lxml")
 
             for tag in tree.find_all("a"):
 
@@ -639,7 +649,7 @@ class Processo(Sei):
             if label in k:
 
                 with self._go_to_arvore():
-                    self._clicar((By.ID, v["id"]), timeout=timeout)
+                    self.page._clicar((By.ID, v["id"]), timeout=timeout)
 
                 return
 
@@ -667,7 +677,7 @@ class Processo(Sei):
         if plus:
             with self._go_to_arvore():
                 try:
-                    self._clicar((By.ID, plus["id"]), timeout=timeout)
+                    self.page._clicar((By.ID, plus["id"]), timeout=timeout)
                 except TimeoutException:
                     self.go(plus['href'])
 
@@ -679,7 +689,7 @@ class Processo(Sei):
 
         with self._go_to_arvore():
             
-            doc = self.wait_for_element((By.PARTIAL_LINK_TEXT, num_doc), timeout=timeout)
+            doc = self.page.wait_for_element((By.PARTIAL_LINK_TEXT, num_doc), timeout=timeout)
 
             source = soup(doc.get_attribute("innerHTML"), "lxml")
             
@@ -687,10 +697,10 @@ class Processo(Sei):
 
             title = source.attrs['title'][:-10] + " - OK" + source.attrs['title'][-10:]
 
-            self.driver.execute_script(fr"var elem=arguments[0]; elem.title = '{title}'; elem.text = '{title}'", doc)
+            self.page.driver.execute_script(fr"var elem=arguments[0]; elem.title = '{title}'; elem.text = '{title}'", doc)
 
             
-        #    self._clicar(h, timeout=timeout)
+        #    self.page._clicar(h, timeout=timeout)
 
     def send_doc_por_email(self, label, dados, timeout=5):
 
@@ -702,64 +712,64 @@ class Processo(Sei):
 
         with self._go_to_central_frame():
             # TODO: Why this is not working?
-            # self.driver.execute_script(script)
+            # self.page.driver.execute_script(script)
 
             # Usamos um context manager
             # para garantir que depois de finalizar a tarefa na nova janela
             # voltamos o foco do navegador para a janela principal
-            with self._navega_nova_janela():
-                self._click_button_new_win((By.XPATH, '//*[@id="divArvoreAcoes"]/a[6]'))
+            with self.page._navega_nova_janela():
+                self.page._click_button_new_win((By.XPATH, '//*[@id="divArvoreAcoes"]/a[6]'))
 
                 destinatario, assunto, mensagem = dados
 
-                self._atualizar_elemento(
+                self.page._atualizar_elemento(
                     helper.get('destinatario'), destinatario, timeout=timeout
                 )
 
-                self._atualizar_elemento(helper.get('assunto'), assunto, timeout=timeout)
+                self.page._atualizar_elemento(helper.get('assunto'), assunto, timeout=timeout)
 
-                self._selecionar_por_texto(helper.get('mensagem'), mensagem, timeout=timeout)
+                self.page._selecionar_por_texto(helper.get('mensagem'), mensagem, timeout=timeout)
 
                 # After putting the email, we must validate ir by clicking it or pressing ENTER
-                self._atualizar_elemento(
+                self.page._atualizar_elemento(
                     helper.destinatario, 2 * Keys.ENTER, timeout=timeout
                 )
 
-                self._clicar(helper.get('enviar'), timeout=timeout)
+                self.page._clicar(helper.get('enviar'), timeout=timeout)
 
     def info_oficio(self, num_doc):
 
         assert (
-            self.get_title() == sei_helpers.Proc_incluir.TITLE
+            self.page.get_title() == sei_helpers.Proc_incluir.TITLE
         ), "Erro ao navegar para o processo"
 
         # Switch to tree frame
         self._go_to_arvore()
 
-        with self.wait_for_page_load():
-            html_tree = soup(self.driver.page_source, "lxml")
+        with self.page.wait_for_page_load():
+            html_tree = soup(self.page.driver.page_source, "lxml")
 
             info = html_tree.find(title=re.compile(num_doc)).string
 
             assert info != "", "Falha ao retornar Info do Ofício da Árvore"
 
             # return to parent frame
-            self.driver.switch_to_default_content()
+            self.page.driver.switch_to_default_content()
 
             return info
 
     def update_andamento(self, buttons, info):
         assert (
-            self.get_title() == sei_helpers.Proc_incluir.TITLE
+            self.page.get_title() == sei_helpers.Proc_incluir.TITLE
         ), "Erro ao navegar para o processo"
 
         andamento = buttons[4]
 
         link = andamento.attrs["href"]
 
-        (proc_window, and_window) = Page.nav_link_to_new_win(self.driver, link)
+        (proc_window, and_window) = Page.nav_link_to_new_win(self.page.driver, link)
 
-        input_and = self.wait_for_element(sei_helpers.Proc_central.IN_AND)
+        input_and = self.page.wait_for_element(sei_helpers.Proc_central.IN_AND)
 
         text = (
             sei_helpers.Proc_central.AND_PRE + info + sei_helpers.Proc_central.AND_POS
@@ -767,17 +777,17 @@ class Processo(Sei):
 
         input_and.send_keys(text)
 
-        self.wait_for_element_to_click(sei_helpers.Proc_central.SV_AND).click()
+        self.page.wait_for_element_to_click(sei_helpers.Proc_central.SV_AND).click()
 
-        self.driver.fechar()
+        self.page.fechar()
 
-        self.driver.switch_to.window(proc_window)
+        self.page.driver.switch_to.window(proc_window)
 
     def send_proc_to_sede(self, buttons):
 
-        with self.wait_for_page_load():
+        with self.page.wait_for_page_load():
             assert (
-                self.get_title() == sei_helpers.Proc_incluir.TITLE
+                self.page.get_title() == sei_helpers.Proc_incluir.TITLE
             ), "Erro na função 'send_proc_to_sede"
 
             enviar = buttons[3]
@@ -785,35 +795,35 @@ class Processo(Sei):
             link = enviar.attrs["href"]
 
             (janela_processo, janela_enviar) = Page.nav_link_to_new_win(
-                self.driver, link
+                self.page.driver, link
             )
 
-        with self.wait_for_page_load():
+        with self.page.wait_for_page_load():
             assert (
-                self.get_title() == sei_helpers.Envio.TITLE
+                self.page.get_title() == sei_helpers.Envio.TITLE
             ), "Erro ao clicar no botão 'Enviar Processo'"
 
-            self.driver.execute_script(sei_helpers.Envio.LUPA)
+            self.page.driver.execute_script(sei_helpers.Envio.LUPA)
 
             # Guarda as janelas do navegador presentes
-            windows = self.driver.window_handles
+            windows = self.page.driver.window_handles
 
             janela_unidades = windows[-1]
 
             # Troca o foco do navegador
-            self.driver.switch_to.window(janela_unidades)
+            self.page.driver.switch_to.window(janela_unidades)
 
         assert (
-            self.get_title() == sei_helpers.Envio.UNIDS
+            self.page.get_title() == sei_helpers.Envio.UNIDS
         ), "Erro ao clicar na lupa 'Selecionar Unidades'"
 
-        unidade = self.wait_for_element(sei_helpers.Envio.IN_SIGLA)
+        unidade = self.page.wait_for_element(sei_helpers.Envio.IN_SIGLA)
 
         unidade.clear()
 
         unidade.send_keys(sei_helpers.Envio.SIGLA + Keys.RETURN)
 
-        sede = self.wait_for_element(sei_helpers.Envio.ID_SEDE)
+        sede = self.page.wait_for_element(sei_helpers.Envio.ID_SEDE)
 
         assert (
             sede.get_attribute("title") == sei_helpers.Envio.SEDE
@@ -821,32 +831,32 @@ class Processo(Sei):
 
         sede.click()
 
-        self.wait_for_element_to_click(sei_helpers.Envio.B_TRSP).click()
+        self.page.wait_for_element_to_click(sei_helpers.Envio.B_TRSP).click()
 
         # Fecha a janela_unidades
-        self.driver.fechar()
+        self.page.fechar()
 
         # Troca o foco do navegador
-        self.driver.switch_to.window(janela_enviar)
+        self.page.driver.switch_to.window(janela_enviar)
 
-        self.wait_for_element_to_click(sei_helpers.Envio.OPEN).click()
+        self.page.wait_for_element_to_click(sei_helpers.Envio.OPEN).click()
 
-        self.wait_for_element_to_click(sei_helpers.Envio.RET_DIAS).click()
+        self.page.wait_for_element_to_click(sei_helpers.Envio.RET_DIAS).click()
 
-        prazo = self.wait_for_element(sei_helpers.Envio.NUM_DIAS)
+        prazo = self.page.wait_for_element(sei_helpers.Envio.NUM_DIAS)
 
         prazo.clear()
 
         prazo.send_keys(sei_helpers.Envio.PRAZO)
 
-        self.wait_for_element_to_click(sei_helpers.Envio.UTEIS).click()
+        self.page.wait_for_element_to_click(sei_helpers.Envio.UTEIS).click()
 
-        self.wait_for_element_to_click(sei_helpers.Envio.ENVIAR).click()
+        self.page.wait_for_element_to_click(sei_helpers.Envio.ENVIAR).click()
 
         # fecha a janela_enviar
-        self.driver.fechar()
+        self.page.fechar()
 
-        self.driver.switch_to.window(janela_processo)
+        self.page.driver.switch_to.window(janela_processo)
 
     def expedir_oficio(self, num_doc: str):
 
@@ -864,11 +874,11 @@ class Processo(Sei):
 
         if link is not None:
 
-            main, new = self.nav_link_to_new_win(link)
+            main, new = self.page.nav_link_to_new_win(link)
 
         else:
 
-            main, new = self.driver.current_window_handle, None
+            main, new = self.page.driver.current_window_handle, None
 
         return main, new
 
@@ -878,7 +888,7 @@ class Processo(Sei):
 
         if new is not None:
 
-            postit = self.wait_for_element(sei_helpers.Proc_central.IN_AND)
+            postit = self.page.wait_for_element(sei_helpers.Proc_central.IN_AND)
 
             postit.clear()
 
@@ -887,7 +897,7 @@ class Processo(Sei):
             if content != "":
                 postit.send_keys(content)
 
-            chk_prioridade = self.wait_for_element_to_click(
+            chk_prioridade = self.page.wait_for_element_to_click(
                 sei_helpers.Proc_central.CHK_PRIOR
             )
 
@@ -905,15 +915,15 @@ class Processo(Sei):
 
                     sleep(1)
 
-            btn = self.wait_for_element_to_click(sei_helpers.Proc_central.BT_POSTIT)
+            btn = self.page.wait_for_element_to_click(sei_helpers.Proc_central.BT_POSTIT)
 
             btn.click()
 
             sleep(1)
 
-            self.fechar()
+            selfpage.fechar()
 
-            self.driver.switch_to.window(main)
+            self.page.driver.switch_to.window(main)
 
             if "anotacao" and "anotacao_link" in self.tags:
                 self.tags["anotacao"] = content
@@ -926,7 +936,7 @@ class Processo(Sei):
 
         if link is not None:
 
-            self.nav_link_to_new_win(link)
+            self.page.nav_link_to_new_win(link)
 
         else:
 
@@ -938,13 +948,13 @@ class Processo(Sei):
 
         if link is not None:
 
-            main, new = self.nav_link_to_new_win(link)
+            main, new = self.page.nav_link_to_new_win(link)
 
             return main, new
 
         else:
 
-            return (self.driver.current_window_handle, None)
+            return (self.page.driver.current_window_handle, None)
 
     def excluir_acomp_especial(self):
 
@@ -952,11 +962,11 @@ class Processo(Sei):
 
         if new is not None:
 
-            if self.check_element_exists(sei_helpers.Acompanhamento_Especial.EXCLUIR):
+            if self.page.check_element_exists(sei_helpers.Acompanhamento_Especial.EXCLUIR):
 
                 try:
 
-                    self._clicar(sei_helpers.Acompanhamento_Especial.EXCLUIR)
+                    self.page._clicar(sei_helpers.Acompanhamento_Especial.EXCLUIR)
 
                 except TimeoutException:
 
@@ -964,7 +974,7 @@ class Processo(Sei):
 
                 try:
 
-                    alert = self.alert_is_present(timeout=5)
+                    alert = self.page.alert_is_present(timeout=5)
 
                     if alert:
                         alert.accept()
@@ -973,30 +983,30 @@ class Processo(Sei):
 
                     print("Não houve pop-up de confirmação")
 
-                self.fechar()
+                selfpage.fechar()
 
-                self.driver.switch_to.window(main)
+                self.page.driver.switch_to.window(main)
 
                 self.tags["Acompanhamento Especial"] = ""
 
     def edita_marcador(self, tipo="", content="", timeout=5):
 
-        with self._navega_nova_janela():
+        with self.page._navega_nova_janela():
             self.go_to_marcador()
 
-            self._clicar(sei_helpers.Marcador.SELECT_MARCADOR, timeout=timeout)
+            self.page._clicar(sei_helpers.Marcador.SELECT_MARCADOR, timeout=timeout)
 
-            self._clicar((By.LINK_TEXT, tipo), timeout=timeout)
+            self.page._clicar((By.LINK_TEXT, tipo), timeout=timeout)
 
-            self._atualizar_elemento(
+            self.page._atualizar_elemento(
                 sei_helpers.Marcador.TXT_MARCADOR, content, timeout=timeout
             )
 
-            self._clicar(sei_helpers.Marcador.SALVAR, timeout=timeout)
+            self.page._clicar(sei_helpers.Marcador.SALVAR, timeout=timeout)
 
-            self.fechar()
+            selfpage.fechar()
 
-        self.driver.get(self.link)
+        self.page.driver.get(self.link)
 
     def incluir_interessados(self, dados, checagem=False, timeout=5):
 
@@ -1009,7 +1019,7 @@ class Processo(Sei):
             dados = [self.pesquisa_contato(dado) for dado in dados]
             dados = [d for d in dados if d is not None]
 
-        # with self.wait_for_page_load():
+        # with self.page.wait_for_page_load():
         #    Sei.go_to_processo(self, self.numero)
 
         link = self._get_acoes().get("Consultar/Alterar Processo")
@@ -1018,30 +1028,30 @@ class Processo(Sei):
 
             self.go(link)
 
-            with self._navega_nova_janela():
+            with self.page._navega_nova_janela():
 
-                self._click_button_new_win(h.LUPA)
+                self.page._click_button_new_win(h.LUPA)
 
                 for dado in dados:
 
-                    self._atualizar_elemento(
+                    self.page._atualizar_elemento(
                         h.INPUT_PESQUISAR, dado + Keys.RETURN, timeout=timeout
                     )
 
-                    self._clicar(h.BTN_PESQUISAR, timeout=timeout / 2)
+                    self.page._clicar(h.BTN_PESQUISAR, timeout=timeout / 2)
 
                     try:
-                        self._clicar((By.ID, "chkInfraItem0"), timeout=timeout)
+                        self.page._clicar((By.ID, "chkInfraItem0"), timeout=timeout)
 
-                        self._clicar(h.B_TRSP, timeout=timeout / 2)
+                        self.page._clicar(h.B_TRSP, timeout=timeout / 2)
 
                     except TimeoutException:
                         next
 
-                # self.fechar()
-                self._clicar(h.BTN_FECHAR, timeout=timeout / 2)
+                # selfpage.fechar()
+                self.page._clicar(h.BTN_FECHAR, timeout=timeout / 2)
 
-        self._clicar(h.SALVAR, timeout=timeout)
+        self.page._clicar(h.SALVAR, timeout=timeout)
 
         self.go(self.link)
 
@@ -1056,11 +1066,11 @@ class Processo(Sei):
 
         if link is not None:
 
-            with self.wait_for_page_load():
+            with self.page.wait_for_page_load():
 
                 self.go(link)
 
-            self._clicar((By.LINK_TEXT, tipo), timeout=timeout)
+            self.page._clicar((By.LINK_TEXT, tipo), timeout=timeout)
 
         else:
 
@@ -1081,22 +1091,22 @@ class Processo(Sei):
 
         self.incluir_documento("Ofício", timeout=timeout / 2)
 
-        self._clicar(helper.get("id_txt_padrao"), timeout=timeout / 2)
+        self.page._clicar(helper.get("id_txt_padrao"), timeout=timeout / 2)
 
-        self._selecionar_por_texto(helper.get("id_modelos"), tipo, timeout=timeout / 2)
+        self.page._selecionar_por_texto(helper.get("id_modelos"), tipo, timeout=timeout / 2)
 
-        # self._atualizar_elemento(helper.get('id_dest'), dados["CNPJ/CPF"] + Keys.TAB + Keys.RETURN )
+        # self.page._atualizar_elemento(helper.get('id_dest'), dados["CNPJ/CPF"] + Keys.TAB + Keys.RETURN )
 
         if acesso == "publico":
 
-            self._clicar(helper.get("id_pub"), timeout=timeout / 2)
+            self.page._clicar(helper.get("id_pub"), timeout=timeout / 2)
 
         elif acesso == "restrito":
 
-            self._clicar(helper.get("id_restrito"), timeout=timeout)
+            self.page._clicar(helper.get("id_restrito"), timeout=timeout)
 
             hip = Select(
-                self.wait_for_element_to_click(
+                self.page.wait_for_element_to_click(
                     helper.get("id_hip_legal"), timeout=timeout
                 )
             )
@@ -1112,17 +1122,17 @@ class Processo(Sei):
                 "Você provavelmente não vai querer mandar um Ofício Sigiloso"
             )
 
-        with self._navega_nova_janela():
+        with self.page._navega_nova_janela():
 
-            self._click_button_new_win(helper.get("submit"), timeout=timeout / 2)
+            self.page._click_button_new_win(helper.get("submit"), timeout=timeout / 2)
 
             if dados:
 
                 self.editar_oficio(functions.string_endereço(dados), timeout=timeout)
 
-                self.fechar()
+                selfpage.fechar()
 
-        self.driver.get(self.link)
+        self.page.driver.get(self.link)
 
     def incluir_informe(self):
         pass
@@ -1146,30 +1156,30 @@ class Processo(Sei):
 
         self.incluir_documento("Externo", timeout=timeout)
 
-        self._selecionar_por_texto(helper.get("id_tipo"), tipo, timeout=timeout)
+        self.page._selecionar_por_texto(helper.get("id_tipo"), tipo, timeout=timeout)
 
         today = dt.datetime.today().strftime("%d%m%Y")
 
-        self._atualizar_elemento(helper.get("id_data"), today, timeout=timeout)
+        self.page._atualizar_elemento(helper.get("id_data"), today, timeout=timeout)
 
         if arvore:
-            self._atualizar_elemento(helper.get("id_txt_tree"), arvore, timeout=timeout)
+            self.page._atualizar_elemento(helper.get("id_txt_tree"), arvore, timeout=timeout)
 
         if formato.lower() == "nato":
-            self._clicar(helper.get("id_nato"), timeout=timeout)
+            self.page._clicar(helper.get("id_nato"), timeout=timeout)
 
         if acesso == "publico":
 
-            self._clicar(helper.get("id_pub"), timeout=timeout)
+            self.page._clicar(helper.get("id_pub"), timeout=timeout)
 
         elif acesso == "restrito":
 
-            self._clicar(helper.get("id_restrito"), timeout=timeout)
+            self.page._clicar(helper.get("id_restrito"), timeout=timeout)
 
             if hipotese not in sei_helpers.Gerar_Doc.HIPOTESES:
                 raise ValueError("Hipótese Legal Inválida: ", hipotese)
 
-            self._selecionar_por_texto(
+            self.page._selecionar_por_texto(
                 helper.get("id_hip_legal"), hipotese, timeout=timeout
             )
 
@@ -1179,35 +1189,35 @@ class Processo(Sei):
                 "Você provavelmente não vai querer um documento Externo Sigiloso"
             )
 
-        self._atualizar_elemento(helper.get("id_file_upload"), path, timeout=timeout)
+        self.page._atualizar_elemento(helper.get("id_file_upload"), path, timeout=timeout)
 
-        self._clicar(helper.get("submit"), timeout=2 * timeout)
+        self.page._clicar(helper.get("submit"), timeout=2 * timeout)
 
         self.go(self.link)
 
     def editar_oficio(self, dados, timeout=5, existing=False):
 
-        links = sei_helpers.SeiBase.Oficio
+        links = sei_helpers.Sei_Login.Oficio
 
-        self.wait_for_element_to_be_visible(links.editor, timeout=timeout)
+        self.page.wait_for_element_to_be_visible(links.editor, timeout=timeout)
 
-        frames = self.driver.find_elements_by_tag_name("iframe")
+        frames = self.page.driver.find_elements_by_tag_name("iframe")
 
         while len(frames) < 3:
 
             sleep(1)
 
-            frames = self.driver.find_elements_by_tag_name("iframe")
+            frames = self.page.driver.find_elements_by_tag_name("iframe")
 
-        self.driver.switch_to.frame(frames[2])  # text frame
+        self.page.driver.switch_to.frame(frames[2])  # text frame
 
         # TODO: make this more general
         for tag, value in dados.items():
             xpath = r"//p[contains(text(), '{0}')]"
 
-            element = self.wait_for_element((By.XPATH, xpath.format(tag)))
+            element = self.page.wait_for_element((By.XPATH, xpath.format(tag)))
 
-            action = ActionChains(self.driver)
+            action = ActionChains(self.page.driver)
 
             action.move_to_element_with_offset(element, 5, 5)
 
@@ -1227,24 +1237,24 @@ class Processo(Sei):
 
             script = "arguments[0].innerHTML = `{0}`;".format(value)
 
-            self.driver.execute_script(script, element)
+            self.page.driver.execute_script(script, element)
 
             sleep(2)
 
-        self.driver.switch_to.parent_frame()
+        self.page.driver.switch_to.parent_frame()
 
-        self._clicar(links.submit, timeout=timeout)
+        self.page._clicar(links.submit, timeout=timeout)
 
         # Necessary steps to save
-        # self.driver.execute_script('arguments[0].removeAttribute("aria-disabled")', salvar)
+        # self.page.driver.execute_script('arguments[0].removeAttribute("aria-disabled")', salvar)
 
-        # self.driver.execute_script('arguments[0].class = "cke_button cke_button__save cke_button_off"', salvar)
+        # self.page.driver.execute_script('arguments[0].class = "cke_button cke_button__save cke_button_off"', salvar)
 
         # salvar.click()
 
         # sleep(5)
 
-        # self.fechar()
+        # selfpage.fechar()
 
     def concluir_processo(self):
 
@@ -1255,22 +1265,22 @@ class Processo(Sei):
         ), "A ação 'Concluir Processo não foi armazenada, verfique as ações do Processo"
 
         # Switch to central frame
-        self.driver.switch_to_frame("ifrVisualizacao")
+        self.page.driver.switch_to_frame("ifrVisualizacao")
 
         try:
 
-            self.driver.execute_script(excluir)
+            self.page.driver.execute_script(excluir)
 
         except JavascriptException as e:
 
             print("One exception was catched: {}".format(repr(e)))
 
-        alert = self.alert_is_present(timeout=5)
+        alert = self.page.alert_is_present(timeout=5)
 
         if alert:
             alert.accept()
 
-        self.driver.switch_to_default_content()
+        self.page.driver.switch_to_default_content()
 
 
 def exibir_bloco(sei, numero):

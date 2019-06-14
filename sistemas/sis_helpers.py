@@ -372,6 +372,7 @@ class Scpx(object):
         "id_btn_marcar_todos": (By.ID, "botaoFlatMarcarTodos"),
         "id_txt_cancelar": (By.ID, "TxtComentarioMov"),
         "id_cpf": consulta["id_cpf"],
+        "id_fistel": (By.ID, "pNumFistel"),
         "id_proc": (By.ID, "NumProcesso"),
         "submit": (By.ID, "botaoFlatConfirmar"),
         "id_atual": (By.ID, "pMovimento"),

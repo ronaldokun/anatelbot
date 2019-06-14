@@ -35,9 +35,10 @@ class make_xlat:
 strip_processo = make_xlat(TRANSLATION)
 
 
-class SeiBase(object):
+class Sei_Login(object):
 
-    Login = dict(url="https://seihm.anatel.gov.br",
+    Login = dict(url="https://sei.anatel.gov.br",
+                url_teste="https://sei.anatel.gov.br",
                  title="SEI / ANATEL",
                  log=(By.ID, "txtUsuario"),
                  pwd=(By.ID, "pwdSenha"),

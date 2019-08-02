@@ -100,10 +100,11 @@ class Page:
 
         if alerta:
             if silent:
+                text = alerta.text
                 alerta.accept()
-                return None
+                return text
             else:
-                return alerta.text
+                return alerta
         else:
             return None
 

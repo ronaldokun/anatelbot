@@ -541,7 +541,7 @@ def salva_aba_no_drive(dataframe, planilha_drive, aba_drive):
 
     worksheet = workbook.worksheet(aba_drive)
 
-    worksheet.clear()
+    # worksheet.clear()
 
     gs_to_df.set_with_dataframe(dataframe=dataframe, worksheet=worksheet, resize=True)
 

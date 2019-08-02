@@ -732,7 +732,7 @@ class Processo(Sei):
 
                 # After putting the email, we must validate ir by clicking it or pressing ENTER
                 self.page._atualizar_elemento(
-                    helper.destinatario, 2 * Keys.ENTER, timeout=timeout
+                    helper['destinatario'], 2 * Keys.ENTER, timeout=timeout
                 )
 
                 self.page._clicar(helper.get('enviar'), timeout=timeout)

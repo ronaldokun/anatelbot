@@ -816,7 +816,7 @@ class Sec(Sistema):
 
                     pass
 
-    def incluir_cadastro(self, dados: dict, menor: bool = False) -> bool:
+    def incluir_cadastro(self, dados: dict, menor: bool = False, timeout: int=5) -> bool:
         """[summary]
         
         Args:
@@ -846,15 +846,16 @@ class Sec(Sistema):
             #telas["Dados do Usuário"]["cpf_resp"] = cpf_resp
             assert cpf_resp, "É obrigatório informar o CPF do Responsável para menores de 18 anos"
 
-        self._atualizar_elemento(h["input_nome"], dados["Nome/Razão Social"]  + Keys.TAB)
+        self._atualizar_elemento(h["input_nome"], 
+        dados["Nome/Razão Social"]  + Keys.TAB, timeout=timeout)
         
         for i, (tela, campos) in enumerate(telas.items()):            
             for campo in campos:
                 value = dados.get(campo, None)
                 if value:
-                    self._atualizar_elemento(h[campo], value + Keys.TAB)
+                    self._atualizar_elemento(h[campo], value + Keys.TAB, timeout=timeout)
                 
-            self._clicar(buttons[i])
+            self._clicar(buttons[i], timeout=timeout)
 
         cep = dados.get("CEP", "").replace("-", "")        
 
@@ -864,13 +865,13 @@ class Sec(Sistema):
             return response            
         try:
 
-            self._clicar(h["submit"], timeout=5)
+            self._clicar(h["submit"], timeout=timeout)
 
         except TimeoutException:
 
             self.driver.execute_script(h["submit_script"])
 
-        alert = self.alert_is_present(30)
+        alert = self.alert_is_present(timeout=timeout)
 
         if alert:
             if alert.text == h["atualizar_ok"]:
@@ -906,11 +907,11 @@ class Sec(Sistema):
 
         self._selecionar_por_texto(h["nova_situacao"], text=situacao, timeout=timeout)
 
-        btn = self.wait_for_element_to_click(h["nova_situacao"])
+        btn = self.wait_for_element_to_click(h["nova_situacao"], timeout=timeout)
 
         btn.send_keys(2 * Keys.TAB + Keys.RETURN)
 
-        alert = self.alert_is_present(30)
+        alert = self.alert_is_present(timeout=timeout)
 
         if alert:
             if alert.text == h["atualizar_ok"]:
@@ -925,13 +926,13 @@ class Sec(Sistema):
 
         return None
 
-    def _carrega_cep(self, dados: dict, cep: str, h: dict)-> bool:
+    def _carrega_cep(self, dados: dict, cep: str, h: dict, timeout: int=5)-> bool:
         
-        self._atualizar_elemento(h["CEP"], cep)
+        self._atualizar_elemento(h["CEP"], cep, timeout=timeout)
 
-        self._clicar(h["bt_cep"])
+        self._clicar(h["bt_cep"], timeout=timeout)
 
-        alert = self.alert_is_present(10)
+        alert = self.alert_is_present(timeout)
 
         if alert:
             return alert.text
@@ -942,27 +943,27 @@ class Sec(Sistema):
         # until then there is no uf.value
         while uf.get_attribute("value") == "":
             sleep(1)
-            uf = self.wait_for_element(h["UF"])
+            uf = self.wait_for_element(h["UF"], timeout=timeout)
 
-        logr = self.wait_for_element_to_be_visible(h["Logradouro"])
+        logr = self.wait_for_element_to_be_visible(h["Logradouro"], timeout=timeout)
 
         # if the CEP loading didn't retrieve the logradouro, update it manually
         if not logr.get_attribute("value"):
-            self._atualizar_elemento(h["Endereço"], dados["Endereço"].title())
+            self._atualizar_elemento(h["Logradouro"], dados["Logradouro"].title(), timeout=timeout)
 
-        bairro = self.wait_for_element(h["Bairro"])
+        bairro = self.wait_for_element(h["Bairro"], timeout=timeout)
 
         if not bairro.get_attribute("value"):
-            self._atualizar_elemento(h["Bairro"], dados["Bairro"].title())
+            self._atualizar_elemento(h["Bairro"], dados["Bairro"].title(), timeout=timeout)
 
         if "Número" not in dados:
             raise ValueError("É obrigatório informar o número do endereço")
 
-        self._atualizar_elemento(h["Número"], dados["Número"])
+        self._atualizar_elemento(h["Número"], dados["Número"], timeout=timeout)
 
-        comp = dados.get("Complemento", "").title()
+        comp = str(dados.get("Complemento", "")).title()
 
-        self._atualizar_elemento(h["Complemento"], comp)
+        self._atualizar_elemento(h["Complemento"], comp,timeout=timeout)
 
         return None
 
@@ -972,6 +973,7 @@ class Sec(Sistema):
         alt_nome: bool = False,
         p_alt: str = None,
         menor: bool = False,
+        timeout: int = 5
     ):
         """
         Atualiza os campos retornados pelo dicionário `dados`.
@@ -1002,21 +1004,22 @@ class Sec(Sistema):
             assert cpf_resp, "É obrigatório informar o CPF do Responsável para menores de 18 anos"
 
         if alt_nome:
-            self._clicar(h["bt_alt_razao"])
-            self._atualizar_elemento(h["id_novo_nome"], dados["Nome/Razão Social"]  + Keys.TAB)
+            self._clicar(h["bt_alt_razao"], timeout=timeout)
+            self._atualizar_elemento(h["id_novo_nome"], 
+                dados["Nome/Razão Social"]  + Keys.TAB, timeout=timeout)
             if p_alt is None:
                 p_alt = dados["CNPJ/CPF"]
-            self._atualizar_elemento(h["id_p_altera"], p_alt + Keys.TAB)
+            self._atualizar_elemento(h["id_p_altera"], p_alt + Keys.TAB, timeout=timeout)
 
         
         for i, (_, campos) in enumerate(telas.items()):
             for campo in campos:
                 value = dados.get(campo, None)
                 if value:
-                    self._atualizar_elemento(h[campo], value + Keys.TAB)
+                    self._atualizar_elemento(h[campo], value + Keys.TAB, timeout=timeout)
                     
 
-            self._clicar(buttons[i])
+            self._clicar(buttons[i], timeout=timeout)
 
         cep = dados.get("CEP", "").replace("-", "")        
 
@@ -1026,13 +1029,13 @@ class Sec(Sistema):
                 return response            
         try:
 
-            self._clicar(h["submit"], timeout=5)
+            self._clicar(h["submit"], timeout=timeout)
 
         except TimeoutException:
 
             self.driver.execute_script(h["submit_script"])
 
-        alert = self.alert_is_present(30)
+        alert = self.alert_is_present(timeout=timeout)
 
         if alert:
             if alert.text == h["atualizar_ok"]:
@@ -1107,30 +1110,30 @@ class Sec(Sistema):
         return dados
 
     def inscrever_candidato(
-        self, cpf, uf, certificado, data, menor=False, protocolo=None
+        self, cpf, uf, certificado, data, menor=False, protocolo=None, timeout: int=5
     ):
 
         h = self.sis.inscricao["incluir"]
 
         self.driver.get(h["link"])
 
-        self._atualizar_elemento(h["id_cpf"], cpf)
+        self._atualizar_elemento(h["id_cpf"], cpf, timeout=timeout)
 
-        self._selecionar_por_texto(h["id_uf"], uf)
+        self._selecionar_por_texto(h["id_uf"], uf, timeout=timeout)
 
-        self._selecionar_por_texto(h["id_certificado"], certificado)
+        self._selecionar_por_texto(h["id_certificado"], certificado, timeout=timeout)
 
-        self._clicar(h["submit"])
+        self._clicar(h["submit"], timeout=timeout)
 
-        sleep(1)
+        sleep(timeout)
 
         if menor:
 
             assert protocolo is not None, "Forneça o protocolo de Inscrição do Menor"
 
-            self._atualizar_elemento(h["protocolo"], protocolo)
+            self._atualizar_elemento(h["protocolo"], protocolo, timeout=timeout)
 
-        result = self._clicar((By.LINK_TEXT, data), False)
+        result = self._clicar((By.LINK_TEXT, data), silent=False, timeout=timeout)
 
         assert (
             result.text
@@ -1139,7 +1142,9 @@ class Sec(Sistema):
 
         result.accept()
 
-    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1):
+        alerta = self.alert_is_present(timeout=2*timeout).accept()
+
+    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1, path: str=PATH, timeout: int=5):
 
         h = self.sis.Prova["imprimir"]
 
@@ -1149,27 +1154,29 @@ class Sec(Sistema):
 
         self.driver.execute_script(h["alt_reg"])
 
-        self._atualizar_elemento(h["num_reg"], str(num_registros) + Keys.RETURN)
+        self._atualizar_elemento(h["num_reg"], str(num_registros) + Keys.RETURN, timeout=timeout)
 
-        sleep(2)
+        sleep(timeout)
 
         dados = self._extrai_inscritos_prova()
 
-        for v in sorted(list(dados.values()))[start:end]:
+        nomes = [n for n in dados.values()]
+
+        for v in sorted(nomes, key=lambda x: x.nome.strip())[start:end]:
 
             self.driver.get(v.link)
 
-            alert = self.alert_is_present(2)
+            alert = self.alert_is_present(timeout=timeout)
 
             if alert:
 
                 alert.accept()
 
-                self._atualizar_elemento(h["justificativa"], "Erro de Impressão")
+                self._atualizar_elemento(h["justificativa"], "Erro de Impressão", timeout=timeout)
 
                 self.driver.execute_script("gravarReimprimirProva();")
 
-                alert = self.alert_is_present(5)
+                alert = self.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.accept()
@@ -1178,34 +1185,33 @@ class Sec(Sistema):
 
                 self.driver.execute_script("reimprimirprova();")
 
-                alert = self.alert_is_present(5)
+                alert = self.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.accept()
 
-                alert = self.alert_is_present(5)
+                alert = self.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.dismiss()
 
             else:
-
                 # self._click_button(h['id_bt_imprimir'], timeout =10)
 
                 self.driver.execute_script("imprimirprova();")
 
-                alert = self.alert_is_present(5)
+                alert = self.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.accept()
 
-            sleep(10)
+            sleep(timeout)
 
-            files = sorted(os.listdir(PATH))
+            files = sorted(os.listdir(path))
 
-            file = os.path.join(PATH, files[0])
+            file = os.path.join(path, files[0])
 
-            os.rename(file, os.path.join(PATH, str(v.nome).title() + ".pdf"))
+            os.rename(file, os.path.join(path, str(v.nome).upper() + ".pdf"))
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
         def soup_clean(source):

@@ -37,7 +37,7 @@ class LoginPage(Page):
         """
         make login and return and instance of browser"""
 
-        helper = SeiBase.Login
+        helper = Sei_Login.Login
 
         self.driver.get(helper.url)
         # self.driver.maximize_window()
@@ -93,7 +93,7 @@ class PagInicial(Page):
 
     def exibir_menu_lateral(self):
 
-        menu = self.wait_for_element(SeiBase.Base.menu)
+        menu = self.wait_for_element(Sei_Login.Base.menu)
 
         if menu.get_attribute("title") == "Exibir Menu do Sistema":
             menu.click()
@@ -185,7 +185,7 @@ class PagInicial(Page):
 
                 num_doc = p["documento"].a.string
 
-                link = SeiBase.Base.url + p["processo"].a.attrs["href"]
+                link = Sei_Login.Base.url + p["processo"].a.attrs["href"]
 
                 self.expedir_oficio(num_doc, link)
 
@@ -200,7 +200,7 @@ class PagInicial(Page):
             with self.wait_for_page_load():
                 self.go_to_blocos()
 
-            sleep(5)
+            sleep(10)
 
             self.driver.execute_script(rf"acaoConcluir('{numero}');")
 
@@ -259,7 +259,7 @@ class PagInicial(Page):
 
         enviar = buttons[3]
 
-        link = SeiBase.Base.url + enviar.attrs["href"]
+        link = Sei_Login.Base.url + enviar.attrs["href"]
 
         (janela_processo, janela_andamento) = navigate_link_to_new_window(
             self.driver, link
@@ -370,7 +370,7 @@ class PagInicial(Page):
 
         andamento = buttons[4]
 
-        link = SeiBase.Base.url + andamento.attrs["href"]
+        link = Sei_Login.Base.url + andamento.attrs["href"]
 
         (proc_window, new_window) = navigate_link_to_new_window(self.driver, link)
 
@@ -450,7 +450,7 @@ def main(blocos):
 
     sei = LoginPage(driver).login("rsilva", "$@V05!tntlaaE")
 
-    sleep(10)
+    sleep(30)
 
     for bloco in blocos:
 

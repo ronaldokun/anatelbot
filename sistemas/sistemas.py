@@ -15,63 +15,6 @@ from sistemas import sis_helpers
 # This add the ../folder to the path while in development mode
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
-
-ESTAÇÕES_RC = ["Fixa", "Móvel", "Telecomando"]
-
-PATH = r"C:\Users\rsilva\Desktop\SEI"
-
-DADOS = OrderedDict(
-    {
-        "Dados do Usuário": [
-            "CNPJ/CPF",
-            "Nome/Razão Social",
-            "Situação",
-            "Número Processo Alteração Nome",
-            "Nacionalidade",
-            "Data de Nascimento",
-            "Validade RNE",
-            "Visto Permanente",
-            "Identidade",
-            "Órgão Exp.",
-            "Sexo",
-            "Estado Civil",
-            "Data Inclusão",
-            "Usuário Inclusão",
-            "Data Alteração",
-            "Usuário Alteração",
-            "Tipo Usuário",
-            "E-mail",
-            "Home Page",
-            "Observação",
-        ],
-        "Dados de Telefones": ["Principal", "Celular"],
-        "Endereço Correspondência": [
-            "País",
-            "Cep",
-            "Logradouro",
-            "Número",
-            "Complemento",
-            "Bairro",
-            "UF",
-            "Município",
-            "Distrito",
-            "Subdistrito",
-        ],
-        "Endereço Sede": [
-            "País",
-            "Cep",
-            "Logradouro",
-            "Número",
-            "Complemento",
-            "Bairro",
-            "UF",
-            "Município",
-            "Distrito",
-            "Subdistrito",
-        ],
-    }
-)
 
 class Sistema(Page):
     def __init__(self, driver, login=None, senha=None, timeout:int=5):

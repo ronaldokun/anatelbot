@@ -120,7 +120,6 @@ class Sec(object):
             "id_resp": (By.ID, "pf_NumCpfResponsavel"),
             "id_nome": (By.ID, "pNomeEntidade"),
             "input_nome": (By.ID, "t_NomeEntidade"),
-            "submit": (By.ID, "botaoFlatConfirmar"),
             "E-mail": (By.ID, "t_EndEletronico"),
             "CNPJ/CPF_Responsável": (By.ID, "pf_NumCpfResponsavel"),
             "bt_alt_razao": (By.ID, "alteraRazao"),

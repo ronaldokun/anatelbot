@@ -74,7 +74,7 @@ DADOS = OrderedDict(
 )
 
 class Sistema(Page):
-    def __init__(self, driver, login=None, senha=None, timeout=5):
+    def __init__(self, driver, login=None, senha=None, timeout:int=5):
         
 
         if login and senha:
@@ -86,7 +86,7 @@ class Sistema(Page):
             self.driver = driver
 
     def _navigate(
-        self, identificador: str, tipo_id: str, acoes: tuple, silent: bool = True
+        self, identificador: str, tipo_id: str, acoes: tuple, silent: bool = True, timeout:int=5
     ):
         """Check id and tipo_id consistency and navigate to link
 
@@ -105,15 +105,15 @@ class Sistema(Page):
 
             if submit is None:
 
-                self._atualizar_elemento(_id, identificador + Keys.RETURN)
+                self._atualizar_elemento(_id, identificador + Keys.RETURN, timeout=timeout)
 
             else:
 
-                self._atualizar_elemento(_id, identificador)
+                self._atualizar_elemento(_id, identificador, timeout)
 
-                self._clicar(submit, silent=False)
+                self._clicar(submit, silent=False, timeout=timeout)
 
-            alert = self.alert_is_present()
+            alert = self.alert_is_present(timeout)
 
             if alert:
                 txt = alert.text
@@ -125,7 +125,7 @@ class Sistema(Page):
 
         else:
 
-            self._atualizar_elemento(_id, identificador)
+            self._atualizar_elemento(_id, identificador, timeout=timeout)
 
             return None
 
@@ -1162,7 +1162,7 @@ class Sec(Sistema):
 
         nomes = [n for n in dados.values()]
 
-        for v in sorted(nomes, key=lambda x: x.nome.strip())[start:end]:
+        for v in nomes[start:end]:
 
             self.driver.get(v.link)
 

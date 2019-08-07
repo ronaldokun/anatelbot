@@ -12,8 +12,8 @@ import functions
 from page import *
 from sistemas import sis_helpers
 
+# This add the ../folder to the path while in development mode
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 
 SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
 
@@ -1337,7 +1337,6 @@ class Sigec(Sistema):
 
         self._navigate(ident, tipo_id, acoes)
 
-
 class Boleto(Sistema):
     def __init__(self, driver, login=None, senha=None, timeout=5):
 
@@ -1380,44 +1379,6 @@ class Boleto(Sistema):
         self._clicar(h["marcar_todos"], timeout=timeout)
 
         self._clicar(h["btn_print"], timeout=timeout)
-
-
-def save_new_window(self, page, filename):
-    try:
-
-        self.wait_for_new_window(timeout=5)
-
-    except TimeoutError:
-
-        print("Não foi possível identificar a nova Janela para salvar")
-
-        return False
-
-    # Guarda as janelas do navegador presentes
-    windows = self.driver.window_handles
-
-    # Troca o foco do navegador
-    self.driver.switch_to_window(windows[-1])
-
-    with open(filename + ".html", "w") as file:
-        # html = soup(driver.page_source).prettify()
-
-        # write image
-        file.write(self.driver.page_source)
-
-    self.driver.fechar()
-
-    self.driver.switch_to_window(windows[0])
-
-    return True
-
-
-def imprime_licenca(page, ident, serv, tipo):
-    ident, serv, tipo, sis = functions.check_input(ident, serv, tipo)
-
-    page.driver.get(sis.Licenca["Imprimir"])
-
-    navigate(page, ident, sis.Licenca, tipo)
 
 
 def abrir_agenda_prova(sec, datas):

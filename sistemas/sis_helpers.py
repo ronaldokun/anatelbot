@@ -13,6 +13,7 @@ from selenium.webdriver.common.by import By
 SISTEMASNET = "http://sistemasnet/"
 
 
+
 class Sapiens(object):
     URL = "https://sapiens.agu.gov.br/"
 

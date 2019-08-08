@@ -660,7 +660,7 @@ class Sec(Sistema):
         "Certificado",
     ]
 
-    SEC_DADOS = DADOS
+    SEC_DADOS = sis_helpers.DADOS
 
     SEC_DADOS["Certificado"] = [
         "Fistel",

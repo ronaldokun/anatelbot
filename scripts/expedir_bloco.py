@@ -249,7 +249,7 @@ class PagInicial(Page):
 
         self.enviar_processo_sede(buttons)
 
-        self.fechar()
+        self.close()
 
         self.driver.switch_to_window(main_window)
 
@@ -458,7 +458,7 @@ def main(blocos):
 
         sei.expedir_bloco(bloco)
 
-    sei.fechar()
+    sei.close()
 
 
 if __name__ == "__main__":

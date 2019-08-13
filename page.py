@@ -8,7 +8,8 @@ As demais classes inicialmente herdavam esta, no entanto futuramente deverá ser
 """
 
 from contextlib import contextmanager
-from typing import Union, Dict, List, Tuple, Callable, Sequence, Optional
+from typing import Any, Union, Dict, List, Tuple, Callable, Sequence, Optional
+from dataclasses import dataclass
 
 import selenium
 from selenium.common.exceptions import (
@@ -30,31 +31,27 @@ Browser = webdriver
 
 
 # Base Class
+@dataclass
 class Page:
-    """Esta classe Base implementa métodos de navegação comum em qualquer página. 
-    Adiciona funcionalidades úteis à navegação Selenium.
+    """This Base class implements common navigation methods on any page.
+    Adds useful features to Selenium navigation.
+    Args:
+        driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc.
 
     """
 
-    timeout = 10
+    driver: Browser = None
+    driver_path: Any = None
 
-    def __init__(self, driver: Browser = None):
-        """Initializes the webdriver
-        
-        Args:
-            driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc. 
-        """
-        if driver:
-            self.driver = driver
+    if driver is not None:
+        self.driver = driver
 
-        else:
-            self.driver = webdriver.Firefox(
-                log_path="files/browser.log",
-                firefox_binary="C:/Users/rsilva/Firefox_ESR/firefox.exe",
-            )
+    else:
+        assert driver_path is not None, "You need to inform the path to webdriver"
+        self.driver = webdriver.Firefox(firefox_binary=driver_path)
 
-    def reiniciar_driver(self, driver: Browser = None) -> None:
-        """Reinicia a instância do webdriver
+    def restart_driver(self, driver: Browser = None) -> None:
+        """Restarts webdriver instance
         
         Args:
             driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc.
@@ -71,8 +68,8 @@ class Page:
         self.driver.close()
 
     def _clicar(
-        self, btn_id: Tuple, silent: bool = True, timeout: int = timeout
-    ) -> Optional[str]:
+        self, btn_id: Tuple, silent: bool = True, timeout: int = 10
+    ) -> Union[str,]:
         """Clica no botão ou link definido pelo elemento btn_id
         
         Args:
@@ -109,7 +106,7 @@ class Page:
             return None
 
     def _atualizar_elemento(
-        self, elem_id: Tuple, dado: str, timeout: int = timeout
+        self, elem_id: Tuple, dado: str, timeout: int = 10
     ) -> Optional[str]:
         """Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
         
@@ -132,7 +129,7 @@ class Page:
             return repr(e)
 
     def _selecionar_por_texto(
-        self, select_id: Tuple, text: str, timeout: int = timeout
+        self, select_id: Tuple, text: str, timeout: int = 10
     ) -> Optional[str]:
         """
 
@@ -182,7 +179,7 @@ class Page:
             self.driver.switch_to.window(main)
 
     @contextmanager
-    def wait_for_page_load(self, timeout: int = timeout):
+    def wait_for_page_load(self, timeout: int = 10):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name("title")
 
@@ -190,7 +187,7 @@ class Page:
 
         WebDriverWait(self.driver, timeout).until(ec.staleness_of(old_page))
 
-    def alert_is_present(self, timeout: int = timeout):
+    def alert_is_present(self, timeout: int = 10):
 
         try:
 
@@ -202,7 +199,7 @@ class Page:
 
         return alert
 
-    def elem_is_visible(self, *locator: Tuple, timeout: int = timeout):
+    def elem_is_visible(self, *locator: Tuple, timeout: int = 10):
         """
         Check is locator is visible on page given the timeout
 
@@ -232,14 +229,14 @@ class Page:
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator: Tuple, timeout: int = timeout):
+    def check_element_exists(self, *locator: Tuple, timeout: int = 10):
         try:
             self.wait_for_element_to_be_visible(*locator, timeout=timeout)
             return True
         except (TimeoutException, NoSuchElementException):
             return False
 
-    def wait_for_element_to_be_visible(self, *locator: Tuple, timeout: int = timeout):
+    def wait_for_element_to_be_visible(self, *locator: Tuple, timeout: int = 10):
         return WebDriverWait(self.driver, timeout).until(
             ec.visibility_of_element_located(*locator)
         )
@@ -249,12 +246,12 @@ class Page:
             ec.presence_of_element_located(*locator)
         )
 
-    def wait_for_element_to_click(self, *locator: Tuple, timeout: int = timeout):
+    def wait_for_element_to_click(self, *locator: Tuple, timeout: int = 10):
         return WebDriverWait(self.driver, timeout).until(
             ec.element_to_be_clickable(*locator)
         )
 
-    def wait_for_new_window(self, windows: Sequence, timeout: int = timeout):
+    def wait_for_new_window(self, windows: Sequence, timeout: int = 10):
         return WebDriverWait(self.driver, timeout).until(
             ec.new_window_is_opened(windows)
         )
@@ -310,7 +307,7 @@ class Page:
         return None
 
     def _click_button_new_win(
-        self, btn_id: Tuple, silencioso: bool = True, timeout: int = timeout
+        self, btn_id: Tuple, silencioso: bool = True, timeout: int = 10
     ):
         """
 

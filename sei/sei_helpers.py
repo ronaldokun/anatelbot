@@ -44,7 +44,6 @@ class Sei_Login(object):
                  pwd=(By.ID, "pwdSenha"),
                  submit=(By.ID, "sbmLogin"))
 
-
     Base = namedtuple('Base', 'init, menu, url, pesquisa')((By.ID, "lnkControleProcessos"),
                                                            (By.ID, "lnkInfraMenuSistema"),
                                                            "https://sei.anatel.gov.br/sei/",

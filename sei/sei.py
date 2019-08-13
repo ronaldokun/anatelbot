@@ -27,7 +27,7 @@ from page import Page
 
 
 Browser = webdriver
-
+Processos = OrderedDict[str, Any]
 
 # TODO: Add password Encryption
 # TODO: Select Normal/Teste

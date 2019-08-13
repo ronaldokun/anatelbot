@@ -987,14 +987,14 @@ class Sec(Sistema):
             else:
                 return alert.text
 
-    def consulta_inscrição(self, cpf: str)-> None:
+    def consulta_inscrição(self, cpf: str, timeout: int =5)-> None:
         h = self.sis.inscricao["consultar"]
 
         acoes = self._get_acoes(h, ("link", "id_cpf", "submit"))  # 'submit'))
 
         response = self._navigate(cpf, h, acoes)
 
-        alert = self.alert_is_present()
+        alert = self.alert_is_present(timeout)
 
         if alert:
             print(alert.text)
@@ -1008,11 +1008,11 @@ class Sec(Sistema):
         else:
             #self._click_button(h["imprimir"])
 
-            imprimir = self.wait_for_element_to_click(h["imprimir"])
+            imprimir = self.wait_for_element_to_click(h["imprimir"], timeout=timeout)
 
             imprimir.send_keys(Keys.CONTROL + "p")
 
-        alert = self.alert_is_present()
+        alert = self.alert_is_present(timeout)
 
         if alert:
             alert.accept()
@@ -1087,7 +1087,7 @@ class Sec(Sistema):
 
         alerta = self.alert_is_present(timeout=2*timeout).accept()
 
-    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1, path: str=PATH, timeout: int=5):
+    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1, path: str=sis_helpers.PATH, timeout: int=5):
 
         h = self.sis.Prova["imprimir"]
 

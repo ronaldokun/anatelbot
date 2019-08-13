@@ -150,8 +150,6 @@ class Page:
         except NoSuchElementException as e:
             raise ValueError(f"Não existe a opção {text} no Menu mencionado") from e
 
-        # except UnexpectedAlertPresentException as e:
-
         alerta = self.alert_is_present(timeout=timeout)
 
         if alerta:

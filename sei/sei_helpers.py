@@ -35,7 +35,7 @@ class make_xlat:
 strip_processo = make_xlat(TRANSLATION)
 
 
-class Sei_Login(object):
+class Sei_Login:
 
     Login = dict(url="https://sei.anatel.gov.br",
                 url_teste="https://sei.anatel.gov.br",
@@ -55,7 +55,7 @@ class Sei_Login(object):
                                                                             (By.ID, "cke_129"))
 
 
-class Sei_Menu(object):
+class Sei_Menu:
 
     CLT_PROC = (By.LINK_TEXT, "Controle de Processos")
 
@@ -89,8 +89,8 @@ class Sei_Menu(object):
 
     PT_CTRL = (By.LINK_TEXT, "Pontos de Controle")
 
-
-class Sei_Inicial(object):
+    
+class Sei_Inicial:
 
     TITLE = 'SEI - Controle de Processos'
 
@@ -101,14 +101,14 @@ class Sei_Inicial(object):
     CONT = (By.ID, "selInfraPaginacaoSuperior")
 
 
-class Blocos(object):
+class Blocos:
 
     TITLE = "SEI - Blocos de Assinatura"
 
     BTN_CONCLUIR = (By.ID, "btnConcluir")
 
 
-class Bloco(object):
+class Bloco:
 
     TITLE = "SEI - Documentos do Bloco de Assinatura"
 
@@ -117,7 +117,7 @@ class Bloco(object):
     RET_BLOCO = (By.ID, 'btnExcluir')
 
 
-class Proc_incluir(object):
+class Proc_incluir:
 
     TITLE = "SEI - Processo"
 
@@ -162,7 +162,7 @@ class Proc_incluir(object):
     #BTN_SALVAR = (By.CLASS_NAME, "cke_button cke_button__save cke_button_disabled")
 
 
-class Proc_central(object):
+class Proc_central:
 
     ACOES = (By.ID, "divArvoreAcoes")
 
@@ -184,7 +184,7 @@ class Proc_central(object):
     AND_POS = "por meio de correspondência simples com aviso de recebimento."
 
 
-class Marcador(object):
+class Marcador:
 
     SELECT_MARCADOR = (By.ID, "selMarcador")
 
@@ -195,7 +195,7 @@ class Marcador(object):
     SALVAR = (By.NAME, "sbmGerenciarMarcador")
 
 
-class Acompanhamento_Especial(object):
+class Acompanhamento_Especial:
 
     GRUPOS = (By.ID, "selGrupoAcompanhamento")
 
@@ -206,7 +206,7 @@ class Acompanhamento_Especial(object):
     EXCLUIR = (By.ID, "btnExcluir")
 
 
-class Envio(object):
+class Envio:
 
     TITLE = "SEI - Enviar Processo"
 
@@ -241,7 +241,7 @@ class Envio(object):
     ENVIAR = (By.ID, "sbmEnviar")
 
 
-class Criar_Processo(object):
+class Criar_Processo:
 
     EXIBE_ALL = (By.ID, 'imgExibirTiposProcedimento')
 
@@ -1005,7 +1005,7 @@ class Selecionar_Contatos:
     LUPA = (By.ID, "imgSelecionarGrupo")
 
 
-class Gerar_Doc(object):
+class Gerar_Doc:
 
     TIPOS = ("Externo",
              "Ofício",
@@ -1350,14 +1350,14 @@ class Gerar_Doc(object):
                 'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)']
 
 
-class Pesq_contato(object):
+class Pesq_contato:
 
     ID_SEARCH = (By.ID, "txtPalavrasPesquisaContatos")
 
     TITLE = "SEI - Contatos"
 
 
-class Contato(object):
+class Contato:
 
     TITLE = 'SEI - Contatos'
 

@@ -9,10 +9,7 @@ import datetime as dt
 import re
 import itertools
 
-import gspread
-import gspread_dataframe as gs_to_df
 import pandas as pd
-from oauth2client.service_account import ServiceAccountCredentials
 from selenium.webdriver.common.keys import Keys
 
 from page import Page
@@ -347,7 +344,7 @@ def check_input(identificador: str, tipo: str) -> str:
     size = 11
 
     if tipo == "indicativo":
-        
+
         for pattern in PATTERNS:
 
             if re.match(pattern, identificador, re.I):
@@ -406,123 +403,6 @@ def last_day_of_month():
     date = date.strftime("%d%m%y")
 
     return date
-
-
-def authenticate_google(path_to_file="files/anatel.json"):
-
-    scope = [
-        "https://spreadsheets.google.com/feeds",
-        "https://www.googleapis.com/auth/drive",
-    ]
-
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(path_to_file, scope)
-
-    return gspread.authorize(credentials)
-
-
-def load_gsheet(title: str) -> gspread.Spreadsheet:
-    """Authenticate the user, opens the Goole Spreadsheet
-    
-    Arguments:
-        title {str} -- Google Drive Spreadsheet Name 
-
-    Raises:
-        ValueError  -- if Spreadsheet is not found
-    
-    Returns:
-        gspread.Spreadsheet -- [Google Spreadsheet Object]
-    """
-
-    auth = authenticate_google()
-
-    try:
-
-        sheet = auth.open(title=title)
-
-    except gspread.SpreadsheetNotFound:
-
-        raise ValueError(f"Planilha {title} não foi encontrada. Verifique o seu Drive")
-
-    return sheet
-
-
-def load_wb_from_sheet(title: str, aba: str):
-    """Carrega a Planilha Google title e retorna aba
-    
-    Arguments:
-        title {str} -- Nome da Planilha no Google Drive
-        aba {str} -- Nome da Aba da Planilha    
-    
-    Raises:
-        ValueError --  if Spreadsheet or Workbook not found
-    """
-
-    sh = load_gsheet(title)
-
-    try:
-
-        wb = sh.worksheet(aba)
-
-    except gspread.WorksheetNotFound:
-
-        raise ValueError(
-            f" A aba não foi encontrada na Planilha {title}. Verifique o seu Drive"
-        )
-
-    return wb
-
-
-def load_df_from_sheet(title: str, aba: str, skiprows: list = None):
-    """Carrega a Planilha Google title e retorna a aba como um Dataframe
-    
-    Args:
-        title (str): Nome da Planilha no Google Drive
-        aba (str): Nome da Aba da planilha
-        skiprows (list, optional): Defaults to None. Opcionalmente ignora essas linhas. 
-    """
-
-    wb = load_wb_from_sheet(title=title, aba=aba)
-
-    df = gs_to_df.get_as_dataframe(
-        wb,
-        evaluate_formulas=True,
-        skiprows=skiprows,
-        dtype=str,
-        na_values=["nan", ""],
-        allow_formulas=True,
-    )
-
-    df = df.dropna(axis=0, how="all")
-
-    return df
-
-
-def load_workbooks_from_drive():
-    """
-    Receives: tuple of strings
-
-        Authenticate the access to Google Sheets Feed
-        Open all authorized Spreadsheets and puts in a list wkbs
-        Filter this list to contain only Spreadsheets with in tuple 'criteria'
-
-    Returns:
-
-        A list with Spreadsheet objects containing one of criteria in the title
-    """
-    gc = authenticate_google()
-
-    return gc.openall()
-
-
-def salva_aba_no_drive(dataframe, planilha_drive, aba_drive):
-
-    workbook = authenticate_google().open(planilha_drive)
-
-    worksheet = workbook.worksheet(aba_drive)
-
-    worksheet.clear()
-
-    gs_to_df.set_with_dataframe(dataframe=dataframe, worksheet=worksheet, resize=True)
 
 
 def transform_date(date):

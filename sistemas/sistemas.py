@@ -956,6 +956,7 @@ class Sec(Sistema):
         return True
 
     def _extrai_inscritos_prova(self):
+        
 
         dados = OrderedDict()
 
@@ -1021,7 +1022,7 @@ class Sec(Sistema):
 
         result.accept()
 
-    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1):
+    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1, timeout: int= 5):
 
         h = self.sis.Prova["imprimir"]
 

@@ -3,35 +3,34 @@ import re
 import os
 import sys
 import datetime as dt
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from time import sleep
 from contextlib import contextmanager
 
 # Other Helpful Libs
 import unidecode
 from bs4 import BeautifulSoup as soup
-from typing import Type, Dict, List, Tuple, Sequence
+from typing import Type, Dict, List, Tuple, Sequence, Any, Callable
 
 # Selenium Dependencies
-from selenium.common.exceptions import *
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import *
+from selenium.webdriver.support.ui import Select
 from selenium import webdriver
 
 # Others modules from this package
 import functions
 from . import sei_helpers
-from page import Page
+from page import Page, Elem
 
 
-Browser = webdriver
-Processos = OrderedDict[str, Any]
+Processos = Dict[str, Any]
 
 # TODO: Add password Encryption
 # TODO: Select Normal/Teste
-def login_sei(usr: str, pwd: str, driver: Browser=None, timeout: int=10)-> 'Sei':
+def login_sei(usr: str, pwd: str, driver: Callable, timeout=10)-> 'Sei':
     """
     Esta função recebe um objeto Webdrive e as credenciais
     do usuário, loga no SEI - ANATEL e retorna uma instância da classe
@@ -55,7 +54,7 @@ def login_sei(usr: str, pwd: str, driver: Browser=None, timeout: int=10)-> 'Sei'
     senha.send_keys(pwd)
 
     try:
-        page._clicar(helper.get('submit'), silent=True, timeout:int=10
+        page._clicar(helper.get('submit'), silent=True, timeout=10
         )
 
     except TimeoutException:
@@ -69,25 +68,34 @@ class Sei:
     Esta subclasse da classe Page define métodos de execução de ações na
     página principal do SEI e de resgate de informações
     """
+    timeout = 10
 
     def __init__(self, page: Page, processos: Processos=None)-> None:
         self.page = page
-        self._processos = processos if processos is not None else {}
+        self._processos = processos if processos is not None else OrderedDict()
 
-    def _mudar_lotação(lotação: str)->None:
-        pass
+    # Used to emulate attributes from page as if from this class
+    def __getattr__(self, k):
+        return getattr(self.page, k)
+
+
+    def _mudar_lotação(self, lotação: str)->None:
+
+        h = sei_helpers.SeiHeader
+
+        self.page._selecionar_por_texto(h.LOTACAO, lotação, timeout=self.timeout)
 
     def _set_processos(self, processos)-> None:
-        self._processos = Orderedict((p["numero"],p) for p in processos)
+        self._processos = OrderedDict((p["numero"],p) for p in processos)
 
-    def pesquisa_contato(self, termo: str, timeout: int=10):
+    def pesquisa_contato(self, termo: str, timeout=10):
         """Pesquisa a existência de cadastro de contato `nome` 
         
         Args:
             termo (str): termo a ser pesquisado
             timeout (int, optional): tempo de espera pelos elementos da página. Defaults to 10.
         """       
-        helper = helper
+        helper = sei_helpers.Contato
 
         termo = unidecode._unidecode(termo)
 
@@ -96,7 +104,7 @@ class Sei:
                 self._vai_para_pag_contato()
 
         try:
-            self.page._clicar(sei_helpers.Pesq_contato.ID_SEARCH, timeout:int=10
+            chave_pesquisa = self.wait_for_element_to_click(sei_helpers.Pesq_contato.ID_SEARCH, timeout=timeout
             )
         except TimeoutException:
 
@@ -104,11 +112,11 @@ class Sei:
 
             return None
 
-        contato.clear()
+        chave_pesquisa.clear()
 
-        contato.send_keys(termo)
+        chave_pesquisa.send_keys(termo)
 
-        self.page_clicar(helper.BTN_PESQUISAR, timeout: int=10
+        self.page_clicar(helper.BTN_PESQUISAR, timeout=10
 
         )
 
@@ -129,15 +137,17 @@ class Sei:
 
             return None
 
-    def _cria_contato(self, dados: Dict, timeout: int=10
+    def _cria_contato(self, dados: Dict, timeout=10
     )-> None:
+
+        helper = sei_helpers.Contato        
 
         with self.page.wait_for_page_load():
             self.page._clicar(helper.BTN_NOVO)       
         
             self._mudar_dados_contato(dados, novo=True, timeout=timeout)
 
-    def _mudar_dados_contato(self, dados: Dict, novo=False, timeout: int=10
+    def _mudar_dados_contato(self, dados: Dict, novo=False, timeout=10
     ):
 
         helper = sei_helpers.Contato
@@ -179,7 +189,7 @@ class Sei:
 
         self.page._selecionar_por_texto(helper.UF, dados.get("UF", ""), timeout)
 
-        self.page._atualizar_elemento(helper.CEP, dados.get("Cep", "")timeout)
+        self.page._atualizar_elemento(helper.CEP, dados.get("Cep", ""), timeout)
 
         self.page._atualizar_elemento(helper.CPF, dados.get("Cpf_RF", ""),timeout)
 
@@ -595,7 +605,7 @@ class Processo(Sei):
 
         return self.arvore
 
-    def _click_na_arvore(self, label, timeout: int = 5):
+    def _click_na_arvore(self, label, timeout = 5):
 
         tree = self.armazena_arvore()
 
@@ -605,7 +615,7 @@ class Processo(Sei):
             if label in k:
 
                 with self._go_to_arvore():
-                    self.page._clicar((By.ID, v["id"]), timeout:int=10
+                    self.page._clicar((By.ID, v["id"]), timeout=10
                     )
 
                 return
@@ -619,12 +629,12 @@ class Processo(Sei):
 
     #     with self._go_to_arvore():
 
-    #         self._click_button((By.LINK_TEXT, self.numero), timeout:int=10
+    #         self._click_button((By.LINK_TEXT, self.numero), timeout=10
     # )
 
     #         return
 
-    def abrir_pastas(self, timeout: int = 10) -> None:
+    def abrir_pastas(self, timeout = 10) -> None:
 
         h = sei_helpers.Arvore.ABRIR_PASTAS
 
@@ -635,12 +645,12 @@ class Processo(Sei):
         if plus:
             with self._go_to_arvore():
                 try:
-                    self.page._clicar((By.ID, plus["id"]), timeout:int=10
+                    self.page._clicar((By.ID, plus["id"]), timeout=10
                     )
                 except TimeoutException:
                     self.go(plus['href'])
 
-    def edita_doc(self, num_doc, timeout: int = 10)-> None:
+    def edita_doc(self, num_doc, timeout = 10)-> None:
 
         self = Sei.go_to_processo(self, num_doc)
 
@@ -648,7 +658,7 @@ class Processo(Sei):
 
         with self._go_to_arvore():
             
-            doc = self.page.wait_for_element((By.PARTIAL_LINK_TEXT, num_doc), timeout:int=10
+            doc = self.page.wait_for_element((By.PARTIAL_LINK_TEXT, num_doc), timeout=10
             )
 
             source = soup(doc.get_attribute("innerHTML"), "lxml")
@@ -660,7 +670,7 @@ class Processo(Sei):
             self.page.driver.execute_script(fr"var elem=arguments[0]; elem.title = '{title}'; elem.text = '{title}'", doc)
 
             
-        #    self.page._clicar(h, timeout:int=10
+        #    self.page._clicar(h, timeout=10
         # )
 
     def send_doc_por_email(self, label, dados, timeout=5):
@@ -669,7 +679,7 @@ class Processo(Sei):
 
         helper = sei_helpers.Email
 
-        self._click_na_arvore(label, timeout:int=10
+        self._click_na_arvore(label, timeout=10
         )
 
         with self._go_to_central_frame():
@@ -685,23 +695,23 @@ class Processo(Sei):
                 destinatario, assunto, mensagem = dados
 
                 self.page._atualizar_elemento(
-                    helper.get('destinatario'), destinatario, timeout:int=10
+                    helper.get('destinatario'), destinatario, timeout=10
 
                 )
 
-                self.page._atualizar_elemento(helper.get('assunto'), assunto, timeout:int=10
+                self.page._atualizar_elemento(helper.get('assunto'), assunto, timeout=10
                 )
 
-                self.page._selecionar_por_texto(helper.get('mensagem'), mensagem, timeout:int=10
+                self.page._selecionar_por_texto(helper.get('mensagem'), mensagem, timeout=10
                 )
 
                 # After putting the email, we must validate ir by clicking it or pressing ENTER
                 self.page._atualizar_elemento(
-                    helper['destinatario'], 2 * Keys.ENTER, timeout:int=10
+                    helper['destinatario'], 2 * Keys.ENTER, timeout=10
 
                 )
 
-                self.page._clicar(helper.get('enviar'), timeout:int=10
+                self.page._clicar(helper.get('enviar'), timeout=10
                 )
 
     def info_oficio(self, num_doc):
@@ -961,18 +971,18 @@ class Processo(Sei):
         with self.page._navega_nova_janela():
             self.go_to_marcador()
 
-            self.page._clicar(sei_helpers.Marcador.SELECT_MARCADOR, timeout:int=10
+            self.page._clicar(sei_helpers.Marcador.SELECT_MARCADOR, timeout=10
             )
 
-            self.page._clicar((By.LINK_TEXT, tipo), timeout:int=10
+            self.page._clicar((By.LINK_TEXT, tipo), timeout=10
             )
 
             self.page._atualizar_elemento(
-                sei_helpers.Marcador.TXT_MARCADOR, content, timeout:int=10
+                sei_helpers.Marcador.TXT_MARCADOR, content, timeout=10
 
             )
 
-            self.page._clicar(sei_helpers.Marcador.SALVAR, timeout:int=10
+            self.page._clicar(sei_helpers.Marcador.SALVAR, timeout=10
             )
 
             selfpage.fechar()
@@ -1006,28 +1016,28 @@ class Processo(Sei):
                 for dado in dados:
 
                     self.page._atualizar_elemento(
-                        h.INPUT_PESQUISAR, dado + Keys.RETURN, timeout:int=10
+                        h.INPUT_PESQUISAR, dado + Keys.RETURN, timeout=10
 
                     )
 
-                    self.page._clicar(h.BTN_PESQUISAR, timeout:int=10
+                    self.page._clicar(h.BTN_PESQUISAR, timeout=10
                      / 2)
 
                     try:
-                        self.page._clicar((By.ID, "chkInfraItem0"), timeout:int=10
+                        self.page._clicar((By.ID, "chkInfraItem0"), timeout=10
                         )
 
-                        self.page._clicar(h.B_TRSP, timeout:int=10
+                        self.page._clicar(h.B_TRSP, timeout=10
                          / 2)
 
                     except TimeoutException:
                         next
 
                 # selfpage.fechar()
-                self.page._clicar(h.BTN_FECHAR, timeout:int=10
+                self.page._clicar(h.BTN_FECHAR, timeout=10
                  / 2)
 
-        self.page._clicar(h.SALVAR, timeout:int=10
+        self.page._clicar(h.SALVAR, timeout=10
         )
 
         self.go(self.link)
@@ -1047,7 +1057,7 @@ class Processo(Sei):
 
                 self.go(link)
 
-            self.page._clicar((By.LINK_TEXT, tipo), timeout:int=10
+            self.page._clicar((By.LINK_TEXT, tipo), timeout=10
             )
 
         else:
@@ -1067,30 +1077,30 @@ class Processo(Sei):
         if tipo not in sei_helpers.Gerar_Doc.TEXTOS_PADRAO:
             raise ValueError("Tipo de Ofício inválido: {}".format(tipo))
 
-        self.incluir_documento("Ofício", timeout:int=10
+        self.incluir_documento("Ofício", timeout=10
          / 2)
 
-        self.page._clicar(helper.get("id_txt_padrao"), timeout:int=10
+        self.page._clicar(helper.get("id_txt_padrao"), timeout=10
          / 2)
 
-        self.page._selecionar_por_texto(helper.get("id_modelos"), tipo, timeout:int=10
+        self.page._selecionar_por_texto(helper.get("id_modelos"), tipo, timeout=10
          / 2)
 
         # self.page._atualizar_elemento(helper.get('id_dest'), dados["CNPJ/CPF"] + Keys.TAB + Keys.RETURN )
 
         if acesso == "publico":
 
-            self.page._clicar(helper.get("id_pub"), timeout:int=10
+            self.page._clicar(helper.get("id_pub"), timeout=10
              / 2)
 
         elif acesso == "restrito":
 
-            self.page._clicar(helper.get("id_restrito"), timeout:int=10
+            self.page._clicar(helper.get("id_restrito"), timeout=10
             )
 
             hip = Select(
                 self.page.wait_for_element_to_click(
-                    helper.get("id_hip_legal"), timeout:int=10
+                    helper.get("id_hip_legal"), timeout=10
 
                 )
             )
@@ -1108,12 +1118,12 @@ class Processo(Sei):
 
         with self.page._navega_nova_janela():
 
-            self.page._click_button_new_win(helper.get("submit"), timeout:int=10
+            self.page._click_button_new_win(helper.get("submit"), timeout=10
              / 2)
 
             if dados:
 
-                self.editar_oficio(functions.string_endereço(dados), timeout:int=10
+                self.editar_oficio(functions.string_endereço(dados), timeout=10
                 )
 
                 selfpage.fechar()
@@ -1140,40 +1150,40 @@ class Processo(Sei):
 
         #    raise ValueError("Tipo de Documento Externo Inválido: {}".format(tipo))
 
-        self.incluir_documento("Externo", timeout:int=10
+        self.incluir_documento("Externo", timeout=10
         )
 
-        self.page._selecionar_por_texto(helper.get("id_tipo"), tipo, timeout:int=10
+        self.page._selecionar_por_texto(helper.get("id_tipo"), tipo, timeout=10
         )
 
         today = dt.datetime.today().strftime("%d%m%Y")
 
-        self.page._atualizar_elemento(helper.get("id_data"), today, timeout:int=10
+        self.page._atualizar_elemento(helper.get("id_data"), today, timeout=10
         )
 
         if arvore:
-            self.page._atualizar_elemento(helper.get("id_txt_tree"), arvore, timeout:int=10
+            self.page._atualizar_elemento(helper.get("id_txt_tree"), arvore, timeout=10
             )
 
         if formato.lower() == "nato":
-            self.page._clicar(helper.get("id_nato"), timeout:int=10
+            self.page._clicar(helper.get("id_nato"), timeout=10
             )
 
         if acesso == "publico":
 
-            self.page._clicar(helper.get("id_pub"), timeout:int=10
+            self.page._clicar(helper.get("id_pub"), timeout=10
             )
 
         elif acesso == "restrito":
 
-            self.page._clicar(helper.get("id_restrito"), timeout:int=10
+            self.page._clicar(helper.get("id_restrito"), timeout=10
             )
 
             if hipotese not in sei_helpers.Gerar_Doc.HIPOTESES:
                 raise ValueError("Hipótese Legal Inválida: ", hipotese)
 
             self.page._selecionar_por_texto(
-                helper.get("id_hip_legal"), hipotese, timeout:int=10
+                helper.get("id_hip_legal"), hipotese, timeout=10
 
             )
 
@@ -1183,7 +1193,7 @@ class Processo(Sei):
                 "Você provavelmente não vai querer um documento Externo Sigiloso"
             )
 
-        self.page._atualizar_elemento(helper.get("id_file_upload"), path, timeout:int=10
+        self.page._atualizar_elemento(helper.get("id_file_upload"), path, timeout=10
         )
 
         self.page._clicar(helper.get("submit"), timeout=2 * timeout)
@@ -1194,7 +1204,7 @@ class Processo(Sei):
 
         links = sei_helpers.Sei_Login.Oficio
 
-        self.page.wait_for_element_to_be_visible(links.editor, timeout:int=10
+        self.page.wait_for_element_to_be_visible(links.editor, timeout=10
         )
 
         frames = self.page.driver.find_elements_by_tag_name("iframe")
@@ -1239,7 +1249,7 @@ class Processo(Sei):
 
         self.page.driver.switch_to.parent_frame()
 
-        self.page._clicar(links.submit, timeout:int=10
+        self.page._clicar(links.submit, timeout=10
         )
 
         # Necessary steps to save

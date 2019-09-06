@@ -10,6 +10,7 @@ As demais classes inicialmente herdavam esta, no entanto futuramente deverá ser
 from contextlib import contextmanager
 from typing import Any, Union, Dict, List, Tuple, Callable, Sequence, Optional
 from dataclasses import dataclass
+from pathlib import Path
 
 import selenium
 from selenium.common.exceptions import (
@@ -24,14 +25,12 @@ from selenium.common.exceptions import (
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import *
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium import webdriver
 
-Browser = webdriver
-
+Elem = Tuple[Any, str]
 
 # Base Class
-@dataclass
 class Page:
     """This Base class implements common navigation methods on any page.
     Adds useful features to Selenium navigation.
@@ -40,24 +39,20 @@ class Page:
 
     """
 
-    driver: Browser = None
-    driver_path: Any = None
+    def __init__(self, driver: Callable):
 
-    if driver is not None:
-        self.driver = driver
+        if driver is not None:
+            self.driver = driver()
 
-    else:
-        assert driver_path is not None, "You need to inform the path to webdriver"
-        self.driver = webdriver.Firefox(firefox_binary=driver_path)
-
-    def restart_driver(self, driver: Browser = None) -> None:
+    def restart_driver(self, driver: Callable = None) -> None:
         """Restarts webdriver instance
         
         Args:
             driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc.
         """
+        if driver is None:
 
-        self.__init__(driver)
+            self.driver = webdriver.firefox()
 
     def fechar(self) -> None:
         """Fecha a instância atual do browser
@@ -68,8 +63,8 @@ class Page:
         self.driver.close()
 
     def _clicar(
-        self, btn_id: Tuple, silent: bool = True, timeout: int = 10
-    ) -> Union[str,]:
+        self, btn_id: Elem, silent: bool = True, timeout: int = 10
+    ) -> Union[str, None, Any]:
         """Clica no botão ou link definido pelo elemento btn_id
         
         Args:
@@ -106,7 +101,7 @@ class Page:
             return None
 
     def _atualizar_elemento(
-        self, elem_id: Tuple, dado: str, timeout: int = 10
+        self, elem_id: Elem, dado: str, timeout: int = 10
     ) -> Optional[str]:
         """Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
         
@@ -128,8 +123,10 @@ class Page:
 
             return repr(e)
 
+        return None
+
     def _selecionar_por_texto(
-        self, select_id: Tuple, text: str, timeout: int = 10
+        self, select_id: Elem, text: str, timeout: int = 10
     ) -> Optional[str]:
         """
 
@@ -156,6 +153,8 @@ class Page:
             txt = alerta.text
             alerta.accept()
             return txt
+
+        return None
 
     @contextmanager
     def _navega_nova_janela(self, main=None):
@@ -197,7 +196,7 @@ class Page:
 
         return alert
 
-    def elem_is_visible(self, *locator: Tuple, timeout: int = 10):
+    def elem_is_visible(self, *locator: Elem, timeout: int = 10):
         """
         Check is locator is visible on page given the timeout
 
@@ -222,29 +221,29 @@ class Page:
     def get_url(self):
         return self.driver.current_url()
 
-    def hover(self, *locator: Tuple):
+    def hover(self, *locator: Elem):
         element = self.wait_for_element(*locator)
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator: Tuple, timeout: int = 10):
+    def check_element_exists(self, *locator: Elem, timeout: int = 10):
         try:
             self.wait_for_element_to_be_visible(*locator, timeout=timeout)
             return True
         except (TimeoutException, NoSuchElementException):
             return False
 
-    def wait_for_element_to_be_visible(self, *locator: Tuple, timeout: int = 10):
+    def wait_for_element_to_be_visible(self, *locator: Elem, timeout: int = 10):
         return WebDriverWait(self.driver, timeout).until(
             ec.visibility_of_element_located(*locator)
         )
 
-    def wait_for_element(self, *locator: Tuple, timeout=10):
+    def wait_for_element(self, *locator: Elem, timeout=10):
         return WebDriverWait(self.driver, timeout).until(
             ec.presence_of_element_located(*locator)
         )
 
-    def wait_for_element_to_click(self, *locator: Tuple, timeout: int = 10):
+    def wait_for_element_to_click(self, *locator: Elem, timeout: int = 10):
         return WebDriverWait(self.driver, timeout).until(
             ec.element_to_be_clickable(*locator)
         )
@@ -255,7 +254,7 @@ class Page:
         )
 
     # TODO: generalize this method
-    def nav_elem_to_new_win(self, elem: Tuple):
+    def nav_elem_to_new_win(self, elem):
         """ Abre o link `elem` em uma nova janela e retorna o foco para esta nova janela 
             Assume que há um link presente no elemento html `elem`.
             Se usado dentro do gerenciador de contexto `self._navega_nova_janela`
@@ -305,9 +304,9 @@ class Page:
         return None
 
     def _click_button_new_win(
-        self, btn_id: Tuple, silencioso: bool = True, timeout: int = 10
+        self, btn_id: Elem, silencioso: bool = True, timeout: int = 10
     ):
-        """
+        """               
 
         :param btn_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
         :param silencioso: se verdadeiro confirma o pop-up após o clique no botão

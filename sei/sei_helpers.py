@@ -1,5 +1,5 @@
 import re
-from collections.__init__ import namedtuple
+from collections import namedtuple
 
 from selenium.webdriver.common.by import By
 
@@ -100,6 +100,8 @@ class Sei_Inicial:
 
     CONT = (By.ID, "selInfraPaginacaoSuperior")
 
+class SeiHeader:
+    LOTACAO = (By.XPATH, '//*[@id="selInfraUnidades"]')
 
 class Blocos:
 
@@ -115,7 +117,6 @@ class Bloco:
     PESQUISA = (By.ID, "txtPalavrasPesquisaBloco")
 
     RET_BLOCO = (By.ID, 'btnExcluir')
-
 
 class Proc_incluir:
 
@@ -161,7 +162,6 @@ class Proc_incluir:
 
     #BTN_SALVAR = (By.CLASS_NAME, "cke_button cke_button__save cke_button_disabled")
 
-
 class Proc_central:
 
     ACOES = (By.ID, "divArvoreAcoes")
@@ -183,7 +183,6 @@ class Proc_central:
 
     AND_POS = "por meio de correspondência simples com aviso de recebimento."
 
-
 class Marcador:
 
     SELECT_MARCADOR = (By.ID, "selMarcador")
@@ -194,7 +193,6 @@ class Marcador:
 
     SALVAR = (By.NAME, "sbmGerenciarMarcador")
 
-
 class Acompanhamento_Especial:
 
     GRUPOS = (By.ID, "selGrupoAcompanhamento")
@@ -204,7 +202,6 @@ class Acompanhamento_Especial:
     SALVAR = (By.NAME, "sbmCadastrarAcompanhamento")
 
     EXCLUIR = (By.ID, "btnExcluir")
-
 
 class Envio:
 
@@ -239,7 +236,6 @@ class Envio:
     UTEIS = (By.ID, "chkSinDiasUteis")
 
     ENVIAR = (By.ID, "sbmEnviar")
-
 
 class Criar_Processo:
 
@@ -1004,7 +1000,6 @@ class Selecionar_Contatos:
 
     LUPA = (By.ID, "imgSelecionarGrupo")
 
-
 class Gerar_Doc:
 
     TIPOS = ("Externo",
@@ -1349,13 +1344,11 @@ class Gerar_Doc:
                 'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)',
                 'Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)']
 
-
 class Pesq_contato:
 
     ID_SEARCH = (By.ID, "txtPalavrasPesquisaContatos")
 
     TITLE = "SEI - Contatos"
-
 
 class Contato:
 

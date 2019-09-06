@@ -1242,6 +1242,78 @@ class Sec(Sistema):
 
         pass
 
+class Slmm(Sistema):
+    """
+    Esta subclasse da classe Page define métodos de execução de funções nos sistemas
+    interativos da ANATEL
+    """
+
+    def __init__(self, driver, login=None, senha=None, timeout=10):
+
+        super().__init__(driver, login, senha, timeout)
+
+        self.sis = sis_helpers.Slmm
+
+    def consulta(self, identificador, tipo_id="id_cpf", timeout=5):
+
+        h = self.sis.consulta
+
+        acoes = self._get_acoes(h, ("link", tipo_id, None))  # 'submit'))
+
+        self._navigate(identificador, tipo_id, acoes)
+
+        identificador = functions.strip_string(identificador)
+
+        try:
+
+            self._click_button(h["id_btn_estacao"], timeout=timeout)
+
+        except (NoSuchElementException, TimeoutException):
+
+            print("Não há registro para o identificador informado")
+
+
+
+    def servico_excluir(
+        self, identificador, documento, 
+        motivo="Renúncia", tipo_id="id_cpf", num_proc=None, timeout=10
+    ):
+
+        h = self.sis.servico
+
+        acoes = self._get_acoes(h, ("excluir", tipo_id, "submit"))
+
+        try:
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            print("Alerta Inesperado")
+
+        alert = self.alert_is_present(2)
+
+        if alert:
+            alert.dismiss()
+
+        proc = self.wait_for_element(h.get("id_num_proc"), timeout=timeout)
+
+        if self.check_element_exists(h.get("id_num_proc"), timeout=timeout):
+            self._atualizar_elemento(h.get("id_num_proc"), num_proc, timeout=timeout)
+
+        self._click_button(h.get("id_btn_dados_exclusão"), timeout=timeout)
+
+        self._atualizar_elemento(h.get("id_doc_exclusão"), documento, timeout=timeout)
+
+        self._selecionar_por_texto(h.get("id_motivo_exclusão"), motivo, timeout=timeout)
+
+        self._click_button(h.get("submit"), timeout=timeout)
+
+        alert = self.alert_is_present(2)
+
+        if alert:
+            alert.dismiss()
+
+        
 class Sigec(Sistema):
     def __init__(self, driver, login="", senha="", timeout=2):
 

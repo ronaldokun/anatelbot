@@ -9,7 +9,6 @@ As demais classes inicialmente herdavam esta, no entanto futuramente deverá ser
 
 from contextlib import contextmanager
 from typing import Any, Union, Dict, List, Tuple, Callable, Sequence, Optional
-from dataclasses import dataclass
 from pathlib import Path
 
 import selenium
@@ -24,7 +23,7 @@ from selenium.common.exceptions import (
 # Utilities
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium import webdriver
 
@@ -39,10 +38,14 @@ class Page:
 
     """
 
+    timeout = 10
+
     def __init__(self, driver: Callable):
 
         if driver is not None:
             self.driver = driver()
+        else:
+            self.driver = webdriver.firefox()
 
     def restart_driver(self, driver: Callable = None) -> None:
         """Restarts webdriver instance
@@ -63,7 +66,7 @@ class Page:
         self.driver.close()
 
     def _clicar(
-        self, btn_id: Elem, silent: bool = True, timeout: int = 10
+        self, btn_id: Elem, silent: bool = True, timeout: int = timeout
     ) -> Union[str, None, Any]:
         """Clica no botão ou link definido pelo elemento btn_id
         
@@ -101,7 +104,7 @@ class Page:
             return None
 
     def _atualizar_elemento(
-        self, elem_id: Elem, dado: str, timeout: int = 10
+        self, elem_id: Elem, dado: str, timeout: int = timeout
     ) -> Optional[str]:
         """Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
         
@@ -126,7 +129,7 @@ class Page:
         return None
 
     def _selecionar_por_texto(
-        self, select_id: Elem, text: str, timeout: int = 10
+        self, select_id: Elem, text: str, timeout: int = timeout
     ) -> Optional[str]:
         """
 
@@ -176,19 +179,19 @@ class Page:
             self.driver.switch_to.window(main)
 
     @contextmanager
-    def wait_for_page_load(self, timeout: int = 10):
+    def wait_for_page_load(self, timeout: int = timeout):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name("title")
 
         yield
 
-        WebDriverWait(self.driver, timeout).until(ec.staleness_of(old_page))
+        WebDriverWait(self.driver, timeout).until(EC.staleness_of(old_page))
 
-    def alert_is_present(self, timeout: int = 10):
+    def alert_is_present(self, timeout: int = timeout):
 
         try:
 
-            alert = WebDriverWait(self.driver, timeout).until(ec.alert_is_present())
+            alert = WebDriverWait(self.driver, timeout).until(EC.alert_is_present())
 
         except (TimeoutException, WebDriverException):
 
@@ -196,7 +199,7 @@ class Page:
 
         return alert
 
-    def elem_is_visible(self, *locator: Elem, timeout: int = 10):
+    def elem_is_visible(self, *locator: Elem, timeout: int = timeout):
         """
         Check is locator is visible on page given the timeout
 
@@ -207,7 +210,7 @@ class Page:
         try:
 
             WebDriverWait(self.driver, timeout).until(
-                ec.visibility_of_element_located(locator)
+                EC.visibility_of_element_located(locator)
             )
 
         except TimeoutException:
@@ -226,31 +229,31 @@ class Page:
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator: Elem, timeout: int = 10):
+    def check_element_exists(self, *locator: Elem, timeout: int = timeout):
         try:
             self.wait_for_element_to_be_visible(*locator, timeout=timeout)
             return True
         except (TimeoutException, NoSuchElementException):
             return False
 
-    def wait_for_element_to_be_visible(self, *locator: Elem, timeout: int = 10):
+    def wait_for_element_to_be_visible(self, *locator: Elem, timeout: int = timeout):
         return WebDriverWait(self.driver, timeout).until(
-            ec.visibility_of_element_located(*locator)
+            EC.visibility_of_element_located(*locator)
         )
 
-    def wait_for_element(self, *locator: Elem, timeout=10):
+    def wait_for_element(self, *locator: Elem, timeout: int = timeout):
         return WebDriverWait(self.driver, timeout).until(
-            ec.presence_of_element_located(*locator)
+            EC.presence_of_element_located(*locator)
         )
 
-    def wait_for_element_to_click(self, *locator: Elem, timeout: int = 10):
+    def wait_for_element_to_click(self, *locator: Elem, timeout: int = timeout):
         return WebDriverWait(self.driver, timeout).until(
-            ec.element_to_be_clickable(*locator)
+            EC.element_to_be_clickable(*locator)
         )
 
-    def wait_for_new_window(self, windows: Sequence, timeout: int = 10):
+    def wait_for_new_window(self, windows: Sequence, timeout: int = timeout):
         return WebDriverWait(self.driver, timeout).until(
-            ec.new_window_is_opened(windows)
+            EC.new_window_is_opened(windows)
         )
 
     # TODO: generalize this method
@@ -304,7 +307,7 @@ class Page:
         return None
 
     def _click_button_new_win(
-        self, btn_id: Elem, silencioso: bool = True, timeout: int = 10
+        self, btn_id: Elem, silencioso: bool = True, timeout: int = timeout
     ):
         """               
 

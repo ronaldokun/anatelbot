@@ -38,7 +38,7 @@ strip_processo = make_xlat(TRANSLATION)
 class Sei_Login:
 
     Login = dict(url="https://sei.anatel.gov.br",
-                url_teste="https://sei.anatel.gov.br",
+                 url_teste="https://sei.anatel.gov.br",
                  title="SEI / ANATEL",
                  log=(By.ID, "txtUsuario"),
                  pwd=(By.ID, "pwdSenha"),

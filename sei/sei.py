@@ -89,7 +89,7 @@ class Sei:
     def _set_processos(self, processos)-> None:
         self._processos = OrderedDict((p["numero"],p) for p in processos)
 
-    def pesquisa_contato(self, termo: str, timeout=10):
+    def pesquisa_contato(self, termo: str, timeout=timeout):
         """Pesquisa a existência de cadastro de contato `nome` 
         
         Args:

@@ -21,7 +21,13 @@ from selenium.webdriver.support.ui import Select
 from selenium import webdriver
 
 # Others modules from this package
-import functions
+from functions import add_point_cpf_cnpj
+from .common import (
+    armazena_tags, 
+    cria_dict_acoes, 
+    string_endereço, 
+    pode_expedir
+)
 from . import config
 from page import Page, Elem
 
@@ -40,44 +46,32 @@ def login_sei(usr: str, pwd: str, driver: Callable, timeout=10)-> 'Sei':
     helper = config.Sei_Login.Login
 
     page = Page(driver)
+    page.timeout = timeout
     page.driver.get(helper.get('url'))
     page.driver.maximize_window()
 
-    usuario = page.wait_for_element_to_click(helper.get('log'))
-    senha = page.wait_for_element_to_click(helper.get('pwd'))
+    page._atualizar_elemento(helper.get('log'), usr)
+    page._atualizar_elemento(helper.get(pwd), pwd)
 
-    # Clear any clutter on the form
-    usuario.clear()
-    usuario.send_keys(usr)
-
-    senha.clear()
-    senha.send_keys(pwd)
-
-    try:
-        page._clicar(helper.get('submit'), silent=True, timeout=timeout
-        )
-
-    except TimeoutException:
-        # Hit Enter
-        senha.send_keys(Keys.RETURN)
-
+    page._clicar(helper.get('submit'), silent=True)
+   
     return Sei(page)
 
 class Sei:
-    """
-    Esta subclasse da classe Page define métodos de execução de ações na
+    """Esta subclasse da classe Page define métodos de execução de ações na
     página principal do SEI e de resgate de informações
     """
-    timeout = 10
 
-    def __init__(self, driver=None , processos: Processos=None)-> None:
+    timeout: int = 10
+
+    def __init__(self, driver=None, processos: Processos=None)-> None:
         self.page = Page(driver)
-        self.page.timeout = Sei.timeout
+        self.page.timeout = timeout
         self._processos = processos if processos is not None else OrderedDict()
 
     # Used to emulate attributes from page as if from this class
-    def __getattr__(self, k):
-        return getattr(self.page, k)
+    #def __getattr__(self, k):
+    #    return getattr(self.page, k)
 
 
     def _mudar_lotação(self, lotação: str)->None:
@@ -164,7 +158,7 @@ class Sei:
 
         cpf = dados.get("CNPJ/CPF", "")
 
-        cpf = functions.add_point(cpf)
+        cpf = add_point_cpf_cnpj(cpf)
 
         self.page._atualizar_elemento(helper.SIGLA, cpf, timeout)
 
@@ -415,7 +409,7 @@ class Sei:
             tags = line("td")
 
             if len(tags) == 6:
-                processos_abertos.append(functions.armazena_tags(tags))
+                processos_abertos.append(armazena_tags(tags))
 
         self._set_processos(processos_abertos)
 
@@ -537,7 +531,7 @@ class Processo(Sei):
 
             acoes = html_frame.find(id="divArvoreAcoes").contents
 
-            return functions.cria_dict_acoes(acoes)
+            return cria_dict_acoes(acoes)
 
     def _get_acoes(self, doc=None):
 
@@ -1124,7 +1118,7 @@ class Processo(Sei):
 
             if dados:
 
-                self.editar_oficio(functions.string_endereço(dados), timeout=10
+                self.editar_oficio(string_endereço(dados), timeout=10
                 )
 
                 selfpage.fechar()
@@ -1349,7 +1343,7 @@ def expedir_bloco(sei, numero):
 
     for p in processos:
 
-        if functions.pode_expedir(p):
+        if pode_expedir(p):
             proc = p["processo"].a.string
 
             num_doc = p["documento"].a.string

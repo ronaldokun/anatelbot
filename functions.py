@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 # -*- coding: utf-8 -*-
 """
 Created on Wed Nov  1 16:50:19 2017
@@ -8,30 +8,21 @@ Created on Wed Nov  1 16:50:19 2017
 # Basic Bultins
 import datetime as dt
 import re
-import itertools
-
-import pandas as pd
-
-
+import sys
+# Third-part Libraries
 from selenium.webdriver.common.keys import Keys
-
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
+from selenium.webdriver.ie.options import Options as IeOptions
+from selenium import webdriver
 from page import Page
 
-URL = "https://sei.anatel.gov.br/sei/"
-
-KEYS = [
-    "processo",
-    "tipo",
-    "atribuicao",
-    "marcador",
-    "anotação",
-    "prioridade",
-    "peticionamento",
-    "aviso",
-    "situacao",
-    "interessado",
-]
-
+#TODO: Generalize this
+NO_DRIVER = """
+You need to install the chromedriver for Selenium\n
+Please see this link https://github.com/weskerfoot/DeleteFB#how-to-use-it\n
+"""
 PADRAO_IND = [
     r"^(P){1}(X){1}(\d){1}([A-Z]){1}(\d){4}$",
     r"^(P){1}(U|Y){1}(\d){1}([A-Z]){2,3}$",
@@ -41,30 +32,79 @@ PADRAO_IND = [
 
 STRIP = ("/", ".", "-")
 
+BROWSERS = {
+    "chrome": {"name" : "chrome", "instance" : webdriver.Chrome, "options": ChromeOptions},
+    "firefox": {"name" : "firefox", "instance" : webdriver.Firefox, "options": FirefoxOptions},
+    "ie": {"name" : "ie", "instance" : webdriver.Ie, "options": IeOptions},
+    "edge": {"name": "edge", "instance": webdriver.Edge, "options": EdgeOptions}
+}
+
 
 def strip_string(identificador: str, strip: tuple = STRIP) -> str:
     """Remove os caracteres contidos em strip do identificador
-    
+
     Args:
         identificador (str): String a ser processada
         strip (tuple, optional): Tupla com caracteres a serem removidos. Defaults to STRIP.
-    
+
     Returns:
         str: String `identificador` formatada.
     """
     return "".join(s for s in identificador if s not in strip)
 
+# TODO: try using seleniumrequests instead
+def init_browser(
+    browser: str = "Chrome", login: str = None, senha: str = None, is_headless: bool = False, timeout: int = 10
+):
+    """Inicia a instância webdriver com algumas configurações otimizadas
+    e com o navegador logado na rede da Anatel
 
-def init_browser(webdriver, login, senha, timeout=10):
+    Args:
+        browser (str, optional): [String com o nome do navegador]. Defaults to "Chrome".
+        login (str, optional): [Nome do Usuário]. Defaults to None.
+        senha (str, optional): [Senha do Usuário]. Defaults to None.
+        timeout (int, optional): [Tempo máximo de espera na navegação]. Defaults to 10.
 
-    page = Page(webdriver)
+    Returns:
+        [webdriver]: [Webdriver instance]
+    """
+    browser = BROWSERS.get(browser.lower(), None)
+    if not browser:
+        raise ValueError(
+            f"O browser mencionado não é suportado, use uma dessas opções: {BROWSERS.items()!r}"
+        )
+
+    if browser['name'] != 'edge':
+        options = browser['options']
+        # The Chrome driver is required because Gecko was having issues
+        options = options()
+        if browser['name'] == 'chrome':
+            prefs = {"profile.default_content_setting_values.notifications": 2, 'disk-cache-size': 4096}
+            options.add_experimental_option("prefs", prefs)
+            options.add_argument("start-maximized")
+
+        if is_headless:
+            options.add_argument('--headless')
+            options.add_argument('--disable-gpu')
+            options.add_argument('log-level=2')
+
+        driver = browser["instance"](options=options)
+    else:
+        driver = browser['instance']()
+
+    if not browser['name'] == 'chrome':
+        driver.maximize_window()
+
+    if not login or not senha:
+        return driver
+
+    page = Page(driver)
 
     page.driver.get("http://sistemasnet")
 
     alert = page.alert_is_present(timeout=timeout)
 
     if alert:
-
         # page.driver.switch_to.alert()
 
         alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
@@ -139,7 +179,6 @@ def last_day_of_month():
 
 
 def transform_date(date):
-
     try:
         formated = dt.datetime.strptime(str(date), "%d/%m/%Y").date()
 
@@ -191,7 +230,6 @@ def extrai_pares_tabulação(source):
 
 
 def add_point_cpf_cnpj(ident):
-
     ident = strip_string(ident)
 
     while len(ident) < 11:
@@ -202,4 +240,3 @@ def add_point_cpf_cnpj(ident):
 
     if len(ident) == 14:
         return f"{ident[:2]}.{ident[2:5]}.{ident[5:8]}/{ident[8:12]}-{ident[12:]}"
-

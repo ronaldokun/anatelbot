@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.2'
-#       jupytext_version: 0.8.6
+#       jupytext_version: 1.2.1
 #   kernelspec:
 #     display_name: Python [conda env:automation]
 #     language: python

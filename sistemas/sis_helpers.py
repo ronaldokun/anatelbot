@@ -432,6 +432,7 @@ class Scpx(object):
         "id_cpf": consulta["id_cpf"],
         "id_fistel": (By.ID, "pNumFistel"),
         "id_proc": (By.ID, "NumProcesso"),
+        "id_indicativo": (By.ID, "pIndicativo"),
         "submit": (By.ID, "botaoFlatConfirmar"),
         "id_atual": (By.ID, "pMovimento"),
         "id_posterior": (By.ID, "CodTipoMovimento"),

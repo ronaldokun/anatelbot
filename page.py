@@ -6,28 +6,27 @@ Esta é a classe principal que adiciona funcionalidades ao webdriver do Selenium
 As demais classes inicialmente herdavam esta, no entanto futuramente deverá ser alterado como esta sendo um Atributo de Classe 
 @author: Ronaldo da Silva Alves Batista
 """
-
+# Standard Lib Imports
 from contextlib import contextmanager
-from typing import Any, Union, Dict, List, Tuple, Callable, Sequence, Optional
-from pathlib import Path
+from typing import Any, Callable, Optional, Sequence, Tuple, Union
 
+# Third-Parties imports
 import selenium
+from selenium import webdriver
 from selenium.common.exceptions import (
-    TimeoutException,
-    NoSuchElementException,
-    UnexpectedAlertPresentException,
     ElementClickInterceptedException,
+    NoSuchElementException,
+    TimeoutException,
+    UnexpectedAlertPresentException,
     WebDriverException,
 )
-
-# Utilities
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait, Select
-from selenium import webdriver
+from selenium.webdriver.support.ui import Select, WebDriverWait
 
 Elem = Tuple[Any, str]
+
 
 # Base Class
 class Page:
@@ -54,7 +53,6 @@ class Page:
             driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc.
         """
         if driver is None:
-
             self.driver = webdriver.firefox()
 
     def fechar(self) -> None:
@@ -66,10 +64,10 @@ class Page:
         self.driver.close()
 
     def _clicar(
-        self, btn_id: Elem, silent: bool = True, timeout: int = timeout
+            self, btn_id: Elem, silent: bool = True, timeout: int = timeout
     ) -> Union[str, None, Any]:
         """Clica no botão ou link definido pelo elemento btn_id
-        
+
         Args:
             btn_id (tuple): localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
             silencioso (bool, optional): Defaults to True. Se verdadeiro confirma o pop-up após o clique no botão
@@ -104,10 +102,10 @@ class Page:
             return None
 
     def _atualizar_elemento(
-        self, elem_id: Elem, dado: str, timeout: int = timeout
+            self, elem_id: Elem, dado: str, timeout: int = timeout
     ) -> Optional[str]:
         """Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
-        
+
         Args:
             elem_id (tuple): localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
             dado (str): conteúdo a ser inserido no form definido pelo elem_id
@@ -129,7 +127,7 @@ class Page:
         return None
 
     def _selecionar_por_texto(
-        self, select_id: Elem, text: str, timeout: int = timeout
+            self, select_id: Elem, text: str, timeout: int = timeout
     ) -> Optional[str]:
         """
 
@@ -258,7 +256,7 @@ class Page:
 
     # TODO: generalize this method
     def nav_elem_to_new_win(self, elem):
-        """ Abre o link `elem` em uma nova janela e retorna o foco para esta nova janela 
+        """ Abre o link `elem` em uma nova janela e retorna o foco para esta nova janela
             Assume que há um link presente no elemento html `elem`.
             Se usado dentro do gerenciador de contexto `self._navega_nova_janela`
             o foco é retornado para a janela original após a saída do contexto
@@ -285,7 +283,7 @@ class Page:
 
     # TODO: generalize this method
     def nav_link_to_new_win(self, link: str):
-        """ Abre o link `link` em uma nova janela e retorna o foco para esta nova janela 
+        """ Abre o link `link` em uma nova janela e retorna o foco para esta nova janela
             Assume que há um link presente no elemento html `elem`.
             Se usado dentro do gerenciador de contexto `self._navega_nova_janela`
             o foco é retornado para a janela original após a saída do contexto
@@ -307,7 +305,7 @@ class Page:
         return None
 
     def _click_button_new_win(
-        self, btn_id: Elem, silencioso: bool = True, timeout: int = timeout
+            self, btn_id: Elem, silencioso: bool = True, timeout: int = timeout
     ):
         """               
 

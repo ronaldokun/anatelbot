@@ -1,6 +1,9 @@
-# pycharm folders
+# tool folders
 .idea/
-
+.vscode
+.mypy_cache
+.pytest_cache
+.swp
 # datasets
 *.xlsx
 *.csv

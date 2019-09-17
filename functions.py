@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 """
 Created on Wed Nov  1 16:50:19 2017
@@ -8,17 +7,15 @@ Created on Wed Nov  1 16:50:19 2017
 # Basic Bultins
 import datetime as dt
 import re
-import sys
+
 # Third-part Libraries
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.webdriver.ie.options import Options as IeOptions
 from selenium import webdriver
-from page import Page
 
-#TODO: Generalize this
+# TODO: Generalize this
 NO_DRIVER = """
 You need to install the chromedriver for Selenium\n
 Please see this link https://github.com/weskerfoot/DeleteFB#how-to-use-it\n
@@ -33,10 +30,18 @@ PADRAO_IND = [
 STRIP = ("/", ".", "-")
 
 BROWSERS = {
-    "chrome": {"name" : "chrome", "instance" : webdriver.Chrome, "options": ChromeOptions},
-    "firefox": {"name" : "firefox", "instance" : webdriver.Firefox, "options": FirefoxOptions},
-    "ie": {"name" : "ie", "instance" : webdriver.Ie, "options": IeOptions},
-    "edge": {"name": "edge", "instance": webdriver.Edge, "options": EdgeOptions}
+    "chrome": {
+        "name": "chrome",
+        "instance": webdriver.Chrome,
+        "options": ChromeOptions,
+    },
+    "firefox": {
+        "name": "firefox",
+        "instance": webdriver.Firefox,
+        "options": FirefoxOptions,
+    },
+    "ie": {"name": "ie", "instance": webdriver.Ie, "options": IeOptions},
+    "edge": {"name": "edge", "instance": webdriver.Edge, "options": EdgeOptions},
 }
 
 
@@ -52,9 +57,12 @@ def strip_string(identificador: str, strip: tuple = STRIP) -> str:
     """
     return "".join(s for s in identificador if s not in strip)
 
+
 # TODO: try using seleniumrequests instead
-def init_browser(
-    browser: str = "Chrome", login: str = None, senha: str = None, is_headless: bool = False, timeout: int = 10
+def get_browser(
+    browser: str = "Chrome",
+    is_headless: bool = False,
+    **kwargs,
 ):
     """Inicia a instância webdriver com algumas configurações otimizadas
     e com o navegador logado na rede da Anatel
@@ -68,50 +76,36 @@ def init_browser(
     Returns:
         [webdriver]: [Webdriver instance]
     """
-    browser = BROWSERS.get(browser.lower(), None)
-    if not browser:
+    _browser = BROWSERS.get(browser.lower(), None)
+    if not _browser:
         raise ValueError(
-            f"O browser mencionado não é suportado, use uma dessas opções: {BROWSERS.items()!r}"
+            f"O browser mencionado é inválido ou não suportado, use uma dessas opções: {BROWSERS.items()!r}"
         )
 
-    if browser['name'] != 'edge':
-        options = browser['options']
-        # The Chrome driver is required because Gecko was having issues
-        options = options()
-        if browser['name'] == 'chrome':
-            prefs = {"profile.default_content_setting_values.notifications": 2, 'disk-cache-size': 4096}
+    if _browser["name"] != "edge":
+        options = _browser["options"]()
+        if _browser["name"] == "chrome":
+            prefs = {
+                "profile.default_content_setting_values.notifications": 2,
+                "disk-cache-size": 4096,
+            }
             options.add_experimental_option("prefs", prefs)
             options.add_argument("start-maximized")
 
         if is_headless:
-            options.add_argument('--headless')
-            options.add_argument('--disable-gpu')
-            options.add_argument('log-level=2')
+            options.add_argument("--headless")
+            options.add_argument("--disable-gpu")
+            options.add_argument("log-level=2")
 
-        driver = browser["instance"](options=options)
+        driver = _browser["instance"](options=options, **kwargs)
     else:
-        driver = browser['instance']()
+        driver = _browser["instance"](**kwargs)
 
-    if not browser['name'] == 'chrome':
+    if not _browser["name"] == "chrome":
         driver.maximize_window()
 
-    if not login or not senha:
-        return driver
+    return driver
 
-    page = Page(driver)
-
-    page.driver.get("http://sistemasnet")
-
-    alert = page.alert_is_present(timeout=timeout)
-
-    if alert:
-        # page.driver.switch_to.alert()
-
-        alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
-
-        alert.accept()
-
-    return page
 
 
 def check_input(identificador: str, tipo: str) -> str:
@@ -188,7 +182,7 @@ def transform_date(date):
 
     return formated
 
-
+# TODO: Remove
 def lastRow(ws, col=2):
     """ Find the last row in the worksheet that contains data.
 

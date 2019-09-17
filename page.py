@@ -8,7 +8,7 @@ As demais classes inicialmente herdavam esta, no entanto futuramente deverá ser
 """
 # Standard Lib Imports
 from contextlib import contextmanager
-from typing import Any, Callable, Optional, Sequence, Tuple, Union
+from typing import Any, Optional, Sequence, Tuple, Union
 
 # Third-Parties imports
 import selenium
@@ -39,21 +39,29 @@ class Page:
 
     timeout = 10
 
-    def __init__(self, driver: Callable):
+    def __init__(self, driver: Any):
+        self.driver = driver
 
-        if driver is not None:
-            self.driver = driver()
-        else:
-            self.driver = webdriver.firefox()
+    def authenticate(self):
 
-    def restart_driver(self, driver: Callable = None) -> None:
+        self.driver.get("http://sistemasnet")
+
+        alert = self.alert_is_present(timeout=timeout)
+
+        if alert:
+            # page.driver.switch_to.alert()
+
+            alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
+
+            alert.accept()
+
+    def restart_driver(self, **kwargs) -> None:
         """Restarts webdriver instance
         
         Args:
             driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc.
         """
-        if driver is None:
-            self.driver = webdriver.firefox()
+        self.driver = webdriver.firefox()
 
     def fechar(self) -> None:
         """Fecha a instância atual do browser
@@ -64,7 +72,7 @@ class Page:
         self.driver.close()
 
     def _clicar(
-            self, btn_id: Elem, silent: bool = True, timeout: int = timeout
+        self, btn_id: Elem, silent: bool = True, timeout: int = timeout
     ) -> Union[str, None, Any]:
         """Clica no botão ou link definido pelo elemento btn_id
 
@@ -102,7 +110,7 @@ class Page:
             return None
 
     def _atualizar_elemento(
-            self, elem_id: Elem, dado: str, timeout: int = timeout
+        self, elem_id: Elem, dado: str, timeout: int = timeout
     ) -> Optional[str]:
         """Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
 
@@ -127,7 +135,7 @@ class Page:
         return None
 
     def _selecionar_por_texto(
-            self, select_id: Elem, text: str, timeout: int = timeout
+        self, select_id: Elem, text: str, timeout: int = timeout
     ) -> Optional[str]:
         """
 
@@ -185,7 +193,7 @@ class Page:
 
         WebDriverWait(self.driver, timeout).until(EC.staleness_of(old_page))
 
-    def alert_is_present(self, timeout: int = timeout):
+    def alert_is_present(self, timeout: int = timeout)-> Union[WebDriverWait, bool]:
 
         try:
 
@@ -305,7 +313,7 @@ class Page:
         return None
 
     def _click_button_new_win(
-            self, btn_id: Elem, silencioso: bool = True, timeout: int = timeout
+        self, btn_id: Elem, silencioso: bool = True, timeout: int = timeout
     ):
         """               
 

@@ -22,7 +22,7 @@ class Sistema(Page):
 
         if login and senha:
 
-            self.driver = functions.init_browser(driver, login, senha, timeout)
+            self.driver = functions.get_browser(driver, login, senha, timeout)
 
         else:
 

@@ -19,14 +19,9 @@ import gc
 
 import pandas as pd
 import gspread_dataframe as gs
-import pyperclip as clip  # copiar o texto clipboard
 from time import sleep
-from selenium import webdriver
-from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup as soup
-
-import random
 
 # Change the directory to reflect the main repository
 os.chdir("C:/Users/rsilva/gdrive/projects/programming/automation")
@@ -34,10 +29,9 @@ os.chdir("C:/Users/rsilva/gdrive/projects/programming/automation")
 # import sistemas
 import sei.sei as sei
 from sei.sei_helpers import *
-import page
-from page import *
+from tool.page import *
 from sistemas import sistemas
-import functions
+from tool import functions
 
 get_ipython().run_line_magic("reload_ext", "autoreload")
 get_ipython().run_line_magic("autoreload", "2")

@@ -13,16 +13,13 @@
 #     name: python3
 # ---
 
-import getpass
-
 # %%
 # Standard Lib imports
 import sys
-from functools import partial
 from pathlib import Path
 
 # Local application imports
-from ..functions import get_browser
+from tool.functions import get_browser
 
 parent = Path("__file__").cwd().parent
 sys.path.append(f"{parent}")

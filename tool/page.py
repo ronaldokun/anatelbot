@@ -25,10 +25,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
+# Local application imports
+from tool.functions import get_browser
+
 Elem = Tuple[Any, str]
 
 
 # Base Class
+# noinspection NonAsciiCharacters
 class Page:
     """This Base class implements common navigation methods on any page.
     Adds useful features to Selenium navigation.
@@ -37,19 +41,27 @@ class Page:
 
     """
 
-    timeout = 10
+    timeout: int = 10
 
-    def __init__(self, driver: Any):
+    def __init__(self, driver: webdriver):
         self.driver = driver
 
-    def authenticate(self):
+    def authenticate(self, login: str, senha: str, timeout: int = timeout):
+        """
+
+        Args:
+            login (str):
+            senha (str):
+
+        Returns:
+            None
+        """
 
         self.driver.get("http://sistemasnet")
 
         alert = self.alert_is_present(timeout=timeout)
 
         if alert:
-            # page.driver.switch_to.alert()
 
             alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
 
@@ -57,11 +69,8 @@ class Page:
 
     def restart_driver(self, **kwargs) -> None:
         """Restarts webdriver instance
-        
-        Args:
-            driver (selenium.webdriver): Selenium Browser Instance - Firefox, Chrome, Edge etc.
         """
-        self.driver = webdriver.firefox()
+        self.driver = get_browser(**kwargs)
 
     def fechar(self) -> None:
         """Fecha a instância atual do browser
@@ -72,14 +81,14 @@ class Page:
         self.driver.close()
 
     def _clicar(
-        self, btn_id: Elem, silent: bool = True, timeout: int = timeout
+            self, btn_id: Elem, silent: bool = True, timeout: int = timeout
     ) -> Union[str, None, Any]:
         """Clica no botão ou link definido pelo elemento btn_id
 
         Args:
             btn_id (tuple): localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
             silencioso (bool, optional): Defaults to True. Se verdadeiro confirma o pop-up após o clique no botão
-            timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
+            timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos
         """
 
         try:
@@ -110,14 +119,14 @@ class Page:
             return None
 
     def _atualizar_elemento(
-        self, elem_id: Elem, dado: str, timeout: int = timeout
+            self, elem_id: Elem, dado: str, timeout: int = timeout
     ) -> Optional[str]:
         """Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
 
         Args:
             elem_id (tuple): localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
             dado (str): conteúdo a ser inserido no form definido pelo elem_id
-            timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
+            timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos
         """
 
         try:
@@ -135,7 +144,7 @@ class Page:
         return None
 
     def _selecionar_por_texto(
-        self, select_id: Elem, text: str, timeout: int = timeout
+            self, select_id: Elem, text: str, timeout: int = timeout
     ) -> Optional[str]:
         """
 
@@ -193,7 +202,7 @@ class Page:
 
         WebDriverWait(self.driver, timeout).until(EC.staleness_of(old_page))
 
-    def alert_is_present(self, timeout: int = timeout)-> Union[WebDriverWait, bool]:
+    def alert_is_present(self, timeout: int = timeout) -> Union[WebDriverWait, bool]:
 
         try:
 
@@ -313,7 +322,7 @@ class Page:
         return None
 
     def _click_button_new_win(
-        self, btn_id: Elem, silencioso: bool = True, timeout: int = timeout
+            self, btn_id: Elem, silencioso: bool = True, timeout: int = timeout
     ):
         """               
 

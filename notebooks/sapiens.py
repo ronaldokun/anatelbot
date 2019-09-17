@@ -25,8 +25,6 @@ except:
 import pandas as pd
 import os
 import gc
-import pickle
-import numpy as np
 
 from time import sleep
 
@@ -39,9 +37,7 @@ PATH = os.path.join(os.getcwd(), 'files/')
 # INITIALIZE DRIVER
 from selenium import webdriver
 import sapiens
-import functions
-import sistemas
-
+from tool import functions
 
 get_ipython().run_line_magic('reload_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
@@ -61,7 +57,7 @@ get_ipython().system('ls {PATH}')
 # %%
 def start_sapiens(cpf, senha, db={}):   
    
-    page = functions.init_browser(webdriver.Firefox(), 'rsilva', 'Savorthemom3nts')
+    page = functions.get_browser(webdriver.Firefox(), 'rsilva', 'Savorthemom3nts')
     
     page = sapiens.LoginPage(page.driver).login(cpf, senha)
     

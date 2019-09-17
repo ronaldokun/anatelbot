@@ -28,7 +28,7 @@ from selenium.webdriver.support.ui import Select
 
 from sei.sei_helpers import *
 from sistemas.sis_helpers import *
-from page import Page
+from tool.page import Page
 from time import sleep
 
 

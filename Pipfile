@@ -14,6 +14,8 @@ pytest-cov = "*"
 [packages]
 selenium = "*"
 pre-commit = "*"
+beautifulsoup4 = "*"
+unidecode = "*"
 
 [requires]
 python_version = "3.7"

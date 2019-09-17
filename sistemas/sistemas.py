@@ -8,8 +8,8 @@ from typing import Dict, List
 from bs4 import BeautifulSoup as soup
 from selenium.webdriver.common.by import By
 
-import functions
-from page import *
+from tool import functions
+from tool.page import *
 from sistemas import sis_helpers
 
 # This add the ../folder to the path while in development mode

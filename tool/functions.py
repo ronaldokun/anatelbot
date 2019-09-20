@@ -8,12 +8,12 @@ Created on Wed Nov  1 16:50:19 2017
 import datetime as dt
 import re
 
+from selenium import webdriver
 # Third-part Libraries
 from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.edge.options import Options as EdgeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.ie.options import Options as IeOptions
-from selenium import webdriver
 
 # TODO: Generalize this
 NO_DRIVER = """
@@ -59,11 +59,7 @@ def strip_string(identificador: str, strip: tuple = STRIP) -> str:
 
 
 # TODO: try using seleniumrequests instead
-def get_browser(
-    browser: str = "Chrome",
-    is_headless: bool = False,
-    **kwargs,
-):
+def get_browser(browser: str = "Chrome", is_headless: bool = False, **kwargs):
     """Inicia a instância webdriver com algumas configurações otimizadas
     e com o navegador logado na rede da Anatel
 
@@ -105,7 +101,6 @@ def get_browser(
         driver.maximize_window()
 
     return driver
-
 
 
 def check_input(identificador: str, tipo: str) -> str:
@@ -181,6 +176,7 @@ def transform_date(date):
         formated = dt.datetime.strptime(str(date), "%Y-%m-%d").date()
 
     return formated
+
 
 # TODO: Remove
 def lastRow(ws, col=2):

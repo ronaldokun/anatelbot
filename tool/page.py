@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# noinspection SpellCheckingInspection
 """
 Esta é a classe principal que adiciona funcionalidades ao webdriver do Selenium.
 
-As demais classes inicialmente herdavam esta, no entanto futuramente deverá ser alterado como esta sendo um Atributo de Classe 
+Ela é um atributo de classe das demais classes específicas.
 @author: Ronaldo da Silva Alves Batista
 """
 # Standard Lib Imports
@@ -32,7 +33,7 @@ Elem = Tuple[Any, str]
 
 
 # Base Class
-# noinspection NonAsciiCharacters
+# noinspection NonAsciiCharacters,SpellCheckingInspection
 class Page:
     """This Base class implements common navigation methods on any page.
     Adds useful features to Selenium navigation.
@@ -46,7 +47,7 @@ class Page:
     def __init__(self, driver: webdriver):
         self.driver = driver
 
-    def authenticate(self, login: str, senha: str, timeout: int = timeout):
+    def authenticate(self, login: str, senha: str):
         """
 
         Args:
@@ -59,11 +60,12 @@ class Page:
 
         self.driver.get("http://sistemasnet")
 
-        alert = self.alert_is_present(timeout=timeout)
+        alert = self.alert_is_present()
 
         if alert:
-
-            alert.send_keys(login + Keys.TAB + senha)  # alert.authenticate is not working
+            alert.send_keys(
+                login + Keys.TAB + senha
+            )  # alert.authenticate is not working
 
             alert.accept()
 
@@ -80,33 +82,30 @@ class Page:
         """
         self.driver.close()
 
-    def _clicar(
-            self, btn_id: Elem, silent: bool = True, timeout: int = timeout
-    ) -> Union[str, None, Any]:
+    def _clicar(self, btn_id: Elem, silent: bool = True) -> Union[str, None, Any]:
         """Clica no botão ou link definido pelo elemento btn_id
 
         Args:
             btn_id (tuple): localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
-            silencioso (bool, optional): Defaults to True. Se verdadeiro confirma o pop-up após o clique no botão
-            timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos
+            silent (bool, optional): Defaults to True. Se verdadeiro confirma o pop-up após o clique no botão
         """
 
         try:
 
-            botão = self.wait_for_element_to_click(btn_id, timeout=timeout)
+            botão = self.wait_for_element_to_click(btn_id)
 
             botão.click()
 
-        except NoSuchElementException as e:
+        except (NoSuchElementException, TimeoutException) as e:
 
-            print(repr(e))
+            return e
 
         except ElementClickInterceptedException:
 
             # noinspection PyUnboundLocalVariable
             self.driver.execute_script("arguments[0].click();", botão)
 
-        alerta = self.alert_is_present(timeout=timeout)
+        alerta = self.alert_is_present()
 
         if alerta:
             if silent:
@@ -116,22 +115,26 @@ class Page:
             else:
                 return alerta
         else:
-            return None
+            return True
 
-    def _atualizar_elemento(
-            self, elem_id: Elem, dado: str, timeout: int = timeout
-    ) -> Optional[str]:
+    def _clicar_se_existir(
+            self, btn_id: Elem, silent: bool = True
+    ) -> Union[str, None, Any]:
+        if self.check_element_exists(btn_id):
+            return self._clicar(btn_id, silent)
+        return None
+
+    def _atualizar_elemento(self, elem_id: Elem, dado: str) -> Optional[str]:
         """Limpa o conteúdo do form definido pelo `elem_id` e insere o conteúdo dado
 
         Args:
             elem_id (tuple): localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
             dado (str): conteúdo a ser inserido no form definido pelo elem_id
-            timeout (int, optional): Defaults to 10. tempo de espera fornecido aos métodos
         """
 
         try:
 
-            elem = self.wait_for_element(elem_id, timeout=timeout)
+            elem = self.wait_for_element(elem_id)
 
             elem.clear()
 
@@ -143,29 +146,26 @@ class Page:
 
         return None
 
-    def _selecionar_por_texto(
-            self, select_id: Elem, text: str, timeout: int = timeout
-    ) -> Optional[str]:
+    def _selecionar_por_texto(self, select_id: Elem, text: str) -> Optional[str]:
         """
 
         :param select_id: localizador da página html que define um Select (menu drop-down):
                           (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
         :param text: texto da opção do menu a ser selecionada
-        :param timeout: tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
         :return: None
         Seleciona o menu drop-down definido pela tupla select_id e escolhe a opção cujo texto de amostra é igual a text
         """
 
         try:
 
-            lista = Select(self.wait_for_element_to_click(select_id, timeout=timeout))
+            lista = Select(self.wait_for_element_to_click(select_id))
 
             lista.select_by_visible_text(text)
 
         except NoSuchElementException as e:
             raise ValueError(f"Não existe a opção {text} no Menu mencionado") from e
 
-        alerta = self.alert_is_present(timeout=timeout)
+        alerta = self.alert_is_present()
 
         if alerta:
             txt = alerta.text
@@ -194,19 +194,21 @@ class Page:
             self.driver.switch_to.window(main)
 
     @contextmanager
-    def wait_for_page_load(self, timeout: int = timeout):
+    def wait_for_page_load(self):
         """ Only used when navigating between Pages with different titles"""
         old_page = self.driver.find_element_by_tag_name("title")
 
         yield
 
-        WebDriverWait(self.driver, timeout).until(EC.staleness_of(old_page))
+        WebDriverWait(self.driver, self.timeout).until(EC.staleness_of(old_page))
 
-    def alert_is_present(self, timeout: int = timeout) -> Union[WebDriverWait, bool]:
+    def alert_is_present(self) -> Union[WebDriverWait, bool]:
 
         try:
 
-            alert = WebDriverWait(self.driver, timeout).until(EC.alert_is_present())
+            alert = WebDriverWait(self.driver, self.timeout).until(
+                EC.alert_is_present()
+            )
 
         except (TimeoutException, WebDriverException):
 
@@ -214,7 +216,7 @@ class Page:
 
         return alert
 
-    def elem_is_visible(self, *locator: Elem, timeout: int = timeout):
+    def elem_is_visible(self, *locator: Elem):
         """
         Check is locator is visible on page given the timeout
 
@@ -224,7 +226,7 @@ class Page:
         """
         try:
 
-            WebDriverWait(self.driver, timeout).until(
+            WebDriverWait(self.driver, self.timeout).until(
                 EC.visibility_of_element_located(locator)
             )
 
@@ -244,30 +246,30 @@ class Page:
         hover = ActionChains(self.driver).move_to_element(element)
         hover.perform()
 
-    def check_element_exists(self, *locator: Elem, timeout: int = timeout):
+    def check_element_exists(self, *locator: Elem):
         try:
-            self.wait_for_element_to_be_visible(*locator, timeout=timeout)
+            self.wait_for_element_to_be_visible(*locator)
             return True
         except (TimeoutException, NoSuchElementException):
             return False
 
-    def wait_for_element_to_be_visible(self, *locator: Elem, timeout: int = timeout):
-        return WebDriverWait(self.driver, timeout).until(
+    def wait_for_element_to_be_visible(self, *locator: Elem):
+        return WebDriverWait(self.driver, self.timeout).until(
             EC.visibility_of_element_located(*locator)
         )
 
-    def wait_for_element(self, *locator: Elem, timeout: int = timeout):
-        return WebDriverWait(self.driver, timeout).until(
+    def wait_for_element(self, *locator: Elem):
+        return WebDriverWait(self.driver, self.timeout).until(
             EC.presence_of_element_located(*locator)
         )
 
-    def wait_for_element_to_click(self, *locator: Elem, timeout: int = timeout):
-        return WebDriverWait(self.driver, timeout).until(
+    def wait_for_element_to_click(self, *locator: Elem):
+        return WebDriverWait(self.driver, self.timeout).until(
             EC.element_to_be_clickable(*locator)
         )
 
-    def wait_for_new_window(self, windows: Sequence, timeout: int = timeout):
-        return WebDriverWait(self.driver, timeout).until(
+    def wait_for_new_window(self, windows: Sequence):
+        return WebDriverWait(self.driver, self.timeout).until(
             EC.new_window_is_opened(windows)
         )
 
@@ -321,13 +323,11 @@ class Page:
 
         return None
 
-    def _click_button_new_win(
-            self, btn_id: Elem, silencioso: bool = True, timeout: int = timeout
-    ):
+    def _click_button_new_win(self, btn_id: Elem, silent: bool = True):
         """               
 
         :param btn_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
-        :param silencioso: se verdadeiro confirma o pop-up após o clique no botão
+        :param silent: se verdadeiro confirma o pop-up após o clique no botão
         :param timeout: tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
         :return: None
 
@@ -335,7 +335,7 @@ class Page:
             a nova janela.
         """
 
-        self._clicar(btn_id=btn_id, silent=silencioso, timeout=timeout)
+        self._clicar(btn_id=btn_id, silent=silent)
 
         # Guarda as janelas do navegador presentes
         windows = self.driver.window_handles

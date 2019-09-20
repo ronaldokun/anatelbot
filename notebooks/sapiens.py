@@ -13,31 +13,33 @@
 #     name: python3
 # ---
 
+import gc
 # %% Change working directory from the workspace root to the ipynb file location. Turn this addition off with the DataSciece.changeDirOnImportExport setting
 import os
+from time import sleep
+
+# INITIALIZE DRIVER
+from selenium import webdriver
+
+import gspread_dataframe as gs_df
+# %%
+import pandas as pd
+import sapiens
+from tool import functions
+
 try:
 	os.chdir(os.path.join(os.getcwd(), 'notebooks'))
 	print(os.getcwd())
 except:
 	pass
 
-# %%
-import pandas as pd
-import os
-import gc
 
-from time import sleep
 
-import gspread_dataframe as gs_df
 
 os.chdir("c:/Users/rsilva/gdrive/projects/programming/automation/")
 
 PATH = os.path.join(os.getcwd(), 'files/')
 
-# INITIALIZE DRIVER
-from selenium import webdriver
-import sapiens
-from tool import functions
 
 get_ipython().run_line_magic('reload_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
@@ -191,5 +193,3 @@ df["Endereço_Completo"] = df.apply(lambda row: " ".join([str(row["Logradouro"])
 
 # %%
 gs_df.set_with_dataframe(registros, df, row=743, col=14, include_column_header=False)
-
-

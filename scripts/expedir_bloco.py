@@ -5,31 +5,28 @@ Created on Thu Aug 24 23:14:09 2017
 
 @author: ronaldo
 """
-import re
 import os
+import re
 import sys
+from time import sleep
+
+from bs4 import BeautifulSoup as soup
+from sei.sei_helpers import *
+# INITIALIZE DRIVER
+from selenium import webdriver
+# METHODS
+from selenium.webdriver.common.keys import Keys
+# WAIT AND CONDITIONS METHODS
+# available since 2.26.0
+from selenium.webdriver.support.ui import Select
+
+from sistemas.sis_helpers import *
+from tool.page import Page
 
 # Recomended way to insert the modules in parent folder in the path
 # Use a simple (but explicit) path modification to resolve the package properly.
 # https://docs.python-guide.org/writing/structure/
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from bs4 import BeautifulSoup as soup
-
-# INITIALIZE DRIVER
-from selenium import webdriver
-
-# METHODS
-from selenium.webdriver.common.keys import Keys
-
-# WAIT AND CONDITIONS METHODS
-# available since 2.26.0
-from selenium.webdriver.support.ui import Select
-
-from sei.sei_helpers import *
-from sistemas.sis_helpers import *
-from tool.page import Page
-from time import sleep
 
 
 class LoginPage(Page):
@@ -466,4 +463,3 @@ if __name__ == "__main__":
     print("Blocos a expedir: {}".format(sys.argv[1:]))
 
     main(sys.argv[1:])
-

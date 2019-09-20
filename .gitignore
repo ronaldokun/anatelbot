@@ -26,9 +26,6 @@ monitor.py
 *~
 
 # Jupyter Notebook
-*checkpoint.ipynb
-*checkpoint.py
-*.ipynb
 *.ipynb_checkpoints
 # Environments 
 .env 

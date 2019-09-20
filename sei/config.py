@@ -1,7 +1,7 @@
 # Standard library imports
 import re
 from collections import namedtuple
-from typing import Any, Callable, Optional, Sequence, Tuple, Union
+from typing import Any, Tuple
 
 # Third party imports
 from selenium.webdriver.common.by import By
@@ -16,10 +16,10 @@ SERVICOS: Tuple = (
     "Outorga: Limitado Móvel Marítimo",
 )
 
-Email = dict(
-    destinatario=(By.ID, "s2id_autogen1"),
-    assunto=(By.ID, "txtAssunto"),
-    mensagem=(By.ID, "selTextoPadrao"),
+Enviar_Doc_Email = dict(
+    destinatario=("id", "s2id_autogen1"),
+    assunto=("id", "txtAssunto"),
+    mensagem=("id", "selTextoPadrao"),
     enviar=(By.NAME, "btnEnviar"),
 )
 
@@ -46,33 +46,32 @@ strip_processo = make_xlat(TRANSLATION)
 
 
 class Sei_Login:
-
     Login = dict(
         url="https://sei.anatel.gov.br",
-        url_teste="https://sei.anatel.gov.br",
+        url_teste="https://seihm.anatel.gov.br",
         title="SEI / ANATEL",
-        log=(By.ID, "txtUsuario"),
-        pwd=(By.ID, "pwdSenha"),
-        submit=(By.ID, "sbmLogin"),
+        log=("id", "txtUsuario"),
+        pwd=("id", "pwdSenha"),
+        submit=("id", "sbmLogin"),
     )
 
-    Base = namedtuple("Base", "init, menu, url, pesquisa")(
-        (By.ID, "lnkControleProcessos"),
-        (By.ID, "lnkInfraMenuSistema"),
-        "https://sei.anatel.gov.br/sei/",
-        (By.ID, "txtPesquisaRapida"),
-    )
+    Base = {
+        "init": ("id", "lnkControleProcessos"),
+        "menu": ("id", "lnkInfraMenuSistema"),
+        "url": "https://sei.anatel.gov.br/sei/",
+        "url_teste": "https://seihm.anatel.gov.br/sei/",
+        "pesquisa": ("id", "txtPesquisaRapida"),
+    }
 
     Oficio = namedtuple("Oficio", "editor, top_frame, iframes, submit")(
-        (By.ID, "frmEditor"),
-        (By.ID, "cke_4_top"),
+        ("id", "frmEditor"),
+        ("id", "cke_4_top"),
         (By.CLASS_NAME, "cke_wysiwyg_frame cke_reset"),
-        (By.ID, "cke_129"),
+        ("id", "cke_129"),
     )
 
 
 class Sei_Menu:
-
     CLT_PROC: Elem = (By.LINK_TEXT, "Controle de Processos")
 
     INIT_PROC: Elem = (By.LINK_TEXT, "Iniciar Processo")
@@ -107,14 +106,25 @@ class Sei_Menu:
 
 
 class Sei_Inicial:
-
     TITLE = "SEI - Controle de Processos"
 
-    ATR: Elem = (By.ID, "ancVisualizacao1")
+    VER_MIM = ("link text", "Ver processos atribuídos a mim")
 
-    VISUAL: Elem = (By.ID, "ancTipoVisualizacao")
+    VER_TODOS = ("link text", "Ver todos os processos")
 
-    CONT: Elem = (By.ID, "selInfraPaginacaoSuperior")
+    VER_RES = ("link text", "Visualização resumida")
+
+    VER_DET = ("link text", "Visualização detalhada")
+
+    ATR: Elem = ("xpath", '//*[@id="ancVisualizacao1"]')
+
+    VISUAL: Elem = ("xpath", '//*[@id="ancTipoVisualizacao"]')
+
+    CONT: Elem = ("id", "selInfraPaginacaoSuperior")
+
+    BOT_PAG_1 = (By.XPATH, '//*[@id="lnkInfraPrimeiraPaginaSuperior"]')
+
+    NEXT_PAG = (By.XPATH, '//*[@id="lnkInfraProximaPaginaSuperior"]')
 
 
 class SeiHeader:
@@ -122,36 +132,33 @@ class SeiHeader:
 
 
 class Blocos:
-
     TITLE = "SEI - Blocos de Assinatura"
 
-    BTN_CONCLUIR: Elem = (By.ID, "btnConcluir")
+    BTN_CONCLUIR: Elem = ("id", "btnConcluir")
 
 
 class Bloco:
-
     TITLE = "SEI - Documentos do Bloco de Assinatura"
 
-    PESQUISA: Elem = (By.ID, "txtPalavrasPesquisaBloco")
+    PESQUISA: Elem = ("id", "txtPalavrasPesquisaBloco")
 
-    RET_BLOCO: Elem = (By.ID, "btnExcluir")
+    RET_BLOCO: Elem = ("id", "btnExcluir")
 
 
 class Proc_incluir:
-
     TITLE = "SEI - Processo"
 
-    ESPEC: Elem = (By.ID, "txtDescricao")
+    ESPEC: Elem = ("id", "txtDescricao")
 
-    INTER: Elem = (By.ID, "txtInteressadoProcedimento")
+    INTER: Elem = ("id", "txtInteressadoProcedimento")
 
-    SIG: Elem = (By.ID, "optSigiloso")
+    SIG: Elem = ("id", "optSigiloso")
 
-    REST: Elem = (By.ID, "optRestrito")
+    REST: Elem = ("id", "optRestrito")
 
-    PUBL: Elem = (By.ID, "optPublico")
+    PUBL: Elem = ("id", "optPublico")
 
-    HIP_LEGAL: Elem = (By.ID, "selHipoteseLegal")
+    HIP_LEGAL: Elem = ("id", "selHipoteseLegal")
 
     HIPS = [
         "",
@@ -184,18 +191,17 @@ class Proc_incluir:
 
 
 class Proc_central:
+    ACOES: Elem = ("id", "divArvoreAcoes")
 
-    ACOES: Elem = (By.ID, "divArvoreAcoes")
-
-    IN_AND: Elem = (By.ID, "txaDescricao")
+    IN_AND: Elem = ("id", "txaDescricao")
 
     BT_POSTIT: Elem = (By.NAME, "sbmRegistrarAnotacao")
 
-    CHK_PRIOR: Elem = (By.ID, "chkSinPrioridade")
+    CHK_PRIOR: Elem = ("id", "chkSinPrioridade")
 
     # OPT_MARCADORES: Elem = (By.CLASS_NAME, "dd-pointer dd-pointer-down")
 
-    SV_AND: Elem = (By.ID, "sbmSalvar")
+    SV_AND: Elem = ("id", "sbmSalvar")
 
     AND_PRE = "Solicita-se ao protocolo a expedição do "
 
@@ -205,69 +211,65 @@ class Proc_central:
 
 
 class Marcador:
-
-    SELECT_MARCADOR: Elem = (By.ID, "selMarcador")
+    SELECT_MARCADOR: Elem = ("id", "selMarcador")
 
     LISTA_MARCADORES: Elem = (By.CLASS_NAME, "dd-options dd-click-off-fechar")
 
-    TXT_MARCADOR: Elem = (By.ID, "txaTexto")
+    TXT_MARCADOR: Elem = ("id", "txaTexto")
 
     SALVAR: Elem = (By.NAME, "sbmGerenciarMarcador")
 
 
 class Acompanhamento_Especial:
+    GRUPOS: Elem = ("id", "selGrupoAcompanhamento")
 
-    GRUPOS: Elem = (By.ID, "selGrupoAcompanhamento")
-
-    TXT: Elem = (By.ID, "txaObservacao")
+    TXT: Elem = ("id", "txaObservacao")
 
     SALVAR: Elem = (By.NAME, "sbmCadastrarAcompanhamento")
 
-    EXCLUIR: Elem = (By.ID, "btnExcluir")
+    EXCLUIR: Elem = ("id", "btnExcluir")
 
 
 class Envio:
-
     TITLE = "SEI - Enviar Processo"
 
     UNIDS = "SEI - Selecionar Unidades"
 
     PRAZO = "5"
 
-    IN_SIGLA: Elem = (By.ID, "txtSiglaUnidade")
+    IN_SIGLA: Elem = ("id", "txtSiglaUnidade")
 
     SIGLA = "Protocolo.Sede"
 
     SEDE = "Protocolo.Sede - Protocolo da Sede"
 
-    ID_SEDE: Elem = (By.ID, "chkInfraItem0")
+    ID_SEDE: Elem = ("id", "chkInfraItem0")
 
-    B_TRSP: Elem = (By.ID, "btnTransportarSelecao")
+    B_TRSP: Elem = ("id", "btnTransportarSelecao")
 
     LUPA = "objLupaUnidades.selecionar(700,500)"
 
-    IDUNIDADE: Elem = (By.ID, "txtUnidade")
+    IDUNIDADE: Elem = ("id", "txtUnidade")
 
-    OPEN: Elem = (By.ID, "chkSinManterAberto")
+    OPEN: Elem = ("id", "chkSinManterAberto")
 
-    IDRETDATA: Elem = (By.ID, "optDataCerta")
+    IDRETDATA: Elem = ("id", "optDataCerta")
 
-    RET_DIAS: Elem = (By.ID, "optDias")
+    RET_DIAS: Elem = ("id", "optDias")
 
-    NUM_DIAS: Elem = (By.ID, "txtDias")
+    NUM_DIAS: Elem = ("id", "txtDias")
 
-    UTEIS: Elem = (By.ID, "chkSinDiasUteis")
+    UTEIS: Elem = ("id", "chkSinDiasUteis")
 
-    ENVIAR: Elem = (By.ID, "sbmEnviar")
+    ENVIAR: Elem = ("id", "sbmEnviar")
 
 
 class Criar_Processo:
+    EXIBE_ALL: Elem = ("id", "imgExibirTiposProcedimento")
 
-    EXIBE_ALL: Elem = (By.ID, "imgExibirTiposProcedimento")
+    FILTRO: Elem = ("id", "txtFiltro")
 
-    FILTRO: Elem = (By.ID, "txtFiltro")
-
-    SL_TIP_PROC: Elem = (By.ID, "selTipoProcedimento")
+    SL_TIP_PROC: Elem = ("id", "selTipoProcedimento")
 
     PROCS = {
         "",
@@ -1011,50 +1013,48 @@ class Criar_Processo:
 
 
 class Selecionar_Contatos:
+    B_TRSP: Elem = ("id", "btnTransportarSelecao")
 
-    B_TRSP: Elem = (By.ID, "btnTransportarSelecao")
+    ALT_INTERESSADO: Elem = ("id", "imgAlterarInteressado")
 
-    ALT_INTERESSADO: Elem = (By.ID, "imgAlterarInteressado")
+    INPUT_PESQUISAR: Elem = ("id", "txtPalavrasPesquisaContatos")
 
-    INPUT_PESQUISAR: Elem = (By.ID, "txtPalavrasPesquisaContatos")
+    BTN_PESQUISAR: Elem = ("id", "btnPesquisar")
 
-    BTN_PESQUISAR: Elem = (By.ID, "btnPesquisar")
+    BTN_FECHAR: Elem = ("id", "btnFecharSelecao")
 
-    BTN_FECHAR: Elem = (By.ID, "btnFecharSelecao")
+    SALVAR: Elem = ("id", "btnSalvar")
 
-    SALVAR: Elem = (By.ID, "btnSalvar")
-
-    LUPA: Elem = (By.ID, "imgSelecionarGrupo")
+    LUPA: Elem = ("id", "imgSelecionarGrupo")
 
 
 class Gerar_Doc:
-
     TIPOS = ("Externo", "Ofício", "Informe")
 
     EXTERNO_TIPOS = ("Boleto", "E-mail", "Relação", "Relatório", "Licença")
 
     doc_externo = dict(
-        id_tipo=(By.ID, "selSerie"),
-        id_data=(By.ID, "txtDataElaboracao"),
-        id_txt_tree=(By.ID, "txtNumero"),
-        id_nato=(By.ID, "optNato"),
-        id_digit=(By.ID, "optDigitalizado"),
-        id_pub=(By.ID, "optPublico"),
-        id_restrito=(By.ID, "optRestrito"),
-        id_hip_legal=(By.ID, "selHipoteseLegal"),
-        id_file_upload=(By.ID, "filArquivo"),
-        submit=(By.ID, "btnSalvar"),
+        id_tipo=("id", "selSerie"),
+        id_data=("id", "txtDataElaboracao"),
+        id_txt_tree=("id", "txtNumero"),
+        id_nato=("id", "optNato"),
+        id_digit=("id", "optDigitalizado"),
+        id_pub=("id", "optPublico"),
+        id_restrito=("id", "optRestrito"),
+        id_hip_legal=("id", "selHipoteseLegal"),
+        id_file_upload=("id", "filArquivo"),
+        submit=("id", "btnSalvar"),
     )
 
     oficio = dict(
-        id_txt_padrao=(By.ID, "optTextoPadrao"),
-        id_modelos=(By.ID, "selTextoPadrao"),
-        id_descricao=(By.ID, "txtDescricao"),
-        id_dest=(By.ID, "txtDestinatario"),
-        id_pub=(By.ID, "optPublico"),
-        id_restrito=(By.ID, "optRestrito"),
-        id_hip_legal=(By.ID, "selHipoteseLegal"),
-        submit=(By.ID, "btnSalvar"),
+        id_txt_padrao=("id", "optTextoPadrao"),
+        id_modelos=("id", "selTextoPadrao"),
+        id_descricao=("id", "txtDescricao"),
+        id_dest=("id", "txtDestinatario"),
+        id_pub=("id", "optPublico"),
+        id_restrito=("id", "optRestrito"),
+        id_hip_legal=("id", "selHipoteseLegal"),
+        submit=("id", "btnSalvar"),
     )
 
     TEXTOS_PADRAO = [
@@ -1374,67 +1374,68 @@ class Gerar_Doc:
 
 
 class Pesq_contato:
-
-    ID_SEARCH: Elem = (By.ID, "txtPalavrasPesquisaContatos")
+    ID_SEARCH: Elem = ("id", "txtPalavrasPesquisaContatos")
 
     TITLE = "SEI - Contatos"
 
 
 class Contato:
-
     TITLE = "SEI - Contatos"
 
-    BTN_NOVO: Elem = (By.ID, "btnNovo")
+    BTN_NOVO: Elem = ("id", "btnNovo")
 
-    BTN_PESQUISAR: Elem = (By.ID, "btnPesquisar")
+    BTN_PESQUISAR: Elem = ("id", "btnPesquisar")
 
-    TIPO: Elem = (By.ID, "selTipoContato")
+    TIPO: Elem = ("id", "selTipoContato")
 
-    SIGLA: Elem = (By.ID, "txtSigla")
+    SIGLA: Elem = ("id", "txtSigla")
 
-    PF: Elem = (By.ID, "lblPessoaFisica")
+    PF: Elem = ("id", "lblPessoaFisica")
 
-    NOME: Elem = (By.ID, "txtNome")
+    NOME: Elem = ("id", "txtNome")
 
-    END: Elem = (By.ID, "txtEndereco")
+    END: Elem = ("id", "txtEndereco")
 
-    COMP: Elem = (By.ID, "txtComplemento")
+    COMP: Elem = ("id", "txtComplemento")
 
-    BAIRRO: Elem = (By.ID, "txtBairro")
+    BAIRRO: Elem = ("id", "txtBairro")
 
-    PAIS: Elem = (By.ID, "selPais")
+    PAIS: Elem = ("id", "selPais")
 
-    UF: Elem = (By.ID, "selUf")
+    UF: Elem = ("id", "selUf")
 
-    CIDADE: Elem = (By.ID, "selCidade")
+    CIDADE: Elem = ("id", "selCidade")
 
-    CEP: Elem = (By.ID, "txtCep")
+    CEP: Elem = ("id", "txtCep")
 
-    MASCULINO: Elem = (By.ID, "optFeminino")
+    MASCULINO: Elem = ("id", "optFeminino")
 
-    FEMININO: Elem = (By.ID, "optMasculino")
+    FEMININO: Elem = ("id", "optMasculino")
 
-    CPF: Elem = (By.ID, "txtCpf")
+    CPF: Elem = ("id", "txtCpf")
 
-    RG: Elem = (By.ID, "txtRg")
+    RG: Elem = ("id", "txtRg")
 
-    ORG: Elem = (By.ID, "txtOrgaoExpedidor")
+    ORG: Elem = ("id", "txtOrgaoExpedidor")
 
-    NASC: Elem = (By.ID, "txtNascimento")
+    NASC: Elem = ("id", "txtNascimento")
 
-    FONE: Elem = (By.ID, "txtTelefoneFixoPF")
+    FONE: Elem = ("id", "txtTelefoneFixoPF")
 
-    CEL: Elem = (By.ID, "txtTelefoneCelularPF")
+    CEL: Elem = ("id", "txtTelefoneCelularPF")
 
-    EMAIL: Elem = (By.ID, "txtEmail")
+    EMAIL: Elem = ("id", "txtEmail")
 
     SALVAR: Elem = (By.NAME, "sbmAlterarContato")
 
     SALVAR_NOVO: Elem = (By.NAME, "sbmCadastrarContato")
 
-    OBS: Elem = (By.ID, "txtaObservacao")
+    OBS: Elem = ("id", "txtaObservacao")
 
 
 class Arvore:
-
     ABRIR_PASTAS: Elem = (By.XPATH, '//*[@title="Abrir todas as Pastas"]')
+
+
+class Processo:
+    Doc = namedtuple("Doc", "Ações")("/html/body/div[1]/div/div/div[2]/a")

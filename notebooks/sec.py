@@ -15,10 +15,10 @@
 
 # %%
 import os
+
 import pandas as pd
 import xlwings as xw
 from bs4 import BeautifulSoup as soup
-
 
 # Change the directory to reflect the main repository
 os.chdir("C:/Users/rsilva/gdrive/projects/programming/automation")

@@ -1023,6 +1023,7 @@ class Sec(Sistema):
         return True
 
     def _extrai_inscritos_prova(self):
+        
 
         dados = OrderedDict()
 
@@ -1088,18 +1089,7 @@ class Sec(Sistema):
 
         result.accept()
 
-        alerta = self.alert_is_present(timeout=2 * timeout).accept()
-
-    def imprimir_provas(
-            self,
-            num_prova,
-            cpf,
-            num_registros,
-            start=0,
-            end=-1,
-            path: str = sis_helpers.PATH,
-            timeout: int = 5,
-    ):
+    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1, timeout: int= 5):
 
         h = self.sis.Prova["imprimir"]
 

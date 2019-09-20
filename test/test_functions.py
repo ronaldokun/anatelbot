@@ -18,11 +18,11 @@
 import sys
 from pathlib import Path
 
-# Local application imports
-from tool.functions import get_browser
-
 parent = Path("__file__").cwd().parent
 sys.path.append(f"{parent}")
+
+# Local application imports
+from tool.functions import get_browser
 
 # Third party imports
 

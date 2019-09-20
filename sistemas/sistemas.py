@@ -28,12 +28,12 @@ class Sistema(Page):
             self.driver = driver
 
     def _navigate(
-            self,
-            identificador: str,
-            tipo_id: str,
-            acoes: tuple,
-            silent: bool = True,
-            timeout: int = 5,
+        self,
+        identificador: str,
+        tipo_id: str,
+        acoes: tuple,
+        silent: bool = True,
+        timeout: int = 5,
     ):
         """Check id and tipo_id consistency and navigate to link
 
@@ -318,7 +318,7 @@ class Scpx(Sistema):
         self._clicar(helper.get("submit"), timeout=timeout)
 
     def movimento_cancelar(
-            self, identificador, tipo_id="id_cpf", timeout: int = 10
+        self, identificador, tipo_id="id_cpf", timeout: int = 10
     ) -> None:
 
         helper = self.sis.movimento
@@ -760,7 +760,7 @@ class Sec(Sistema):
                     pass
 
     def incluir_cadastro(
-            self, dados: dict, menor: bool = False, timeout: int = 5
+        self, dados: dict, menor: bool = False, timeout: int = 5
     ) -> bool:
         """[summary]
         
@@ -919,7 +919,7 @@ class Sec(Sistema):
         alt_nome: bool = False,
         p_alt: str = None,
         menor: bool = False,
-            timeout: int = 5,
+        timeout: int = 5,
     ):
         """
         Atualiza os campos retornados pelo dicionário `dados`.
@@ -1023,7 +1023,6 @@ class Sec(Sistema):
         return True
 
     def _extrai_inscritos_prova(self):
-        
 
         dados = OrderedDict()
 
@@ -1057,7 +1056,7 @@ class Sec(Sistema):
         return dados
 
     def inscrever_candidato(
-            self, cpf, uf, certificado, data, menor=False, protocolo=None, timeout: int = 5
+        self, cpf, uf, certificado, data, menor=False, protocolo=None, timeout: int = 5
     ):
 
         h = self.sis.inscricao["incluir"]
@@ -1089,7 +1088,9 @@ class Sec(Sistema):
 
         result.accept()
 
-    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1, timeout: int= 5):
+    def imprimir_provas(
+        self, num_prova, cpf, num_registros, start=0, end=-1, timeout: int = 5
+    ):
 
         h = self.sis.Prova["imprimir"]
 
@@ -1276,13 +1277,13 @@ class Slmm(Sistema):
             print("Não há registro para o identificador informado")
 
     def servico_excluir(
-            self,
-            identificador,
-            documento,
-            motivo="Renúncia",
-            tipo_id="id_cpf",
-            num_proc=None,
-            timeout=10,
+        self,
+        identificador,
+        documento,
+        motivo="Renúncia",
+        tipo_id="id_cpf",
+        num_proc=None,
+        timeout=10,
     ):
 
         h = self.sis.servico

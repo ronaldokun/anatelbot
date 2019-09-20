@@ -8,86 +8,32 @@ from typing import Dict, List
 from bs4 import BeautifulSoup as soup
 from selenium.webdriver.common.by import By
 
-import functions
-from page import *
 from sistemas import sis_helpers
+from tool import functions
+from tool.page import *
 
+# This add the ../folder to the path while in development mode
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
-
-ESTAÇÕES_RC = ["Fixa", "Móvel", "Telecomando"]
-
-PATH = r"C:\Users\rsilva\Desktop\SEI"
-
-DADOS = OrderedDict(
-    {
-        "Dados do Usuário": [
-            "CNPJ/CPF",
-            "Nome/Razão Social",
-            "Situação",
-            "Número Processo Alteração Nome",
-            "Nacionalidade",
-            "Data de Nascimento",
-            "Validade RNE",
-            "Visto Permanente",
-            "Identidade",
-            "Órgão Exp.",
-            "Sexo",
-            "Estado Civil",
-            "Data Inclusão",
-            "Usuário Inclusão",
-            "Data Alteração",
-            "Usuário Alteração",
-            "Tipo Usuário",
-            "E-mail",
-            "Home Page",
-            "Observação",
-        ],
-        "Dados de Telefones": ["Principal", "Celular"],
-        "Endereço Correspondência": [
-            "País",
-            "Cep",
-            "Logradouro",
-            "Número",
-            "Complemento",
-            "Bairro",
-            "UF",
-            "Município",
-            "Distrito",
-            "Subdistrito",
-        ],
-        "Endereço Sede": [
-            "País",
-            "Cep",
-            "Logradouro",
-            "Número",
-            "Complemento",
-            "Bairro",
-            "UF",
-            "Município",
-            "Distrito",
-            "Subdistrito",
-        ],
-    }
-)
-
-
 class Sistema(Page):
-    def __init__(self, driver, login=None, senha=None, timeout=5):
-        
+    def __init__(self, driver, login=None, senha=None, timeout: int = 5):
 
         if login and senha:
 
-            self.driver = functions.init_browser(driver, login, senha, timeout)
+            self.driver = functions.get_browser(driver, login, senha, timeout)
 
         else:
 
             self.driver = driver
 
     def _navigate(
-        self, identificador: str, tipo_id: str, acoes: tuple, silent: bool = True
+        self,
+        identificador: str,
+        tipo_id: str,
+        acoes: tuple,
+        silent: bool = True,
+        timeout: int = 5,
     ):
         """Check id and tipo_id consistency and navigate to link
 
@@ -112,9 +58,9 @@ class Sistema(Page):
 
                 self._atualizar_elemento(_id, identificador)
 
-                self._click_button(submit, silencioso=False)
+                self._clicar(submit, silent=False, timeout=timeout)
 
-            alert = self.alert_is_present()
+            alert = self.alert_is_present(timeout)
 
             if alert:
                 txt = alert.text
@@ -132,6 +78,7 @@ class Sistema(Page):
 
     def _get_acoes(self, helper, keys):
         return tuple(helper.get(x, None) for x in keys)
+
 
 class Scpx(Sistema):
     """
@@ -153,11 +100,11 @@ class Scpx(Sistema):
 
         self._navigate(identificador, tipo_id, acoes)
 
-        identificador = strip_string(identificador)
+        identificador = functions.strip_string(identificador)
 
         try:
 
-            self._click_button((By.LINK_TEXT, identificador), timeout=timeout)
+            self._clicar((By.LINK_TEXT, identificador), timeout=timeout)
 
         except (NoSuchElementException, TimeoutException):
 
@@ -166,7 +113,7 @@ class Scpx(Sistema):
 
         try:
 
-            self._click_button(h["id_btn_estacao"], timeout=timeout)
+            self._clicar(h["id_btn_estacao"], timeout=timeout)
 
         except (NoSuchElementException, TimeoutException):
 
@@ -195,7 +142,7 @@ class Scpx(Sistema):
 
             return
 
-        self._click_button(btn_id)
+        self._clicar(btn_id)
 
     def servico_incluir(
         self, identificador, num_processo, tipo_id="id_cpf", silent=False, timeout=5
@@ -203,7 +150,7 @@ class Scpx(Sistema):
 
         h = self.sis.servico
 
-        num_processo = strip_string(num_processo)
+        num_processo = functions.strip_string(num_processo)
 
         acoes = self._get_acoes(h, ("incluir", tipo_id, "submit"))
 
@@ -214,12 +161,12 @@ class Scpx(Sistema):
 
             print("Alerta Inesperado")
 
-        self._atualizar_elemento(h.get("id_num_proc"), num_processo, timeout=timeout)
+        self._atualizar_elemento(h.get("id_num_proc"), num_processo)
 
-        self._click_button(h.get("id_btn_corresp"), timeout=timeout)
+        self._clicar(h.get("id_btn_corresp"), timeout=timeout)
 
         if silent:
-            self._click_button(h.get("submit"), timeout=timeout)
+            self._clicar(h.get("submit"), timeout=timeout)
 
     def servico_excluir(
         self, identificador, documento, motivo="Renúncia", tipo_id="id_cpf"
@@ -241,13 +188,13 @@ class Scpx(Sistema):
         if alert:
             alert.dismiss()
 
-        self._click_button(h.get("id_btn_dados_exclusão"))
+        self._clicar(h.get("id_btn_dados_exclusão"))
 
         self._atualizar_elemento(h.get("id_doc_exclusão"), documento)
 
         self._selecionar_por_texto(h.get("id_motivo_exclusão"), motivo)
 
-        self._click_button(h.get("submit"))
+        self._clicar(h.get("submit"))
 
         alert = self.alert_is_present(2)
 
@@ -279,7 +226,7 @@ class Scpx(Sistema):
 
         self._navigate(identificador, tipo_id, acoes)
 
-        self._click_button(helper.get("id_btn_dados_estacao"), timeout=timeout)
+        self._clicar(helper.get("id_btn_dados_estacao"), timeout=timeout)
 
         self._selecionar_por_texto(helper.get("id_uf"), uf, timeout=timeout)
 
@@ -288,18 +235,16 @@ class Scpx(Sistema):
         if alert:
             alert.dismiss()
 
-        self._atualizar_elemento(
-            helper.get("id_indicativo"), indicativo, timeout=timeout
-        )
+        self._atualizar_elemento(helper.get("id_indicativo"), indicativo)
 
-        self._atualizar_elemento(helper.get("id_seq"), sequencial, timeout=timeout)
+        self._atualizar_elemento(helper.get("id_seq"), sequencial)
 
         self._selecionar_por_texto(helper.get("id_tipo"), tipo_estacao, timeout=timeout)
 
         if tipo_estacao == "Fixa" and sede:
-            self._click_button(helper.get("copiar_sede"), timeout=2 * timeout)
+            self._clicar(helper.get("copiar_sede"), timeout=2 * timeout)
             sleep(1)
-        self._click_button(helper.get("submit"), timeout=2 * timeout)
+        self._clicar(helper.get("submit"), timeout=2 * timeout)
 
     def movimento_transferir(
         self, identificador, origem, dest, proc, tipo_id="id_cpf", timeout=5
@@ -342,12 +287,12 @@ class Scpx(Sistema):
 
         self._selecionar_por_texto(id_atual, text, timeout=timeout)
 
-        self._click_button(helper.get("submit"), timeout=timeout)
+        self._clicar(helper.get("submit"), timeout=timeout)
 
-        if self.check_element_exists(helper.get("id_proc"), timeout=1):
+        if self.check_element_exists(helper.get("id_proc")):
             proc = re.sub("[.-/]", "", proc)
 
-            self._atualizar_elemento(helper.get("id_proc"), proc, timeout=timeout)
+            self._atualizar_elemento(helper.get("id_proc"), proc)
 
         id_posterior = helper.get("id_posterior")
 
@@ -368,12 +313,13 @@ class Scpx(Sistema):
             self._atualizar_elemento(
                 helper.get("id_txt_cancelar"),
                 "Cadastro Incorreto. Estação será refeita com dados corretos",
-                timeout=timeout,
             )
 
-        self._click_button(helper.get("submit"), timeout=timeout)
+        self._clicar(helper.get("submit"), timeout=timeout)
 
-    def movimento_cancelar(self, identificador, tipo_id="id_cpf"):
+    def movimento_cancelar(
+        self, identificador, tipo_id="id_cpf", timeout: int = 10
+    ) -> None:
 
         helper = self.sis.movimento
 
@@ -392,11 +338,11 @@ class Scpx(Sistema):
             if alert:
                 alert.accept()
 
-        self._click_button(helper["id_btn_lista_estacoes"])
+        self._clicar(helper["id_btn_lista_estacoes"], timeout=timeout / 2)
 
-        self._click_button(helper["id_btn_marcar_todos"])
+        self._clicar(helper["id_btn_marcar_todos"], timeout=timeout / 2)
 
-        self._click_button(helper["submit"])
+        self._clicar(helper["submit"], timeout=timeout)
 
     def licenciar_estacao(
         self, identificador, tipo_id="id_cpf", ppdess=True, silent=False, timeout=5
@@ -409,27 +355,25 @@ class Scpx(Sistema):
         self._navigate(identificador, tipo_id, acoes)
 
         if tipo_id == "id_cpf":
-            self._click_button(
+            self._clicar(
                 (By.LINK_TEXT, strip_string(identificador)),
-                silencioso=silent,
+                silent=silent,
                 timeout=5 * timeout,
             )
 
         if not ppdess:
-            self._click_button(
-                helper.get("id_btn_lista_estacoes"), timeout=timeout, silencioso=silent
+            self._clicar(
+                helper.get("id_btn_lista_estacoes"), timeout=timeout, silent=silent
             )
 
-            self._click_button(
-                helper.get("id_btn_licenciar"), timeout=timeout, silencioso=silent
-            )
+            self._clicar(helper.get("id_btn_licenciar"), timeout=timeout, silent=silent)
 
-            self._click_button(helper["submit"], timeout=2 * timeout)
+            self._clicar(helper["submit"], timeout=2 * timeout)
 
             with self._navega_nova_janela():
-                self._click_button(helper["marcar_todos"], timeout=timeout)
+                self._clicar(helper["marcar_todos"], timeout=timeout)
 
-                self._click_button(helper["btn_print"], timeout=timeout)
+                self._clicar(helper["btn_print"], timeout=timeout)
 
     def prorrogar_rf(self, identificador, tipo_id="id_cpf"):
 
@@ -439,9 +383,9 @@ class Scpx(Sistema):
 
         self._navigate(identificador, tipo_id, acoes)
 
-        self._click_button(helper.get("id_btn_dados_estacao"))
+        self._clicar(helper.get("id_btn_dados_estacao"))
 
-        self._click_button(helper.get("submit"))
+        self._clicar(helper.get("submit"))
 
         alert = self.alert_is_present(5)
 
@@ -466,9 +410,9 @@ class Scpx(Sistema):
 
         alert.dismiss()
 
-        self._click_button(helper.get("id_btn_lista_estacoes"))
+        self._clicar(helper.get("id_btn_lista_estacoes"))
 
-        self._click_button(helper["submit"])
+        self._clicar(helper["submit"])
 
     def imprimir_licenca(self, identificador, tipo_id="id_cpf", timeout=5):
 
@@ -478,7 +422,7 @@ class Scpx(Sistema):
 
         self._navigate(identificador, helper, acoes)
 
-        self._click_button(helper["id_btn_imprimir"], timeout=timeout)
+        self._clicar(helper["id_btn_imprimir"], timeout=timeout)
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
 
@@ -500,6 +444,7 @@ class Scpx(Sistema):
 
         return dados
 
+
 class Scra(Sistema):
     """
         Esta subclasse da classe Page define métodos de execução de funções nos sistemas
@@ -520,11 +465,11 @@ class Scra(Sistema):
 
         self._navigate(id, tipo_id, acoes)
 
-        id = strip_string(id)
+        id = functions.strip_string(id)
 
         try:
 
-            self._click_button((By.LINK_TEXT, id), timeout=timeout)
+            self._clicar((By.LINK_TEXT, id), timeout=timeout)
 
         except (NoSuchElementException, TimeoutException):
 
@@ -533,7 +478,7 @@ class Scra(Sistema):
 
         try:
 
-            self._click_button(h["id_btn_estacao"], timeout=timeout)
+            self._clicar(h["id_btn_estacao"], timeout=timeout)
 
         except (NoSuchElementException, TimeoutException):
 
@@ -542,6 +487,121 @@ class Scra(Sistema):
             return None
 
         return True
+
+    def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
+
+        self.consulta(id, tipo_id, timeout=timeout)
+
+        dados = {}
+
+        source = soup(self.driver.page_source, "lxml")
+
+        for tr in source.find_all("tr"):
+
+            for td in tr.find_all("td", string=True):
+
+                key = td.text.strip(" :")
+                value = td.find_next_sibling("td")
+
+                if key not in dados and hasattr(value, "text"):
+                    dados[key] = value.text.strip()
+
+        return dados
+
+    def servico_incluir(
+        self, identificador, num_processo, tipo_id="id_cpf", silent=False, timeout=5
+    ):
+
+        h = self.sis.servico
+
+        num_processo = functions.strip_string(num_processo)
+
+        acoes = self._get_acoes(h, ("incluir", tipo_id, "submit"))
+
+        try:
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            print("Alerta Inesperado")
+
+        self._atualizar_elemento(h.get("id_num_proc"), num_processo)
+
+        self._clicar(h.get("id_btn_corresp"), timeout=timeout)
+
+        if silent:
+            self._clicar(h.get("submit"), timeout=timeout)
+
+    def movimento_transferir(
+        self, identificador, origem, dest, proc, tipo_id="id_cpf", timeout=5
+    ):
+
+        helper = self.sis.movimento
+
+        links = ("transferir", tipo_id, "submit")
+
+        acoes = self._get_acoes(helper, links)
+
+        try:
+
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            alert = self.alert_is_present(2)
+
+            if alert:
+                alert.accept()
+
+        id_atual = helper.get("id_atual")
+
+        if origem.lower() == "a":
+
+            text = "A - Em análise"
+
+        elif origem.lower() == "b":
+
+            text = "B - Cadastro pela Anatel"
+
+        else:
+
+            print(
+                "A transferência de movimento é somente à partir dos Movimentos A ou B"
+            )
+
+            return
+
+        self._selecionar_por_texto(id_atual, text, timeout=timeout)
+
+        self._clicar(helper.get("submit"), timeout=timeout)
+
+        if self.check_element_exists(helper.get("id_proc")):
+            proc = re.sub("[.-/]", "", proc)
+
+            self._atualizar_elemento(helper.get("id_proc"), proc)
+
+        id_posterior = helper.get("id_posterior")
+
+        if dest.lower() == "e":
+
+            self._selecionar_por_texto(
+                id_posterior, "E - Aprovado / Licença", timeout=timeout
+            )
+
+        elif dest.lower() == "g":
+
+            self._selecionar_por_texto(
+                id_posterior,
+                "G - Cadastro pelo usuário (auto-cadastramento)",
+                timeout=timeout,
+            )
+
+            self._atualizar_elemento(
+                helper.get("id_txt_cancelar"),
+                "Cadastro Incorreto. Estação será refeita com dados corretos",
+            )
+
+        self._clicar(helper.get("submit"), timeout=timeout)
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
 
@@ -581,13 +641,14 @@ class Scra(Sistema):
 
         try:
 
-            self._click_button((By.LINK_TEXT, id), timeout=timeout)
+            self._clicar((By.LINK_TEXT, id), timeout=timeout)
 
         except (NoSuchElementException, TimeoutException):
 
             print("Não foi possível navegar para a página de consulta")
 
-        self._click_button(helper["id_btn_imprimir"])
+        self._clicar(helper["id_btn_imprimir"])
+
 
 class Sec(Sistema):
 
@@ -599,7 +660,7 @@ class Sec(Sistema):
         "Certificado",
     ]
 
-    SEC_DADOS = DADOS
+    SEC_DADOS = sis_helpers.DADOS
 
     SEC_DADOS["Certificado"] = [
         "Fistel",
@@ -629,41 +690,43 @@ class Sec(Sistema):
         "Observação",
     ]
 
-    SEC_ALT = OrderedDict({
-        "Dados do Usuário": [
-            # "CNPJ/CPF",
-            # "Nome/Razão Social",
-            # "Nacionalidade",
-            # "Usuário Alteração",
-            # "Tipo Usuário",
-            "E-mail",
-            # "Home Page",
-            # "Observação",
-        ],
-        "Dados Complementares": [
-            "Identidade",
-            "Órgão Exp.",
-            "Sexo",
-            "Estado Civil",
-            "Data de Nascimento",
-            "Num CREA", 
-            "Sigla UF_CREA",
-            "CNPJ/CPF_Responsável"
-        ],
-        "Dados de Telefones": ["DDD", "Principal", "DDD2", "Principal2"],
-        "Endereço Sede": [
-            "País",
-            "CEP",
-            "Logradouro",
-            "Número",
-            "Complemento",
-            "Bairro",
-            "UF",
-            "Município",
-            "Distrito",
-            "Subdistrito",
-        ],
-    })  # type: Dict[str, List[str]]
+    SEC_ALT = OrderedDict(
+        {
+            "Dados do Usuário": [
+                # "CNPJ/CPF",
+                # "Nome/Razão Social",
+                # "Nacionalidade",
+                # "Usuário Alteração",
+                # "Tipo Usuário",
+                "E-mail",
+                # "Home Page",
+                # "Observação",
+            ],
+            "Dados Complementares": [
+                "Identidade",
+                "Órgão Exp.",
+                "Sexo",
+                "Estado Civil",
+                "Data de Nascimento",
+                "Num CREA",
+                "Sigla UF_CREA",
+                "CNPJ/CPF_Responsável",
+            ],
+            "Dados de Telefones": ["DDD", "Principal", "DDD2", "Principal2"],
+            "Endereço Sede": [
+                "País",
+                "CEP",
+                "Logradouro",
+                "Número",
+                "Complemento",
+                "Bairro",
+                "UF",
+                "Município",
+                "Distrito",
+                "Subdistrito",
+            ],
+        }
+    )  # type: Dict[str, List[str]]
 
     def __init__(
         self, driver: selenium.webdriver, login: str = "", senha: str = "", timeout=2
@@ -686,19 +749,19 @@ class Sec(Sistema):
 
         if tipo_id == "id_cpf":
 
-            if self.check_element_exists(
-                (By.LINK_TEXT, identificador), timeout=timeout
-            ):
+            if self.check_element_exists((By.LINK_TEXT, identificador)):
 
                 try:
 
-                    self._click_button((By.LINK_TEXT, identificador), timeout=timeout)
+                    self._clicar((By.LINK_TEXT, identificador), timeout=timeout)
 
                 except (NoSuchElementException, TimeoutException):
 
                     pass
 
-    def incluir_cadastro(self, dados: dict, menor: bool = False) -> bool:
+    def incluir_cadastro(
+        self, dados: dict, menor: bool = False, timeout: int = 5
+    ) -> bool:
         """[summary]
         
         Args:
@@ -717,42 +780,44 @@ class Sec(Sistema):
 
         if response is not None:
             return response
-        
+
         buttons = (h["bt_dados"], h["bt_fone"], h["bt_end"])
 
         telas = self.SEC_ALT.copy()
         telas.pop("Endereço Sede")
-        
-        if menor:
-            cpf_resp = dados.get("CNPJ/CPF_Responsável", None) 
-            #telas["Dados do Usuário"]["cpf_resp"] = cpf_resp
-            assert cpf_resp, "É obrigatório informar o CPF do Responsável para menores de 18 anos"
 
-        self._atualizar_elemento(h["input_nome"], dados["Nome/Razão Social"]  + Keys.TAB)
-        
-        for i, (tela, campos) in enumerate(telas.items()):            
+        if menor:
+            cpf_resp = dados.get("CNPJ/CPF_Responsável", None)
+            # telas["Dados do Usuário"]["cpf_resp"] = cpf_resp
+            assert (
+                cpf_resp
+            ), "É obrigatório informar o CPF do Responsável para menores de 18 anos"
+
+        self._atualizar_elemento(h["input_nome"], dados["Nome/Razão Social"] + Keys.TAB)
+
+        for i, (tela, campos) in enumerate(telas.items()):
             for campo in campos:
                 value = dados.get(campo, None)
                 if value:
                     self._atualizar_elemento(h[campo], value + Keys.TAB)
-                
-            self._click_button(buttons[i])
 
-        cep = dados.get("CEP", "").replace("-", "")        
+            self._clicar(buttons[i], timeout=timeout)
+
+        cep = dados.get("CEP", "").replace("-", "")
 
         assert cep, "É Obrigatório informar o CEP para inclusão de Cadastro"
         response = self._carrega_cep(dados, cep, h)
         if response is not None:
-            return response            
+            return response
         try:
 
-            self._click_button(h["submit"], timeout=5)
+            self._clicar(h["submit"], timeout=timeout)
 
         except TimeoutException:
 
             self.driver.execute_script(h["submit_script"])
 
-        alert = self.alert_is_present(30)
+        alert = self.alert_is_present(timeout=timeout)
 
         if alert:
             if alert.text == h["atualizar_ok"]:
@@ -788,11 +853,11 @@ class Sec(Sistema):
 
         self._selecionar_por_texto(h["nova_situacao"], text=situacao, timeout=timeout)
 
-        btn = self.wait_for_element_to_click(h["nova_situacao"])
+        btn = self.wait_for_element_to_click(h["nova_situacao"], timeout=timeout)
 
         btn.send_keys(2 * Keys.TAB + Keys.RETURN)
 
-        alert = self.alert_is_present(30)
+        alert = self.alert_is_present(timeout=timeout)
 
         if alert:
             if alert.text == h["atualizar_ok"]:
@@ -807,13 +872,13 @@ class Sec(Sistema):
 
         return None
 
-    def _carrega_cep(self, dados: dict, cep: str, h: dict)-> bool:
-        
+    def _carrega_cep(self, dados: dict, cep: str, h: dict, timeout: int = 5) -> bool:
+
         self._atualizar_elemento(h["CEP"], cep)
 
-        self._click_button(h["bt_cep"])
+        self._clicar(h["bt_cep"], timeout=timeout)
 
-        alert = self.alert_is_present(10)
+        alert = self.alert_is_present(timeout)
 
         if alert:
             return alert.text
@@ -824,15 +889,15 @@ class Sec(Sistema):
         # until then there is no uf.value
         while uf.get_attribute("value") == "":
             sleep(1)
-            uf = self.wait_for_element(h["UF"])
+            uf = self.wait_for_element(h["UF"], timeout=timeout)
 
-        logr = self.wait_for_element_to_be_visible(h["Logradouro"])
+        logr = self.wait_for_element_to_be_visible(h["Logradouro"], timeout=timeout)
 
         # if the CEP loading didn't retrieve the logradouro, update it manually
         if not logr.get_attribute("value"):
-            self._atualizar_elemento(h["Endereço"], dados["Endereço"].title())
+            self._atualizar_elemento(h["Logradouro"], dados["Logradouro"].title())
 
-        bairro = self.wait_for_element(h["Bairro"])
+        bairro = self.wait_for_element(h["Bairro"], timeout=timeout)
 
         if not bairro.get_attribute("value"):
             self._atualizar_elemento(h["Bairro"], dados["Bairro"].title())
@@ -842,7 +907,7 @@ class Sec(Sistema):
 
         self._atualizar_elemento(h["Número"], dados["Número"])
 
-        comp = dados.get("Complemento", "").title()
+        comp = str(dados.get("Complemento", "")).title()
 
         self._atualizar_elemento(h["Complemento"], comp)
 
@@ -854,6 +919,7 @@ class Sec(Sistema):
         alt_nome: bool = False,
         p_alt: str = None,
         menor: bool = False,
+        timeout: int = 5,
     ):
         """
         Atualiza os campos retornados pelo dicionário `dados`.
@@ -862,59 +928,61 @@ class Sec(Sistema):
 
 
         Assuma que as chaves do dicionário casa com os campos da página
-        """       
+        """
 
         h = self.sis.entidade
-    
+
         h = h["alterar"]
         acoes = self._get_acoes(h, ("link", "id_cpf", "submit"))
         response = self._navigate(dados["CNPJ/CPF"], h, acoes)
 
         if response is not None:
             return response
-        
+
         buttons = (h["bt_dados"], h["bt_fone"], h["bt_end"])
 
         telas = self.SEC_ALT.copy()
         telas.pop("Endereço Sede")
-        
+
         if menor:
-            cpf_resp = dados.get("CNPJ/CPF_Responsável", None) 
-            #telas["Dados do Usuário"]["cpf_resp"] = cpf_resp
-            assert cpf_resp, "É obrigatório informar o CPF do Responsável para menores de 18 anos"
+            cpf_resp = dados.get("CNPJ/CPF_Responsável", None)
+            # telas["Dados do Usuário"]["cpf_resp"] = cpf_resp
+            assert (
+                cpf_resp
+            ), "É obrigatório informar o CPF do Responsável para menores de 18 anos"
 
         if alt_nome:
-            self._click_button(h["bt_alt_razao"])
-            self._atualizar_elemento(h["id_novo_nome"], dados["Nome/Razão Social"]  + Keys.TAB)
+            self._clicar(h["bt_alt_razao"], timeout=timeout)
+            self._atualizar_elemento(
+                h["id_novo_nome"], dados["Nome/Razão Social"] + Keys.TAB
+            )
             if p_alt is None:
                 p_alt = dados["CNPJ/CPF"]
             self._atualizar_elemento(h["id_p_altera"], p_alt + Keys.TAB)
 
-        
         for i, (_, campos) in enumerate(telas.items()):
             for campo in campos:
                 value = dados.get(campo, None)
                 if value:
                     self._atualizar_elemento(h[campo], value + Keys.TAB)
-                    
 
-            self._click_button(buttons[i])
+            self._clicar(buttons[i], timeout=timeout)
 
-        cep = dados.get("CEP", "").replace("-", "")        
+        cep = dados.get("CEP", "").replace("-", "")
 
         if cep:
             response = self._carrega_cep(dados, cep, h)
             if response is not None:
-                return response            
+                return response
         try:
 
-            self._click_button(h["submit"], timeout=5)
+            self._clicar(h["submit"], timeout=timeout)
 
         except TimeoutException:
 
             self.driver.execute_script(h["submit_script"])
 
-        alert = self.alert_is_present(30)
+        alert = self.alert_is_present(timeout=timeout)
 
         if alert:
             if alert.text == h["atualizar_ok"]:
@@ -923,32 +991,31 @@ class Sec(Sistema):
             else:
                 return alert.text
 
-    def consulta_inscrição(self, cpf: str)-> None:
+    def consulta_inscrição(self, cpf: str, timeout: int = 5) -> None:
         h = self.sis.inscricao["consultar"]
 
         acoes = self._get_acoes(h, ("link", "id_cpf", "submit"))  # 'submit'))
 
         response = self._navigate(cpf, h, acoes)
 
-        alert = self.alert_is_present()
+        alert = self.alert_is_present(timeout)
 
         if alert:
             print(alert.text)
             alert.accept()
             return False
 
-
-        #if hasattr(response, "text") and response.text == h["not_found"]:
+        # if hasattr(response, "text") and response.text == h["not_found"]:
         #    return False
 
         else:
-            #self._click_button(h["imprimir"])
+            # self._click_button(h["imprimir"])
 
-            imprimir = self.wait_for_element_to_click(h["imprimir"])
+            imprimir = self.wait_for_element_to_click(h["imprimir"], timeout=timeout)
 
             imprimir.send_keys(Keys.CONTROL + "p")
 
-        alert = self.alert_is_present()
+        alert = self.alert_is_present(timeout)
 
         if alert:
             alert.accept()
@@ -956,7 +1023,6 @@ class Sec(Sistema):
         return True
 
     def _extrai_inscritos_prova(self):
-        
 
         dados = OrderedDict()
 
@@ -990,7 +1056,7 @@ class Sec(Sistema):
         return dados
 
     def inscrever_candidato(
-        self, cpf, uf, certificado, data, menor=False, protocolo=None
+        self, cpf, uf, certificado, data, menor=False, protocolo=None, timeout: int = 5
     ):
 
         h = self.sis.inscricao["incluir"]
@@ -999,13 +1065,13 @@ class Sec(Sistema):
 
         self._atualizar_elemento(h["id_cpf"], cpf)
 
-        self._selecionar_por_texto(h["id_uf"], uf)
+        self._selecionar_por_texto(h["id_uf"], uf, timeout=timeout)
 
-        self._selecionar_por_texto(h["id_certificado"], certificado)
+        self._selecionar_por_texto(h["id_certificado"], certificado, timeout=timeout)
 
-        self._click_button(h["submit"])
+        self._clicar(h["submit"], timeout=timeout)
 
-        sleep(1)
+        sleep(timeout)
 
         if menor:
 
@@ -1013,7 +1079,7 @@ class Sec(Sistema):
 
             self._atualizar_elemento(h["protocolo"], protocolo)
 
-        result = self._click_button((By.LINK_TEXT, data), False)
+        result = self._clicar((By.LINK_TEXT, data), silent=False, timeout=timeout)
 
         assert (
             result.text
@@ -1022,7 +1088,9 @@ class Sec(Sistema):
 
         result.accept()
 
-    def imprimir_provas(self, num_prova, cpf, num_registros, start=0, end=-1, timeout: int= 5):
+    def imprimir_provas(
+        self, num_prova, cpf, num_registros, start=0, end=-1, timeout: int = 5
+    ):
 
         h = self.sis.Prova["imprimir"]
 
@@ -1034,15 +1102,17 @@ class Sec(Sistema):
 
         self._atualizar_elemento(h["num_reg"], str(num_registros) + Keys.RETURN)
 
-        sleep(2)
+        sleep(timeout)
 
         dados = self._extrai_inscritos_prova()
 
-        for v in sorted(list(dados.values()))[start:end]:
+        nomes = [n for n in dados.values()]
+
+        for v in nomes[start:end]:
 
             self.driver.get(v.link)
 
-            alert = self.alert_is_present(2)
+            alert = self.alert_is_present(timeout=timeout)
 
             if alert:
 
@@ -1052,7 +1122,7 @@ class Sec(Sistema):
 
                 self.driver.execute_script("gravarReimprimirProva();")
 
-                alert = self.alert_is_present(5)
+                alert = self.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.accept()
@@ -1061,34 +1131,33 @@ class Sec(Sistema):
 
                 self.driver.execute_script("reimprimirprova();")
 
-                alert = self.alert_is_present(5)
+                alert = self.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.accept()
 
-                alert = self.alert_is_present(5)
+                alert = self.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.dismiss()
 
             else:
-
                 # self._click_button(h['id_bt_imprimir'], timeout =10)
 
                 self.driver.execute_script("imprimirprova();")
 
-                alert = self.alert_is_present(5)
+                alert = self.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.accept()
 
-            sleep(10)
+            sleep(timeout)
 
-            files = sorted(os.listdir(PATH))
+            files = sorted(os.listdir(path))
 
-            file = os.path.join(PATH, files[0])
+            file = os.path.join(path, files[0])
 
-            os.rename(file, os.path.join(PATH, str(v.nome).title() + ".pdf"))
+            os.rename(file, os.path.join(path, str(v.nome).upper() + ".pdf"))
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
         def soup_clean(source):
@@ -1176,6 +1245,82 @@ class Sec(Sistema):
 
         pass
 
+
+class Slmm(Sistema):
+    """
+    Esta subclasse da classe Page define métodos de execução de funções nos sistemas
+    interativos da ANATEL
+    """
+
+    def __init__(self, driver, login=None, senha=None, timeout=10):
+
+        super().__init__(driver, login, senha, timeout)
+
+        self.sis = sis_helpers.Slmm
+
+    def consulta(self, identificador, tipo_id="id_cpf", timeout=5):
+
+        h = self.sis.consulta
+
+        acoes = self._get_acoes(h, ("link", tipo_id, None))  # 'submit'))
+
+        self._navigate(identificador, tipo_id, acoes)
+
+        identificador = functions.strip_string(identificador)
+
+        try:
+
+            self._click_button(h["id_btn_estacao"], timeout=timeout)
+
+        except (NoSuchElementException, TimeoutException):
+
+            print("Não há registro para o identificador informado")
+
+    def servico_excluir(
+        self,
+        identificador,
+        documento,
+        motivo="Renúncia",
+        tipo_id="id_cpf",
+        num_proc=None,
+        timeout=10,
+    ):
+
+        h = self.sis.servico
+
+        acoes = self._get_acoes(h, ("excluir", tipo_id, "submit"))
+
+        try:
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            print("Alerta Inesperado")
+
+        alert = self.alert_is_present(2)
+
+        if alert:
+            alert.dismiss()
+
+        proc = self.wait_for_element(h.get("id_num_proc"), timeout=timeout)
+
+        if self.check_element_exists(h.get("id_num_proc")):
+            self._atualizar_elemento(h.get("id_num_proc"), num_proc)
+
+        self._click_button(h.get("id_btn_dados_exclusão"), timeout=timeout)
+
+        self._atualizar_elemento(h.get("id_doc_exclusão"), documento)
+
+        self._selecionar_por_texto(h.get("id_motivo_exclusão"), motivo, timeout=timeout)
+
+        self._click_button(h.get("submit"), timeout=timeout)
+
+        alert = self.alert_is_present(2)
+
+        if alert:
+            alert.dismiss()
+
+
 class Sigec(Sistema):
     def __init__(self, driver, login="", senha="", timeout=2):
 
@@ -1240,61 +1385,21 @@ class Boleto(Sistema):
 
             input_ = h["input_cpf"]
 
-            self._click_button(h[tipo_id], timeout=timeout)
+            self._clicar(h[tipo_id], timeout=timeout)
 
         elif tipo_id == "id_fistel":
 
             input_ = h["input_fistel"]
 
-        self._atualizar_elemento(input_, ident, timeout=timeout)
+        self._atualizar_elemento(input_, ident)
 
-        self._atualizar_elemento(
-            h["input_data"], functions.last_day_of_month(), timeout=timeout
-        )
+        self._atualizar_elemento(h["input_data"], functions.last_day_of_month())
 
-        self._click_button(h["submit"], timeout=timeout)
+        self._clicar(h["submit"], timeout=timeout)
 
-        self._click_button(h["marcar_todos"], timeout=timeout)
+        self._clicar(h["marcar_todos"], timeout=timeout)
 
-        self._click_button(h["btn_print"], timeout=timeout)
-
-
-def save_new_window(self, page, filename):
-    try:
-
-        self.wait_for_new_window(timeout=5)
-
-    except TimeoutError:
-
-        print("Não foi possível identificar a nova Janela para salvar")
-
-        return False
-
-    # Guarda as janelas do navegador presentes
-    windows = self.driver.window_handles
-
-    # Troca o foco do navegador
-    self.driver.switch_to_window(windows[-1])
-
-    with open(filename + ".html", "w") as file:
-        # html = soup(driver.page_source).prettify()
-
-        # write image
-        file.write(self.driver.page_source)
-
-    self.driver.fechar()
-
-    self.driver.switch_to_window(windows[0])
-
-    return True
-
-
-def imprime_licenca(page, ident, serv, tipo):
-    ident, serv, tipo, sis = functions.check_input(ident, serv, tipo)
-
-    page.driver.get(sis.Licenca["Imprimir"])
-
-    navigate(page, ident, sis.Licenca, tipo)
+        self._clicar(h["btn_print"], timeout=timeout)
 
 
 def abrir_agenda_prova(sec, datas):

@@ -1,6 +1,9 @@
-# pycharm folders
+# tool folders
 .idea/
-
+.vscode
+.mypy_cache
+.pytest_cache
+.swp
 # datasets
 *.xlsx
 *.csv
@@ -23,8 +26,6 @@ monitor.py
 *~
 
 # Jupyter Notebook
-*checkpoint.ipynb
-*checkpoint.py
 *.ipynb_checkpoints
 # Environments 
 .env 

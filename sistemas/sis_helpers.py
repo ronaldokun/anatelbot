@@ -6,11 +6,70 @@ Created on Mon Aug 28 20:19:59 2017
 @author: ronaldo
 """
 
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 from selenium.webdriver.common.by import By
 
 SISTEMASNET = "http://sistemasnet/"
+
+SERVICOS = ["cidadao", "radioamador", "maritimo", "aeronautico", "boleto", "sec"]
+
+ESTAÇÕES_RC = ["Fixa", "Móvel", "Telecomando"]
+
+PATH = r"C:\Users\rsilva\Desktop\SEI"
+
+DADOS = OrderedDict(
+    {
+        "Dados do Usuário": [
+            "CNPJ/CPF",
+            "Nome/Razão Social",
+            "Situação",
+            "Número Processo Alteração Nome",
+            "Nacionalidade",
+            "Data de Nascimento",
+            "Validade RNE",
+            "Visto Permanente",
+            "Identidade",
+            "Órgão Exp.",
+            "Sexo",
+            "Estado Civil",
+            "Data Inclusão",
+            "Usuário Inclusão",
+            "Data Alteração",
+            "Usuário Alteração",
+            "Tipo Usuário",
+            "E-mail",
+            "Home Page",
+            "Observação",
+        ],
+        "Dados de Telefones": ["Principal", "Celular"],
+        "Endereço Correspondência": [
+            "País",
+            "Cep",
+            "Logradouro",
+            "Número",
+            "Complemento",
+            "Bairro",
+            "UF",
+            "Município",
+            "Distrito",
+            "Subdistrito",
+        ],
+        "Endereço Sede": [
+            "País",
+            "Cep",
+            "Logradouro",
+            "Número",
+            "Complemento",
+            "Bairro",
+            "UF",
+            "Município",
+            "Distrito",
+            "Subdistrito",
+        ],
+    }
+)
+
 
 
 class Sapiens(object):
@@ -21,6 +80,7 @@ class Sapiens(object):
     LOGIN = (By.ID, "cpffield-1017-inputEl")
 
     SENHA = (By.ID, "textfield-1018-inputEl")
+
 
 class Rf_Sapiens(object):
 
@@ -40,6 +100,7 @@ class Rf_Sapiens(object):
 
     NAME = (By.ID, "textfield-1015-inputE1")
 
+
 class Boleto(object):
 
     imprimir = dict(
@@ -53,6 +114,7 @@ class Boleto(object):
         marcar_todos=(By.ID, "botaoFlatMarcarTodos"),
         btn_print=(By.ID, "botaoFlatImprimirSelecionados"),
     )
+
 
 class Sec(object):
 
@@ -117,7 +179,6 @@ class Sec(object):
             "id_resp": (By.ID, "pf_NumCpfResponsavel"),
             "id_nome": (By.ID, "pNomeEntidade"),
             "input_nome": (By.ID, "t_NomeEntidade"),
-            "submit": (By.ID, "botaoFlatConfirmar"),
             "E-mail": (By.ID, "t_EndEletronico"),
             "CNPJ/CPF_Responsável": (By.ID, "pf_NumCpfResponsavel"),
             "bt_alt_razao": (By.ID, "alteraRazao"),
@@ -129,7 +190,7 @@ class Sec(object):
             "DDD": (By.ID, "tel_NumCodigoNacional0"),
             "Principal": (By.ID, "tel_NumTelefone0"),
             "DDD2": (By.ID, "tel_NumCodigoNacional1"),
-            "Principal2": (By.ID, "tel_NumTelefone1"),            
+            "Principal2": (By.ID, "tel_NumTelefone1"),
             "CEP": (By.ID, "CodCep1"),
             "bt_cep": (By.ID, "buscarEndereco"),
             "Logradouro": (By.ID, "EndLogradouro1"),
@@ -143,7 +204,7 @@ class Sec(object):
             "bt_end": (By.ID, "botaoFlatEndereço"),
             "submit_script": "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')",
             "submit": (By.ID, "botaoFlatConfirmar"),
-            "atualizar_ok": "Operação realizada com Sucesso!"
+            "atualizar_ok": "Operação realizada com Sucesso!",
         },
         "incluir": {
             "link": "http://sistemasnet/SEC/Chamada/Entidade.asp?OP=I",
@@ -162,7 +223,7 @@ class Sec(object):
             "DDD": (By.ID, "tel_NumCodigoNacional0"),
             "Principal": (By.ID, "tel_NumTelefone0"),
             "DDD2": (By.ID, "tel_NumCodigoNacional1"),
-            "Principal2": (By.ID, "tel_NumTelefone1"),            
+            "Principal2": (By.ID, "tel_NumTelefone1"),
             "CEP": (By.ID, "CodCep1"),
             "bt_cep": (By.ID, "buscarEndereco"),
             "Logradouro": (By.ID, "EndLogradouro1"),
@@ -176,16 +237,15 @@ class Sec(object):
             "bt_end": (By.ID, "botaoFlatEndereço"),
             "submit_script": "submeterTela('http://sistemasnet/SEC/Chamada/Entidade.asp?SISQSModulo=&OP=A')",
             "submit": (By.ID, "botaoFlatConfirmar"),
-            "atualizar_ok": "Operação realizada com Sucesso!"
+            "atualizar_ok": "Operação realizada com Sucesso!",
         },
-        "regularizar_RF" : {'link':
-        "http://sistemasnet/SEC/Chamada/CadastroSRFRegularizado.asp",
-        "id_cpf": (By.ID, "NumCNPJCPF"),
-        "submit": (By.ID, "botaoFlatConfirmar"),
-        "nova_situacao": (By.ID, "CodSituacaoCadastralNova"),
-        "atualizar_ok": "Operação realizada com Sucesso!"
- 
-        }   
+        "regularizar_RF": {
+            "link": "http://sistemasnet/SEC/Chamada/CadastroSRFRegularizado.asp",
+            "id_cpf": (By.ID, "NumCNPJCPF"),
+            "submit": (By.ID, "botaoFlatConfirmar"),
+            "nova_situacao": (By.ID, "CodSituacaoCadastralNova"),
+            "atualizar_ok": "Operação realizada com Sucesso!",
+        },
     }
 
     inscricao = {
@@ -201,11 +261,9 @@ class Sec(object):
             "link": "http://sistemasnet/SEC/Consulta/Provamarcada/Tela.asp",
             "id_cpf": (By.ID, "NumCnpjCpf"),
             "not_found": "Não foi encontrado o candidato.",
-            "imprimir": (By.ID, "botaoFlatImprimir")
-        }
+            "imprimir": (By.ID, "botaoFlatImprimir"),
+        },
     }
-
-    
 
     Ent_Incl = "http://sistemasnet/SEC/Chamada/Entidade.asp?OP=I&SISQSmodulo=4150"
 
@@ -229,6 +287,7 @@ class Sec(object):
     }
 
     Prova_Res = "http://sistemasnet/SEC/Prova/Resultado/Tela.asp?SISQSmodulo=3872"
+
 
 class Agenda(object):
 
@@ -270,6 +329,7 @@ class Agenda(object):
 
     btn_confirmar = (By.ID, "botaoFlatConfirmar")
 
+
 Entidade = {
     "cpf": [(By.ID, "pNumCnpjCpf"), (By.ID, "pnumCPFCNPJ"), (By.ID, "NumCNPJCPF")],
     "cnpj": [(By.ID, "pNumCnpjCpf"), (By.ID, "pnumCPFCNPJ")],
@@ -292,6 +352,7 @@ Entidade = {
     "cidade": (By.ID, "CodMunicipio1"),
     "confirmar": (By.ID, "botaoFlatConfirmar"),
 }
+
 
 class Scpx(object):
 
@@ -369,7 +430,9 @@ class Scpx(object):
         "id_btn_marcar_todos": (By.ID, "botaoFlatMarcarTodos"),
         "id_txt_cancelar": (By.ID, "TxtComentarioMov"),
         "id_cpf": consulta["id_cpf"],
+        "id_fistel": (By.ID, "pNumFistel"),
         "id_proc": (By.ID, "NumProcesso"),
+        "id_indicativo": (By.ID, "pIndicativo"),
         "submit": (By.ID, "botaoFlatConfirmar"),
         "id_atual": (By.ID, "pMovimento"),
         "id_posterior": (By.ID, "CodTipoMovimento"),
@@ -424,6 +487,7 @@ class Scpx(object):
         "submit": estacao["submit"],
     }
 
+
 class Scra(object):
 
     consulta = dict(
@@ -445,13 +509,41 @@ class Scra(object):
         incluir="http://sistemasnet/scpx/Chamada/Entidade.asp?OP=I",
     )
 
-    Estacao = dict(
+    estacao = dict(
         alterar="http://sistemasnet/scra/Chamada/Entidade.asp?OP=A",
         alterar_indicativo="http://sistemasnet/SCRA/IndicativoAlterar/Tela.asp?OP=A",
         excluir="http://sistemasnet/SCRA/Estacao/Tela.asp?OP=E",
         incluir="http://sistemasnet/SCRA/Estacao/Tela.asp?OP=I",
         licenciar="http://sistemasnet/SCRA/EstacaoLicenciar/Tela.asp",
+        id_btn_lista_estacoes=(By.ID, "botaoFlatListadeEstações"),
     )
+
+    servico = {
+        "incluir": "http://sistemasnet/scra/Servico/Tela.asp?Op=I",
+        "prorrogar_rf": "http://sistemasnet/scra/ServicoProrrogar/Tela.asp",
+        "excluir": "http://sistemasnet/scra/Servico/Tela.asp?Op=E",
+        "id_num_proc": (By.ID, "NumProcesso"),
+        "id_cpf": (By.ID, "pNumCnpjCpf"),
+        "id_btn_dados_estacao": (By.ID, "botaoFlatEstação"),
+        "id_btn_dados_exclusão": (By.ID, "botaoFlatDadosExclusão"),
+        "id_btn_corresp": (By.ID, "botaoFlatEndereçoCorrespondência"),
+        "id_doc_exclusão": (By.ID, "pDocAto"),
+        "id_motivo_exclusão": (By.ID, "CodMotivoExclusao"),
+        "submit": (By.ID, "botaoFlatConfirmar"),
+    }
+
+    movimento = {
+        "transferir": "http://sistemasnet/scra/MovimentoTransferir/Tela.asp",
+        "cancelar": "http://sistemasnet/scra/MovimentoCancelar/Tela.asp",
+        "id_btn_lista_estacoes": estacao["id_btn_lista_estacoes"],
+        "id_btn_marcar_todos": (By.ID, "botaoFlatMarcarTodos"),
+        "id_txt_cancelar": (By.ID, "TxtComentarioMov"),
+        "id_cpf": consulta["id_cpf"],
+        "id_proc": (By.ID, "NumProcesso"),
+        "submit": (By.ID, "botaoFlatConfirmar"),
+        "id_atual": (By.ID, "pMovimento"),
+        "id_posterior": (By.ID, "CodTipoMovimento"),
+    }
 
     licenca = {
         "imprimir": dict(
@@ -462,13 +554,41 @@ class Scra(object):
         )
     }
 
+
 class Slmm(object):
 
-    Consulta = "http://sistemasnet/stel/SCMM/Consulta/Tela.asp"
-
-    Licenca = {
-        "imprimir": "http://sistemasnet/stel/SCMM/LicencaImprimir/Tela.asp?SISQSmodulo=7766"
+    consulta = {
+        "link": "http://sistemasnet/stel/SCMM/Consulta/Tela.asp",
+        "id_nome": (By.ID, "pNomeEntidade"),
+        "id_cpf": (By.ID, "pNumCnpjCpf"),
+        "id_fistel": (By.ID, "pNumFistel"),
+        "id_indicativo": (By.ID, "pIndicativo"),
+        "id_btn_estacao": (By.ID, "botaoFlatEstação"),
+        "submit": (By.ID, "botaoFlatConfirmar"),
+        "impressao_completa": (By.ID, "botaoFlatVersãoparaImpressão"),
+        "impressao_resumida": (By.ID, "botaoFlatVersãoResumida"),
+        "imprimir": (By.ID, "botaoFlatCLIQUEAQUIPARAIMPRIMIR"),
+        "frame_impressao": "imprime1",
     }
+
+    servico = {
+        "incluir": "",
+        "prorrogar_rf": "",
+        "excluir": "http://sistemasnet/stel/SCMM/Servico/Tela.asp?OP=E",
+        "id_num_proc": (By.ID, "NumProcesso"),
+        "id_cpf": (By.ID, "pNumCnpjCpf"),
+        "id_fistel": (By.ID, "pNumFistel"),
+        "id_btn_dados_estacao": (By.ID, "botaoFlatEstação"),
+        "id_btn_dados_exclusão": (By.ID, "botaoFlatDadosExclusão"),
+        "id_btn_corresp": (By.ID, "botaoFlatEndereçoCorrespondência"),
+        "id_doc_exclusão": (By.ID, "t_NumInforme"),
+        "id_motivo_exclusão": (By.ID, "t_CodMotivoExclusao"),
+        "submit": (By.ID, "botaoFlatConfirmar"),
+    }
+
+    Licenca = {"imprimir": "http://sistemasnet/stel/SCMM/LicencaImprimir/Tela.asp?SISQSmodulo=7766"
+    }
+
 
 class Slma(object):
 
@@ -477,6 +597,7 @@ class Slma(object):
     Licenca = {
         "imprimir": "http://sistemasnet/stel/SCMA/LicencaPadrao/ImpressaoLicenca.asp?SISQSmodulo=7005"
     }
+
 
 class Sigec(object):
 

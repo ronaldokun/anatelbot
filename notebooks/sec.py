@@ -15,23 +15,15 @@
 
 # %%
 import os
-import gc
+
 import pandas as pd
 import xlwings as xw
-import gspread as gs
-import gspread_dataframe as gs_df
 from bs4 import BeautifulSoup as soup
-
 
 # Change the directory to reflect the main repository
 os.chdir("C:/Users/rsilva/gdrive/projects/programming/automation")
 
-from time import sleep
-
 from sistemas.sistemas import Sec
-
-import functions
-from page import *
 
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities

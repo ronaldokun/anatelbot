@@ -9,6 +9,7 @@ import datetime as dt
 import re
 
 from selenium import webdriver
+
 # Third-part Libraries
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.edge.options import Options as EdgeOptions
@@ -59,7 +60,7 @@ def strip_string(identificador: str, strip: tuple = STRIP) -> str:
 
 
 # TODO: try using seleniumrequests instead
-def get_browser(browser: str = "Chrome", is_headless: bool = False, **kwargs):
+def get_browser(browser: str = "Chrome", is_headless: bool = False):
     """Inicia a instância webdriver com algumas configurações otimizadas
     e com o navegador logado na rede da Anatel
 
@@ -93,9 +94,9 @@ def get_browser(browser: str = "Chrome", is_headless: bool = False, **kwargs):
             options.add_argument("--disable-gpu")
             options.add_argument("log-level=2")
 
-        driver = _browser["instance"](options=options, **kwargs)
+        driver = _browser["instance"](options=options)
     else:
-        driver = _browser["instance"](**kwargs)
+        driver = _browser["instance"]()
 
     if not _browser["name"] == "chrome":
         driver.maximize_window()

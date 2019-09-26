@@ -163,7 +163,7 @@ class Page:
             lista.select_by_visible_text(text)
 
         except NoSuchElementException as e:
-            raise ValueError(f"Não existe a opção {text} no Menu mencionado") from e
+            print(f"Não existe a opção {text} no Menu mencionado")
 
         alerta = self.alert_is_present()
 

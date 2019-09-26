@@ -1039,6 +1039,7 @@ class Gerar_Doc:
         id_txt_tree=("id", "txtNumero"),
         id_nato=("id", "optNato"),
         id_digit=("id", "optDigitalizado"),
+
         id_pub=("id", "optPublico"),
         id_restrito=("id", "optRestrito"),
         id_hip_legal=("id", "selHipoteseLegal"),

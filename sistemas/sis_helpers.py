@@ -589,14 +589,40 @@ class Slmm(object):
     Licenca = {"imprimir": "http://sistemasnet/stel/SCMM/LicencaImprimir/Tela.asp?SISQSmodulo=7766"
     }
 
-
 class Slma(object):
 
-    Consulta = "http://sistemasnet/stel/SCMA/Consulta/Tela.asp"
-
-    Licenca = {
-        "imprimir": "http://sistemasnet/stel/SCMA/LicencaPadrao/ImpressaoLicenca.asp?SISQSmodulo=7005"
+    consulta = {
+        "link": "http://sistemasnet/stel/SCMA/Consulta/Tela.asp",
+        "id_nome": (By.ID, "pNomeEntidade"),
+        "id_cpf": (By.ID, "pNumCnpjCpf"),
+        "id_fistel": (By.ID, "pNumFistel"),
+        "id_indicativo": (By.ID, "pIndicativo"),
+        "id_btn_estacao": (By.ID, "botaoFlatEstação"),
+        "submit": (By.ID, "botaoFlatConfirmar"),
+        "impressao_completa": (By.ID, "botaoFlatVersãoparaImpressão"),
+        "impressao_resumida": (By.ID, "botaoFlatVersãoResumida"),
+        "imprimir": (By.ID, "botaoFlatCLIQUEAQUIPARAIMPRIMIR"),
+        "frame_impressao": "imprime1",
     }
+
+    servico = {
+        "incluir": "",
+        "prorrogar_rf": "",
+        "excluir": "http://sistemasnet/stel/SCMA/Servico/Tela.asp?OP=E",
+        "id_num_proc": (By.ID, "NumProcesso"),
+        "id_cpf": (By.ID, "pNumCnpjCpf"),
+        "id_fistel": (By.ID, "pNumFistel"),
+        "id_btn_dados_estacao": (By.ID, "botaoFlatEstação"),
+        "id_btn_dados_exclusão": (By.ID, "botaoFlatDadosExclusão"),
+        "id_btn_corresp": (By.ID, "botaoFlatEndereçoCorrespondência"),
+        "id_doc_exclusão": (By.ID, "NumInformeExclusao"),
+        "id_motivo_exclusão": (By.ID, "CodMotivoExclusao"),
+        "submit": (By.ID, "botaoFlatConfirmar"),
+    }
+
+    Licenca = {"imprimir": "http://sistemasnet/stel/SCMA/LicencaImprimir/Tela.asp?SISQSmodulo=7766"
+    }
+
 
 
 class Sigec(object):

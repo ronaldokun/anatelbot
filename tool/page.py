@@ -47,27 +47,6 @@ class Page:
     def __init__(self, driver: webdriver):
         self.driver = driver
 
-    def authenticate(self, login: str, senha: str):
-        """
-
-        Args:
-            login (str):
-            senha (str):
-
-        Returns:
-            None
-        """
-
-        self.driver.get("http://sistemasnet")
-
-        alert = self.alert_is_present()
-
-        if alert:
-            alert.send_keys(
-                login + Keys.TAB + senha
-            )  # alert.authenticate is not working
-
-            alert.accept()
 
     def restart_driver(self, **kwargs) -> None:
         """Restarts webdriver instance
@@ -175,7 +154,7 @@ class Page:
         return None
 
     @contextmanager
-    def _navega_nova_janela(self, main=None):
+    def _go_new_win(self, main=None) -> None:
         """
         :param main: Caso seja fornecida uma instância do webdriver
         :return:
@@ -273,11 +252,11 @@ class Page:
             EC.new_window_is_opened(windows)
         )
 
-    # TODO: generalize this method
+    @_go_new_win
     def nav_elem_to_new_win(self, elem):
         """ Abre o link `elem` em uma nova janela e retorna o foco para esta nova janela
             Assume que há um link presente no elemento html `elem`.
-            Se usado dentro do gerenciador de contexto `self._navega_nova_janela`
+            Se usado dentro do gerenciador de contexto `self._go_new_win`
             o foco é retornado para a janela original após a saída do contexto
             Args:
                elem: elemento html com link navegável
@@ -292,15 +271,7 @@ class Page:
         # Abre link no elem em uma nova janela
         elem.send_keys(Keys.SHIFT + Keys.RETURN)
 
-        # Guarda as janelas do navegador presentes
-        windows = self.driver.window_handles
-
-        # Troca o foco do navegador
-        self.driver.switch_to_window(windows[-1])
-
-        return None
-
-    # TODO: generalize this method
+    @_go_new_win
     def nav_link_to_new_win(self, link: str):
         """ Abre o link `link` em uma nova janela e retorna o foco para esta nova janela
             Assume que há um link presente no elemento html `elem`.
@@ -312,12 +283,6 @@ class Page:
                 None
         """
         self.driver.execute_script("window.open()")
-
-        # Guarda as janelas do navegador presentes
-        windows = self.driver.window_handles
-
-        # Troca o foco do navegador
-        self.driver.switch_to.window(windows[-1])
 
         self.driver.get(link)
 
@@ -334,11 +299,5 @@ class Page:
             Método auxiliar para clicar num elemento da página que abre uma nova janela. Muda o foco para
             a nova janela.
         """
-
-        self._clicar(btn_id=btn_id, silent=silent)
-
-        # Guarda as janelas do navegador presentes
-        windows = self.driver.window_handles
-
-        # Troca o foco do navegador
-        self.driver.switch_to.window(windows[-1])
+        with self._go_new_win():
+            self._clicar(btn_id=btn_id, silent=silent)

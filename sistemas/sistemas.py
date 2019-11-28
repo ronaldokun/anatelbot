@@ -16,24 +16,39 @@ from tool.page import *
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-class Sistema(Page):
-    def __init__(self, driver, login=None, senha=None, timeout: int = 5):
+class Sistema:
+    def __init__(self, driver):
+        self.sis = None
+        self.page = Page(driver)
 
-        if login and senha:
+    def authenticate(self, login: str, senha: str):
+        """
 
-            self.driver = functions.get_browser(driver, login, senha, timeout)
+        Args:
+            login (str):
+            senha (str):
 
-        else:
+        Returns:
+            None
+        """
 
-            self.driver = driver
+        self.page.driver.get("http://sistemasnet")
+
+        alert = self.page.alert_is_present()
+
+        if alert:
+            alert.send_keys(
+                login + Keys.TAB + senha
+            )  # alert.authenticate is not working
+
+            alert.accept()
 
     def _navigate(
         self,
         identificador: str,
         tipo_id: str,
         acoes: tuple,
-        silent: bool = True,
-        timeout: int = 5,
+        silent: bool = True
     ):
         """Check id and tipo_id consistency and navigate to link
 
@@ -46,21 +61,21 @@ class Sistema(Page):
 
         link, _id, submit = acoes
 
-        self.driver.get(link)
+        self.page.driver.get(link)
 
         if silent:
 
             if submit is None:
 
-                self._atualizar_elemento(_id, identificador + Keys.RETURN)
+                self.page._atualizar_elemento(_id, identificador + Keys.RETURN)
 
             else:
 
-                self._atualizar_elemento(_id, identificador)
+                self.page._atualizar_elemento(_id, identificador)
 
-                self._clicar(submit, silent=False, timeout=timeout)
+                self.page._clicar(submit, silent=False)
 
-            alert = self.alert_is_present(timeout)
+            alert = self.page.alert_is_present()
 
             if alert:
                 txt = alert.text
@@ -72,12 +87,71 @@ class Sistema(Page):
 
         else:
 
-            self._atualizar_elemento(_id, identificador)
+            self.page._atualizar_elemento(_id, identificador)
 
             return None
 
     def _get_acoes(self, helper, keys):
         return tuple(helper.get(x, None) for x in keys)
+
+    def consulta(self, identificador, tipo_id="id_cpf", timeout=5):
+
+        h = self.sis.consulta
+
+        acoes = self._get_acoes(h, ("link", tipo_id, None))  # 'submit'))
+
+        self._navigate(identificador, tipo_id, acoes)
+
+        identificador = functions.strip_string(identificador)
+
+        try:
+
+            self.page._clicar(h["id_btn_estacao"])
+
+        except (NoSuchElementException, TimeoutException):
+
+            print("Não há registro para o identificador informado")
+
+    def servico_excluir(
+        self,
+        identificador,
+        documento,
+        motivo="Renúncia",
+        tipo_id="id_cpf",
+        num_proc=None,
+    ):
+
+        h = self.sis.servico
+
+        acoes = self._get_acoes(h, ("excluir", tipo_id, "submit"))
+
+        try:
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            print("Alerta Inesperado")
+
+        alert = self.page.alert_is_present()
+
+        if alert:
+            alert.dismiss()
+
+        if self.page.check_element_exists(h.get("id_num_proc")):
+            self.page._atualizar_elemento(h.get("id_num_proc"), num_proc)
+
+        self.page._clicar(h.get("id_btn_dados_exclusão"))
+
+        self.page._atualizar_elemento(h.get("id_doc_exclusão"), documento)
+
+        self.page._selecionar_por_texto(h.get("id_motivo_exclusão"), motivo)
+
+        self.page._clicar(h.get("submit"))
+
+        alert = self.page.alert_is_present()
+
+        if alert:
+            alert.dismiss()
 
 
 class Scpx(Sistema):
@@ -86,9 +160,9 @@ class Scpx(Sistema):
     interativos da ANATEL
     """
 
-    def __init__(self, driver, login=None, senha=None, timeout=10):
+    def __init__(self, driver):
 
-        super().__init__(driver, login, senha, timeout)
+        super().__init__(driver)
 
         self.sis = sis_helpers.Scpx
 
@@ -104,7 +178,7 @@ class Scpx(Sistema):
 
         try:
 
-            self._clicar((By.LINK_TEXT, identificador), timeout=timeout)
+            self.page._clicar((By.LINK_TEXT, identificador))
 
         except (NoSuchElementException, TimeoutException):
 
@@ -113,7 +187,7 @@ class Scpx(Sistema):
 
         try:
 
-            self._clicar(h["id_btn_estacao"], timeout=timeout)
+            self.page._clicar(h["id_btn_estacao"])
 
         except (NoSuchElementException, TimeoutException):
 
@@ -142,7 +216,7 @@ class Scpx(Sistema):
 
             return
 
-        self._clicar(btn_id)
+        self.page._clicar(btn_id)
 
     def servico_incluir(
         self, identificador, num_processo, tipo_id="id_cpf", silent=False, timeout=5
@@ -161,12 +235,12 @@ class Scpx(Sistema):
 
             print("Alerta Inesperado")
 
-        self._atualizar_elemento(h.get("id_num_proc"), num_processo)
+        self.page._atualizar_elemento(h.get("id_num_proc"), num_processo)
 
-        self._clicar(h.get("id_btn_corresp"), timeout=timeout)
+        self.page._clicar(h.get("id_btn_corresp"))
 
         if silent:
-            self._clicar(h.get("submit"), timeout=timeout)
+            self.page._clicar(h.get("submit"))
 
     def servico_excluir(
         self, identificador, documento, motivo="Renúncia", tipo_id="id_cpf"
@@ -188,15 +262,15 @@ class Scpx(Sistema):
         if alert:
             alert.dismiss()
 
-        self._clicar(h.get("id_btn_dados_exclusão"))
+        self.page._clicar(h.get("id_btn_dados_exclusão"))
 
-        self._atualizar_elemento(h.get("id_doc_exclusão"), documento)
+        self.page._atualizar_elemento(h.get("id_doc_exclusão"), documento)
 
-        self._selecionar_por_texto(h.get("id_motivo_exclusão"), motivo)
+        self.page._selecionar_por_texto(h.get("id_motivo_exclusão"), motivo)
 
-        self._clicar(h.get("submit"))
+        self.page._clicar(h.get("submit"))
 
-        alert = self.alert_is_present(2)
+        alert = self.page.alert_is_present(2)
 
         if alert:
             alert.dismiss()
@@ -226,25 +300,25 @@ class Scpx(Sistema):
 
         self._navigate(identificador, tipo_id, acoes)
 
-        self._clicar(helper.get("id_btn_dados_estacao"), timeout=timeout)
+        self.page._clicar(helper.get("id_btn_dados_estacao"))
 
-        self._selecionar_por_texto(helper.get("id_uf"), uf, timeout=timeout)
+        self.page._selecionar_por_texto(helper.get("id_uf"), uf)
 
-        alert = self.alert_is_present(timeout=1)
+        alert = self.page.alert_is_present(timeout=1)
 
         if alert:
             alert.dismiss()
 
-        self._atualizar_elemento(helper.get("id_indicativo"), indicativo)
+        self.page._atualizar_elemento(helper.get("id_indicativo"), indicativo)
 
-        self._atualizar_elemento(helper.get("id_seq"), sequencial)
+        self.page._atualizar_elemento(helper.get("id_seq"), sequencial)
 
-        self._selecionar_por_texto(helper.get("id_tipo"), tipo_estacao, timeout=timeout)
+        self.page._selecionar_por_texto(helper.get("id_tipo"), tipo_estacao)
 
         if tipo_estacao == "Fixa" and sede:
-            self._clicar(helper.get("copiar_sede"), timeout=2 * timeout)
+            self.page._clicar(helper.get("copiar_sede"), timeout=2 * timeout)
             sleep(1)
-        self._clicar(helper.get("submit"), timeout=2 * timeout)
+        self.page._clicar(helper.get("submit"), timeout=2 * timeout)
 
     def movimento_transferir(
         self, identificador, origem, dest, proc, tipo_id="id_cpf", timeout=5
@@ -262,7 +336,7 @@ class Scpx(Sistema):
 
         except UnexpectedAlertPresentException:
 
-            alert = self.alert_is_present(2)
+            alert = self.page.alert_is_present(2)
 
             if alert:
                 alert.accept()
@@ -285,37 +359,37 @@ class Scpx(Sistema):
 
             return
 
-        self._selecionar_por_texto(id_atual, text, timeout=timeout)
+        self.page._selecionar_por_texto(id_atual, text)
 
-        self._clicar(helper.get("submit"), timeout=timeout)
+        self.page._clicar(helper.get("submit"))
 
-        if self.check_element_exists(helper.get("id_proc")):
+        if self.page.check_element_exists(helper.get("id_proc")):
             proc = re.sub("[.-/]", "", proc)
 
-            self._atualizar_elemento(helper.get("id_proc"), proc)
+            self.page._atualizar_elemento(helper.get("id_proc"), proc)
 
         id_posterior = helper.get("id_posterior")
 
         if dest.lower() == "e":
 
-            self._selecionar_por_texto(
-                id_posterior, "E - Aprovado / Licença", timeout=timeout
+            self.page._selecionar_por_texto(
+                id_posterior, "E - Aprovado / Licença"
             )
 
         elif dest.lower() == "g":
 
-            self._selecionar_por_texto(
+            self.page._selecionar_por_texto(
                 id_posterior,
                 "G - Cadastro pelo usuário (auto-cadastramento)",
                 timeout=timeout,
             )
 
-            self._atualizar_elemento(
+            self.page._atualizar_elemento(
                 helper.get("id_txt_cancelar"),
                 "Cadastro Incorreto. Estação será refeita com dados corretos",
             )
 
-        self._clicar(helper.get("submit"), timeout=timeout)
+        self.page._clicar(helper.get("submit"))
 
     def movimento_cancelar(
         self, identificador, tipo_id="id_cpf", timeout: int = 10
@@ -333,16 +407,16 @@ class Scpx(Sistema):
 
         except UnexpectedAlertPresentException:
 
-            alert = self.alert_is_present(2)
+            alert = self.page.alert_is_present(2)
 
             if alert:
                 alert.accept()
 
-        self._clicar(helper["id_btn_lista_estacoes"], timeout=timeout / 2)
+        self.page._clicar(helper["id_btn_lista_estacoes"] / 2)
 
-        self._clicar(helper["id_btn_marcar_todos"], timeout=timeout / 2)
+        self.page._clicar(helper["id_btn_marcar_todos"] / 2)
 
-        self._clicar(helper["submit"], timeout=timeout)
+        self.page._clicar(helper["submit"])
 
     def licenciar_estacao(
         self, identificador, tipo_id="id_cpf", ppdess=True, silent=False, timeout=5
@@ -355,25 +429,25 @@ class Scpx(Sistema):
         self._navigate(identificador, tipo_id, acoes)
 
         if tipo_id == "id_cpf":
-            self._clicar(
+            self.page._clicar(
                 (By.LINK_TEXT, strip_string(identificador)),
                 silent=silent,
                 timeout=5 * timeout,
             )
 
         if not ppdess:
-            self._clicar(
-                helper.get("id_btn_lista_estacoes"), timeout=timeout, silent=silent
+            self.page._clicar(
+                helper.get("id_btn_lista_estacoes"), silent=silent
             )
 
-            self._clicar(helper.get("id_btn_licenciar"), timeout=timeout, silent=silent)
+            self.page._clicar(helper.get("id_btn_licenciar"), silent=silent)
 
-            self._clicar(helper["submit"], timeout=2 * timeout)
+            self.page._clicar(helper["submit"], timeout=2 * timeout)
 
-            with self._navega_nova_janela():
-                self._clicar(helper["marcar_todos"], timeout=timeout)
+            with self.page._go_new_win():
+                self.page._clicar(helper["marcar_todos"])
 
-                self._clicar(helper["btn_print"], timeout=timeout)
+                self.page._clicar(helper["btn_print"])
 
     def prorrogar_rf(self, identificador, tipo_id="id_cpf"):
 
@@ -383,11 +457,11 @@ class Scpx(Sistema):
 
         self._navigate(identificador, tipo_id, acoes)
 
-        self._clicar(helper.get("id_btn_dados_estacao"))
+        self.page._clicar(helper.get("id_btn_dados_estacao"))
 
-        self._clicar(helper.get("submit"))
+        self.page._clicar(helper.get("submit"))
 
-        alert = self.alert_is_present(5)
+        alert = self.page.alert_is_present(5)
 
         if alert:
             alert.accept()
@@ -406,13 +480,13 @@ class Scpx(Sistema):
 
             print(repr(e))
 
-        alert = self.alert_is_present(timeout=5)
+        alert = self.page.alert_is_present(timeout=5)
 
         alert.dismiss()
 
-        self._clicar(helper.get("id_btn_lista_estacoes"))
+        self.page._clicar(helper.get("id_btn_lista_estacoes"))
 
-        self._clicar(helper["submit"])
+        self.page._clicar(helper["submit"])
 
     def imprimir_licenca(self, identificador, tipo_id="id_cpf", timeout=5):
 
@@ -422,15 +496,15 @@ class Scpx(Sistema):
 
         self._navigate(identificador, helper, acoes)
 
-        self._clicar(helper["id_btn_imprimir"], timeout=timeout)
+        self.page._clicar(helper["id_btn_imprimir"])
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
 
-        self.consulta(id, tipo_id, timeout=timeout)
+        self.consulta(id, tipo_id)
 
         dados = {}
 
-        source = soup(self.driver.page_source, "lxml")
+        source = soup(self.page.driver.page_source, "lxml")
 
         for tr in source.find_all("tr"):
 
@@ -451,9 +525,9 @@ class Scra(Sistema):
         interativos da ANATEL
     """
 
-    def __init__(self, driver, login="", senha="", timeout=2):
+    def __init__(self, driver):
 
-        super().__init__(driver, login, senha, timeout)
+        super().__init__(driver)
 
         self.sis = sis_helpers.Scra
 
@@ -469,7 +543,7 @@ class Scra(Sistema):
 
         try:
 
-            self._clicar((By.LINK_TEXT, id), timeout=timeout)
+            self.page._clicar((By.LINK_TEXT, id))
 
         except (NoSuchElementException, TimeoutException):
 
@@ -478,7 +552,7 @@ class Scra(Sistema):
 
         try:
 
-            self._clicar(h["id_btn_estacao"], timeout=timeout)
+            self.page._clicar(h["id_btn_estacao"])
 
         except (NoSuchElementException, TimeoutException):
 
@@ -490,7 +564,7 @@ class Scra(Sistema):
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
 
-        self.consulta(id, tipo_id, timeout=timeout)
+        self.consulta(id, tipo_id)
 
         dados = {}
 
@@ -525,12 +599,12 @@ class Scra(Sistema):
 
             print("Alerta Inesperado")
 
-        self._atualizar_elemento(h.get("id_num_proc"), num_processo)
+        self.page._atualizar_elemento(h.get("id_num_proc"), num_processo)
 
-        self._clicar(h.get("id_btn_corresp"), timeout=timeout)
+        self.page._clicar(h.get("id_btn_corresp"))
 
         if silent:
-            self._clicar(h.get("submit"), timeout=timeout)
+            self.page._clicar(h.get("submit"))
 
     def movimento_transferir(
         self, identificador, origem, dest, proc, tipo_id="id_cpf", timeout=5
@@ -548,7 +622,7 @@ class Scra(Sistema):
 
         except UnexpectedAlertPresentException:
 
-            alert = self.alert_is_present(2)
+            alert = self.page.alert_is_present(2)
 
             if alert:
                 alert.accept()
@@ -571,45 +645,45 @@ class Scra(Sistema):
 
             return
 
-        self._selecionar_por_texto(id_atual, text, timeout=timeout)
+        self.page._selecionar_por_texto(id_atual, text)
 
-        self._clicar(helper.get("submit"), timeout=timeout)
+        self.page._clicar(helper.get("submit"))
 
-        if self.check_element_exists(helper.get("id_proc")):
+        if self.page.check_element_exists(helper.get("id_proc")):
             proc = re.sub("[.-/]", "", proc)
 
-            self._atualizar_elemento(helper.get("id_proc"), proc)
+            self.page._atualizar_elemento(helper.get("id_proc"), proc)
 
         id_posterior = helper.get("id_posterior")
 
         if dest.lower() == "e":
 
-            self._selecionar_por_texto(
-                id_posterior, "E - Aprovado / Licença", timeout=timeout
+            self.page._selecionar_por_texto(
+                id_posterior, "E - Aprovado / Licença"
             )
 
         elif dest.lower() == "g":
 
-            self._selecionar_por_texto(
+            self.page._selecionar_por_texto(
                 id_posterior,
                 "G - Cadastro pelo usuário (auto-cadastramento)",
                 timeout=timeout,
             )
 
-            self._atualizar_elemento(
+            self.page._atualizar_elemento(
                 helper.get("id_txt_cancelar"),
                 "Cadastro Incorreto. Estação será refeita com dados corretos",
             )
 
-        self._clicar(helper.get("submit"), timeout=timeout)
+        self.page._clicar(helper.get("submit"))
 
     def extrai_cadastro(self, id, tipo_id="id_cpf", timeout=5):
 
         dados = {}
 
-        if self.consulta(id, tipo_id, timeout=timeout):
+        if self.consulta(id, tipo_id):
 
-            source = soup(self.driver.page_source, "lxml")
+            source = soup(self.page.driver.page_source, "lxml")
 
             i = 1
 
@@ -641,13 +715,13 @@ class Scra(Sistema):
 
         try:
 
-            self._clicar((By.LINK_TEXT, id), timeout=timeout)
+            self.page._clicar((By.LINK_TEXT, id))
 
         except (NoSuchElementException, TimeoutException):
 
             print("Não foi possível navegar para a página de consulta")
 
-        self._clicar(helper["id_btn_imprimir"])
+        self.page._clicar(helper["id_btn_imprimir"])
 
 
 class Sec(Sistema):
@@ -749,11 +823,11 @@ class Sec(Sistema):
 
         if tipo_id == "id_cpf":
 
-            if self.check_element_exists((By.LINK_TEXT, identificador)):
+            if self.page.check_element_exists((By.LINK_TEXT, identificador)):
 
                 try:
 
-                    self._clicar((By.LINK_TEXT, identificador), timeout=timeout)
+                    self.page._clicar((By.LINK_TEXT, identificador))
 
                 except (NoSuchElementException, TimeoutException):
 
@@ -793,15 +867,15 @@ class Sec(Sistema):
                 cpf_resp
             ), "É obrigatório informar o CPF do Responsável para menores de 18 anos"
 
-        self._atualizar_elemento(h["input_nome"], dados["Nome/Razão Social"] + Keys.TAB)
+        self.page._atualizar_elemento(h["input_nome"], dados["Nome/Razão Social"] + Keys.TAB)
 
         for i, (tela, campos) in enumerate(telas.items()):
             for campo in campos:
                 value = dados.get(campo, None)
                 if value:
-                    self._atualizar_elemento(h[campo], value + Keys.TAB)
+                    self.page._atualizar_elemento(h[campo], value + Keys.TAB)
 
-            self._clicar(buttons[i], timeout=timeout)
+            self.page._clicar(buttons[i])
 
         cep = dados.get("CEP", "").replace("-", "")
 
@@ -811,13 +885,13 @@ class Sec(Sistema):
             return response
         try:
 
-            self._clicar(h["submit"], timeout=timeout)
+            self.page._clicar(h["submit"])
 
         except TimeoutException:
 
-            self.driver.execute_script(h["submit_script"])
+            self.page.driver.execute_script(h["submit_script"])
 
-        alert = self.alert_is_present(timeout=timeout)
+        alert = self.page.alert_is_present(timeout=timeout)
 
         if alert:
             if alert.text == h["atualizar_ok"]:
@@ -851,13 +925,13 @@ class Sec(Sistema):
         if source.find_all("label", string="0 - Regular"):
             return True
 
-        self._selecionar_por_texto(h["nova_situacao"], text=situacao, timeout=timeout)
+        self.page._selecionar_por_texto(h["nova_situacao"], text=situacao)
 
-        btn = self.wait_for_element_to_click(h["nova_situacao"], timeout=timeout)
+        btn = self.page.wait_for_element_to_click(h["nova_situacao"])
 
         btn.send_keys(2 * Keys.TAB + Keys.RETURN)
 
-        alert = self.alert_is_present(timeout=timeout)
+        alert = self.page.alert_is_present(timeout=timeout)
 
         if alert:
             if alert.text == h["atualizar_ok"]:
@@ -866,50 +940,50 @@ class Sec(Sistema):
             else:
                 return alert.text
 
-        # self._click_button(h["submit"], timeout=timeout)
+        # self._click_button(h["submit"])
 
-        # self._click_button((By.PARTIAL_LINK_TEXT, "Confirmar"), timeout=timeout)
+        # self._click_button((By.PARTIAL_LINK_TEXT, "Confirmar"))
 
         return None
 
     def _carrega_cep(self, dados: dict, cep: str, h: dict, timeout: int = 5) -> bool:
 
-        self._atualizar_elemento(h["CEP"], cep)
+        self.page._atualizar_elemento(h["CEP"], cep)
 
-        self._clicar(h["bt_cep"], timeout=timeout)
+        self.page._clicar(h["bt_cep"])
 
-        alert = self.alert_is_present(timeout)
+        alert = self.page.alert_is_present(timeout)
 
         if alert:
             return alert.text
 
-        uf = self.wait_for_element(h["UF"])
+        uf = self.page.wait_for_element(h["UF"])
 
         # After clicking the 'bt_cep' button it takes a while until the uf.value attribute is set
         # until then there is no uf.value
         while uf.get_attribute("value") == "":
             sleep(1)
-            uf = self.wait_for_element(h["UF"], timeout=timeout)
+            uf = self.page.wait_for_element(h["UF"])
 
-        logr = self.wait_for_element_to_be_visible(h["Logradouro"], timeout=timeout)
+        logr = self.page.wait_for_element_to_be_visible(h["Logradouro"])
 
         # if the CEP loading didn't retrieve the logradouro, update it manually
         if not logr.get_attribute("value"):
-            self._atualizar_elemento(h["Logradouro"], dados["Logradouro"].title())
+            self.page._atualizar_elemento(h["Logradouro"], dados["Logradouro"].title())
 
-        bairro = self.wait_for_element(h["Bairro"], timeout=timeout)
+        bairro = self.page.wait_for_element(h["Bairro"])
 
         if not bairro.get_attribute("value"):
-            self._atualizar_elemento(h["Bairro"], dados["Bairro"].title())
+            self.page._atualizar_elemento(h["Bairro"], dados["Bairro"].title())
 
         if "Número" not in dados:
             raise ValueError("É obrigatório informar o número do endereço")
 
-        self._atualizar_elemento(h["Número"], dados["Número"])
+        self.page._atualizar_elemento(h["Número"], dados["Número"])
 
         comp = str(dados.get("Complemento", "")).title()
 
-        self._atualizar_elemento(h["Complemento"], comp)
+        self.page._atualizar_elemento(h["Complemento"], comp)
 
         return None
 
@@ -952,21 +1026,21 @@ class Sec(Sistema):
             ), "É obrigatório informar o CPF do Responsável para menores de 18 anos"
 
         if alt_nome:
-            self._clicar(h["bt_alt_razao"], timeout=timeout)
-            self._atualizar_elemento(
+            self.page._clicar(h["bt_alt_razao"])
+            self.page._atualizar_elemento(
                 h["id_novo_nome"], dados["Nome/Razão Social"] + Keys.TAB
             )
             if p_alt is None:
                 p_alt = dados["CNPJ/CPF"]
-            self._atualizar_elemento(h["id_p_altera"], p_alt + Keys.TAB)
+            self.page._atualizar_elemento(h["id_p_altera"], p_alt + Keys.TAB)
 
         for i, (_, campos) in enumerate(telas.items()):
             for campo in campos:
                 value = dados.get(campo, None)
                 if value:
-                    self._atualizar_elemento(h[campo], value + Keys.TAB)
+                    self.page._atualizar_elemento(h[campo], value + Keys.TAB)
 
-            self._clicar(buttons[i], timeout=timeout)
+            self.page._clicar(buttons[i])
 
         cep = dados.get("CEP", "").replace("-", "")
 
@@ -976,13 +1050,13 @@ class Sec(Sistema):
                 return response
         try:
 
-            self._clicar(h["submit"], timeout=timeout)
+            self.page._clicar(h["submit"])
 
         except TimeoutException:
 
-            self.driver.execute_script(h["submit_script"])
+            self.page.driver.execute_script(h["submit_script"])
 
-        alert = self.alert_is_present(timeout=timeout)
+        alert = self.page.alert_is_present(timeout=timeout)
 
         if alert:
             if alert.text == h["atualizar_ok"]:
@@ -998,7 +1072,7 @@ class Sec(Sistema):
 
         response = self._navigate(cpf, h, acoes)
 
-        alert = self.alert_is_present(timeout)
+        alert = self.page.alert_is_present(timeout)
 
         if alert:
             print(alert.text)
@@ -1011,11 +1085,11 @@ class Sec(Sistema):
         else:
             # self._click_button(h["imprimir"])
 
-            imprimir = self.wait_for_element_to_click(h["imprimir"], timeout=timeout)
+            imprimir = self.page.wait_for_element_to_click(h["imprimir"])
 
             imprimir.send_keys(Keys.CONTROL + "p")
 
-        alert = self.alert_is_present(timeout)
+        alert = self.page.alert_is_present(timeout)
 
         if alert:
             alert.accept()
@@ -1061,15 +1135,15 @@ class Sec(Sistema):
 
         h = self.sis.inscricao["incluir"]
 
-        self.driver.get(h["link"])
+        self.page.driver.get(h["link"])
 
-        self._atualizar_elemento(h["id_cpf"], cpf)
+        self.page._atualizar_elemento(h["id_cpf"], cpf)
 
-        self._selecionar_por_texto(h["id_uf"], uf, timeout=timeout)
+        self.page._selecionar_por_texto(h["id_uf"], uf)
 
-        self._selecionar_por_texto(h["id_certificado"], certificado, timeout=timeout)
+        self.page._selecionar_por_texto(h["id_certificado"], certificado)
 
-        self._clicar(h["submit"], timeout=timeout)
+        self.page._clicar(h["submit"])
 
         sleep(timeout)
 
@@ -1077,9 +1151,9 @@ class Sec(Sistema):
 
             assert protocolo is not None, "Forneça o protocolo de Inscrição do Menor"
 
-            self._atualizar_elemento(h["protocolo"], protocolo)
+            self.page._atualizar_elemento(h["protocolo"], protocolo)
 
-        result = self._clicar((By.LINK_TEXT, data), silent=False, timeout=timeout)
+        result = self.page._clicar((By.LINK_TEXT, data), silent=False)
 
         assert (
             result.text
@@ -1096,11 +1170,11 @@ class Sec(Sistema):
 
         link = h["link_direto"].format(num_prova, cpf)
 
-        self.driver.get(link)
+        self.page.driver.get(link)
 
-        self.driver.execute_script(h["alt_reg"])
+        self.page.driver.execute_script(h["alt_reg"])
 
-        self._atualizar_elemento(h["num_reg"], str(num_registros) + Keys.RETURN)
+        self.page._atualizar_elemento(h["num_reg"], str(num_registros) + Keys.RETURN)
 
         sleep(timeout)
 
@@ -1110,33 +1184,33 @@ class Sec(Sistema):
 
         for v in nomes[start:end]:
 
-            self.driver.get(v.link)
+            self.page.driver.get(v.link)
 
-            alert = self.alert_is_present(timeout=timeout)
+            alert = self.page.alert_is_present(timeout=timeout)
 
             if alert:
 
                 alert.accept()
 
-                self._atualizar_elemento(h["justificativa"], "Erro de Impressão")
+                self.page._atualizar_elemento(h["justificativa"], "Erro de Impressão")
 
-                self.driver.execute_script("gravarReimprimirProva();")
+                self.page.driver.execute_script("gravarReimprimirProva();")
 
-                alert = self.alert_is_present(timeout=timeout)
+                alert = self.page.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.accept()
 
                 sleep(2)
 
-                self.driver.execute_script("reimprimirprova();")
+                self.page.driver.execute_script("reimprimirprova();")
 
-                alert = self.alert_is_present(timeout=timeout)
+                alert = self.page.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.accept()
 
-                alert = self.alert_is_present(timeout=timeout)
+                alert = self.page.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.dismiss()
@@ -1144,9 +1218,9 @@ class Sec(Sistema):
             else:
                 # self._click_button(h['id_bt_imprimir'], timeout =10)
 
-                self.driver.execute_script("imprimirprova();")
+                self.page.driver.execute_script("imprimirprova();")
 
-                alert = self.alert_is_present(timeout=timeout)
+                alert = self.page.alert_is_present(timeout=timeout)
 
                 if alert:
                     alert.accept()
@@ -1189,7 +1263,7 @@ class Sec(Sistema):
 
             return [l.text.strip().strip(":") for l in labels]
 
-        self.consulta(id, tipo_id, timeout=timeout)
+        self.consulta(id, tipo_id)
 
         source = soup(self.driver.page_source, "lxml")
 
@@ -1252,9 +1326,9 @@ class Slmm(Sistema):
     interativos da ANATEL
     """
 
-    def __init__(self, driver, login=None, senha=None, timeout=10):
+    def __init__(self, driver):
 
-        super().__init__(driver, login, senha, timeout)
+        super().__init__(driver)
 
         self.sis = sis_helpers.Slmm
 
@@ -1266,11 +1340,9 @@ class Slmm(Sistema):
 
         self._navigate(identificador, tipo_id, acoes)
 
-        identificador = functions.strip_string(identificador)
-
         try:
 
-            self._click_button(h["id_btn_estacao"], timeout=timeout)
+            self.page._clicar(h["id_btn_estacao"])
 
         except (NoSuchElementException, TimeoutException):
 
@@ -1297,34 +1369,97 @@ class Slmm(Sistema):
 
             print("Alerta Inesperado")
 
-        alert = self.alert_is_present(2)
+        alert = self.page.alert_is_present()
 
         if alert:
             alert.dismiss()
 
-        proc = self.wait_for_element(h.get("id_num_proc"), timeout=timeout)
+        proc = self.page.wait_for_element(h.get("id_num_proc"))
 
-        if self.check_element_exists(h.get("id_num_proc")):
-            self._atualizar_elemento(h.get("id_num_proc"), num_proc)
+        if self.page.check_element_exists(h.get("id_num_proc")):
+            self.page._atualizar_elemento(h.get("id_num_proc"), num_proc)
 
-        self._click_button(h.get("id_btn_dados_exclusão"), timeout=timeout)
+        self.page._clicar(h.get("id_btn_dados_exclusão"))
 
-        self._atualizar_elemento(h.get("id_doc_exclusão"), documento)
+        self.page._atualizar_elemento(h.get("id_doc_exclusão"), documento)
 
-        self._selecionar_por_texto(h.get("id_motivo_exclusão"), motivo, timeout=timeout)
+        self.page._selecionar_por_texto(h.get("id_motivo_exclusão"), motivo)
 
-        self._click_button(h.get("submit"), timeout=timeout)
+        print(self.page._clicar(h.get("submit"), False))
+        #
+        # alert = self.page.alert_is_present()
+        #
+        # if alert:
+        #     alert.dismiss()
 
-        alert = self.alert_is_present(2)
+class Slma(Sistema):
+    def __init__(self, driver):
+
+        super().__init__(driver)
+
+        self.sis = sis_helpers.Slma
+
+    def consulta(self, identificador, tipo_id="id_cpf", timeout=5):
+
+        h = self.sis.consulta
+
+        acoes = self._get_acoes(h, ("link", tipo_id, None))  # 'submit'))
+
+        self._navigate(identificador, tipo_id, acoes)
+
+        try:
+
+            self.page._clicar(h["id_btn_estacao"])
+
+        except (NoSuchElementException, TimeoutException):
+
+            print("Não há registro para o identificador informado")
+
+    def servico_excluir(
+        self,
+        identificador,
+        documento,
+        motivo="Renúncia",
+        tipo_id="id_cpf",
+        num_proc=None
+    ):
+
+        h = self.sis.servico
+
+        acoes = self._get_acoes(h, ("excluir", tipo_id, "submit"))
+
+        try:
+            self._navigate(identificador, tipo_id, acoes)
+
+        except UnexpectedAlertPresentException:
+
+            print("Alerta Inesperado")
+
+        alert = self.page.alert_is_present()
 
         if alert:
             alert.dismiss()
 
+        if self.page.check_element_exists(h.get("id_num_proc")):
+            self.page._atualizar_elemento(h.get("id_num_proc"), num_proc)
+
+        self.page._clicar(h.get("id_btn_dados_exclusão"))
+
+        self.page._atualizar_elemento(h.get("id_doc_exclusão"), documento)
+
+        self.page._selecionar_por_texto(h.get("id_motivo_exclusão"), motivo)
+
+        self.page._clicar(h.get("submit"))
+
+        alert = self.page.alert_is_present()
+
+        if alert:
+            alert.dismiss()
 
 class Sigec(Sistema):
-    def __init__(self, driver, login="", senha="", timeout=2):
+    def __init__(self, driver):
 
-        super().__init__(driver, login, senha, timeout)
+        super().__init__(driver)
 
         self.sis = sis_helpers.Sigec
 
@@ -1385,7 +1520,7 @@ class Boleto(Sistema):
 
             input_ = h["input_cpf"]
 
-            self._clicar(h[tipo_id], timeout=timeout)
+            self._clicar(h[tipo_id])
 
         elif tipo_id == "id_fistel":
 
@@ -1395,11 +1530,11 @@ class Boleto(Sistema):
 
         self._atualizar_elemento(h["input_data"], functions.last_day_of_month())
 
-        self._clicar(h["submit"], timeout=timeout)
+        self._clicar(h["submit"])
 
-        self._clicar(h["marcar_todos"], timeout=timeout)
+        self._clicar(h["marcar_todos"])
 
-        self._clicar(h["btn_print"], timeout=timeout)
+        self._clicar(h["btn_print"])
 
 
 def abrir_agenda_prova(sec, datas):

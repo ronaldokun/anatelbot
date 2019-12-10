@@ -9,13 +9,14 @@ from typing import Any, Dict
 # Other Helpful Libs
 import unidecode
 from bs4 import BeautifulSoup as soup
+
 # Selenium Dependencies
 from selenium.common.exceptions import (
-    WebDriverException,
     JavascriptException,
     NoAlertPresentException,
     NoSuchElementException,
     TimeoutException,
+    WebDriverException,
 )
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -25,6 +26,7 @@ from selenium.webdriver.support.ui import Select
 # Others modules from this package
 from tool.functions import add_point_cpf_cnpj, get_browser
 from tool.page import Page
+
 from . import config
 from .common import armazena_tags, cria_dict_acoes, pode_expedir, string_endereço
 
@@ -35,8 +37,13 @@ Processos = Dict[str, Any]
 # TODO: Select Normal/Teste
 # noinspection PyProtectedMember,PyProtectedMember,PyProtectedMember
 def login_sei(
-        usr: str, pwd: str, browser: str = None, timeout: int = 10, teste: bool = False,
-is_headless: bool = False) -> "Sei":
+    usr: str,
+    pwd: str,
+    browser: str = None,
+    timeout: int = 10,
+    teste: bool = False,
+    is_headless: bool = False,
+) -> "Sei":
     """
     Esta função recebe uma string com o nome do webdriver, e as credenciais
     do usuário, loga no SEI - ANATEL e retorna uma instância da classe
@@ -56,7 +63,7 @@ is_headless: bool = False) -> "Sei":
     except WebDriverException as e:
         print("Problema ao carregar a página")
         repr(e)
-        return 
+        return
     page.driver.maximize_window()
 
     page._atualizar_elemento(helper.get("log"), usr)
@@ -73,12 +80,11 @@ class Sei:
     """
 
     def __init__(
-            self, page: Page, processos: Processos = None, teste: bool = False
+        self, page: Page, processos: Processos = None, teste: bool = False
     ) -> None:
         self.teste = teste
         self.page = page
         self._processos = processos if processos is not None else OrderedDict()
-
 
     # noinspection PyProtectedMember
     def mudar_lotação(self, lotação: str) -> None:
@@ -160,7 +166,7 @@ class Sei:
         else:
             self.page._clicar(helper.MASCULINO)
 
-        #TODO: Criar função auxiliar page.atualizar_elementos
+        # TODO: Criar função auxiliar page.atualizar_elementos
 
         self.page._atualizar_elemento(helper.NOME, dados.get("Nome/Razão Social", ""))
 
@@ -334,7 +340,6 @@ class Sei:
 
             self.go("")
 
-
     def show_lat_menu(self):
         """
         Exibe o Menu Lateral á Esquerda no SEI para acessos aos seus diversos
@@ -493,7 +498,7 @@ class Processo(Sei):
     def _acoes_central_frame(self):
 
         assert (
-                self.page.get_title() == config.Proc_incluir.TITLE
+            self.page.get_title() == config.Proc_incluir.TITLE
         ), "Erro ao navegar para o processo"
 
         with self._go_to_central_frame():
@@ -509,24 +514,27 @@ class Processo(Sei):
 
             return cria_dict_acoes(acoes)
 
-    def _get_acoes(self, doc=None):
+    def _get_acoes(self, doc=None, click=True):
 
         # O comportamento padrão é extrair as ações do Processo Pai
-        if doc is None:
+        if click:
+            if doc is None:
+                self._click_na_arvore(self.numero)
 
-            self._click_na_arvore(self.numero)
-
-        else:
-
-            self._click_na_arvore(doc)
+            else:
+                self._click_na_arvore(doc)
 
         return self._acoes_central_frame()
 
     def _info_unidades(self):
-        self._get_acoes()
+        #self._get_acoes()
         with self._go_to_central_frame():
             source = soup(self.page.driver.page_source, "lxml")
-            return source.find("div", id="divInformacao")
+            result = source.find("div", id="divInformacao")
+            if hasattr(result, 'text'):
+                return result.text
+            else:
+                ""
 
     def is_open(self, setor: str = None):
         info_unidades = self._info_unidades()
@@ -538,6 +546,21 @@ class Processo(Sei):
 
     def close_processo(self):
         self.page.fechar()
+
+    def concluir_processo(self):
+
+        assert (
+                self.page.get_title() == config.Proc_incluir.TITLE
+        ), "Erro ao navegar para o processo"
+
+        concluir = self._get_acoes(click=False).get("Concluir Processo")
+
+        if concluir is not None:
+            with self._go_to_central_frame():
+                self.page._clicar(concluir)
+
+
+    #todo: Implementar click_central_frame
 
     @contextmanager
     def _go_to_arvore(self):
@@ -643,7 +666,7 @@ class Processo(Sei):
     def info_oficio(self, num_doc):
 
         assert (
-                self.page.get_title() == config.Proc_incluir.TITLE
+            self.page.get_title() == config.Proc_incluir.TITLE
         ), "Erro ao navegar para o processo"
 
         # Switch to tree frame
@@ -660,11 +683,12 @@ class Processo(Sei):
             self.page.driver.switch_to_default_content()
 
             return info
+
     # TODO: Mudar verificação para bs4
     # TODO: Criar helper para verificação bs4 DRY principle
     def update_andamento(self, buttons, info):
         assert (
-                self.page.get_title() == config.Proc_incluir.TITLE
+            self.page.get_title() == config.Proc_incluir.TITLE
         ), "Erro ao navegar para o processo"
 
         andamento = buttons[4]
@@ -684,13 +708,14 @@ class Processo(Sei):
         self.page.fechar()
 
         self.page.driver.switch_to.window(proc_window)
+
     # TODO: Update to bs4 and to use page methods
     # TODO: Replicate logic of send_doc_por_email
     def send_proc_to_sede(self, buttons):
 
         with self.page.wait_for_page_load():
             assert (
-                    self.page.get_title() == config.Proc_incluir.TITLE
+                self.page.get_title() == config.Proc_incluir.TITLE
             ), "Erro na função 'send_proc_to_sede"
 
             enviar = buttons[3]
@@ -703,7 +728,7 @@ class Processo(Sei):
 
         with self.page.wait_for_page_load():
             assert (
-                    self.page.get_title() == config.Envio.TITLE
+                self.page.get_title() == config.Envio.TITLE
             ), "Erro ao clicar no botão 'Enviar Processo'"
 
             self.page.driver.execute_script(config.Envio.LUPA)
@@ -717,7 +742,7 @@ class Processo(Sei):
             self.page.driver.switch_to.window(janela_unidades)
 
         assert (
-                self.page.get_title() == config.Envio.UNIDS
+            self.page.get_title() == config.Envio.UNIDS
         ), "Erro ao clicar na lupa 'Selecionar Unidades'"
 
         unidade = self.page.wait_for_element(config.Envio.IN_SIGLA)
@@ -729,7 +754,7 @@ class Processo(Sei):
         sede = self.page.wait_for_element(config.Envio.ID_SEDE)
 
         assert (
-                sede.get_attribute("title") == config.Envio.SEDE
+            sede.get_attribute("title") == config.Envio.SEDE
         ), "Erro ao selecionar a Unidade Protocolo.Sede para envio"
 
         sede.click()
@@ -991,11 +1016,12 @@ class Processo(Sei):
             )
 
     def incluir_doc_sei(
-            self, tipo:str, txt_inicial:str, acesso="publico", hipotese=None):
+        self, tipo: str, txt_inicial: str, acesso="publico", hipotese=None
+    ):
 
         txt = unidecode.unidecode(txt_inicial).lower()
 
-        assert txt in ('modelo', 'padrao','nenhum'),  f"Opção Inválida: {txt_inicial}"
+        assert txt in ("modelo", "padrao", "nenhum"), f"Opção Inválida: {txt_inicial}"
 
         helper = config.Gerar_Doc.oficio
 
@@ -1007,7 +1033,6 @@ class Processo(Sei):
         self.page._clicar(helper.get("id_txt_padrao"))
 
         self.page._selecionar_por_texto(helper.get("id_modelos"), tipo)
-
 
         if acesso == "publico":
 
@@ -1044,7 +1069,8 @@ class Processo(Sei):
         self.page.driver.get(self.link)
 
     def incluir_oficio(
-            self, tipo, dados=None, anexo=False, acesso="publico", hipotese=None):
+        self, tipo, dados=None, anexo=False, acesso="publico", hipotese=None
+    ):
 
         # TODO:Inclui anexo
 
@@ -1058,7 +1084,6 @@ class Processo(Sei):
         self.page._clicar(helper.get("id_txt_padrao"))
 
         self.page._selecionar_por_texto(helper.get("id_modelos"), tipo)
-
 
         if acesso == "publico":
 
@@ -1098,14 +1123,14 @@ class Processo(Sei):
         pass
 
     def incluir_doc_externo(
-            self,
-            tipo,
-            path,
-            arvore="",
-            formato="nato",
-            acesso="publico",
-            hipotese=None,
-            timeout=5,
+        self,
+        tipo,
+        path,
+        arvore="",
+        formato="nato",
+        acesso="publico",
+        hipotese=None,
+        timeout=5,
     ):
 
         helper = config.Gerar_Doc.doc_externo
@@ -1214,31 +1239,31 @@ class Processo(Sei):
 
         # selfpage.fechar()
 
-    def concluir_processo(self):
-
-        excluir = self._get_acoes().get("Concluir Processo").strip()
-
-        assert (
-                excluir is not None
-        ), "A ação 'Concluir Processo não foi armazenada, verfique as ações do Processo"
-
-        # Switch to central frame
-        self.page.driver.switch_to_frame("ifrVisualizacao")
-
-        try:
-
-            self.page.driver.execute_script(excluir)
-
-        except JavascriptException as e:
-
-            print("One exception was catched: {}".format(repr(e)))
-
-            alert = self.page.alert_is_present()
-
-            if alert:
-                alert.accept()
-
-            self.page.driver.switch_to_default_content()
+    # def concluir_processo(self):
+    #
+    #     excluir = self._get_acoes().get("Concluir Processo").strip()
+    #
+    #     assert (
+    #         excluir is not None
+    #     ), "A ação 'Concluir Processo não foi armazenada, verfique as ações do Processo"
+    #
+    #     # Switch to central frame
+    #     self.page.driver.switch_to_frame("ifrVisualizacao")
+    #
+    #     try:
+    #
+    #         self.page.driver.execute_script(excluir)
+    #
+    #     except JavascriptException as e:
+    #
+    #         print("One exception was catched: {}".format(repr(e)))
+    #
+    #         alert = self.page.alert_is_present()
+    #
+    #         if alert:
+    #             alert.accept()
+    #
+    #         self.page.driver.switch_to_default_content()
 
 
 def armazena_bloco(sei, numero):

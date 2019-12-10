@@ -44,11 +44,7 @@ class Sistema:
             alert.accept()
 
     def _navigate(
-        self,
-        identificador: str,
-        tipo_id: str,
-        acoes: tuple,
-        silent: bool = True
+        self, identificador: str, tipo_id: str, acoes: tuple, silent: bool = True
     ):
         """Check id and tipo_id consistency and navigate to link
 
@@ -372,9 +368,7 @@ class Scpx(Sistema):
 
         if dest.lower() == "e":
 
-            self.page._selecionar_por_texto(
-                id_posterior, "E - Aprovado / Licença"
-            )
+            self.page._selecionar_por_texto(id_posterior, "E - Aprovado / Licença")
 
         elif dest.lower() == "g":
 
@@ -436,9 +430,7 @@ class Scpx(Sistema):
             )
 
         if not ppdess:
-            self.page._clicar(
-                helper.get("id_btn_lista_estacoes"), silent=silent
-            )
+            self.page._clicar(helper.get("id_btn_lista_estacoes"), silent=silent)
 
             self.page._clicar(helper.get("id_btn_licenciar"), silent=silent)
 
@@ -658,9 +650,7 @@ class Scra(Sistema):
 
         if dest.lower() == "e":
 
-            self.page._selecionar_por_texto(
-                id_posterior, "E - Aprovado / Licença"
-            )
+            self.page._selecionar_por_texto(id_posterior, "E - Aprovado / Licença")
 
         elif dest.lower() == "g":
 
@@ -867,7 +857,9 @@ class Sec(Sistema):
                 cpf_resp
             ), "É obrigatório informar o CPF do Responsável para menores de 18 anos"
 
-        self.page._atualizar_elemento(h["input_nome"], dados["Nome/Razão Social"] + Keys.TAB)
+        self.page._atualizar_elemento(
+            h["input_nome"], dados["Nome/Razão Social"] + Keys.TAB
+        )
 
         for i, (tela, campos) in enumerate(telas.items()):
             for campo in campos:
@@ -1392,6 +1384,7 @@ class Slmm(Sistema):
         # if alert:
         #     alert.dismiss()
 
+
 class Slma(Sistema):
     def __init__(self, driver):
 
@@ -1421,7 +1414,7 @@ class Slma(Sistema):
         documento,
         motivo="Renúncia",
         tipo_id="id_cpf",
-        num_proc=None
+        num_proc=None,
     ):
 
         h = self.sis.servico
@@ -1455,6 +1448,7 @@ class Slma(Sistema):
 
         if alert:
             alert.dismiss()
+
 
 class Sigec(Sistema):
     def __init__(self, driver):

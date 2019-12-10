@@ -6,7 +6,7 @@ Created on Mon Aug 28 20:19:59 2017
 @author: ronaldo
 """
 
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 
 from selenium.webdriver.common.by import By
 
@@ -69,7 +69,6 @@ DADOS = OrderedDict(
         ],
     }
 )
-
 
 
 class Sapiens(object):
@@ -586,8 +585,10 @@ class Slmm(object):
         "submit": (By.ID, "botaoFlatConfirmar"),
     }
 
-    Licenca = {"imprimir": "http://sistemasnet/stel/SCMM/LicencaImprimir/Tela.asp?SISQSmodulo=7766"
+    Licenca = {
+        "imprimir": "http://sistemasnet/stel/SCMM/LicencaImprimir/Tela.asp?SISQSmodulo=7766"
     }
+
 
 class Slma(object):
 
@@ -620,9 +621,9 @@ class Slma(object):
         "submit": (By.ID, "botaoFlatConfirmar"),
     }
 
-    Licenca = {"imprimir": "http://sistemasnet/stel/SCMA/LicencaImprimir/Tela.asp?SISQSmodulo=7766"
+    Licenca = {
+        "imprimir": "http://sistemasnet/stel/SCMA/LicencaImprimir/Tela.asp?SISQSmodulo=7766"
     }
-
 
 
 class Sigec(object):
@@ -644,4 +645,3 @@ class Sigec(object):
     fistel = (By.ID, "NumFistel")
 
     Consulta = {"id_confirmar": (By.ID, "botaoFlatConfirmar")}
-

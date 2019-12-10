@@ -47,7 +47,6 @@ class Page:
     def __init__(self, driver: webdriver):
         self.driver = driver
 
-
     def restart_driver(self, **kwargs) -> None:
         """Restarts webdriver instance
         """
@@ -97,7 +96,7 @@ class Page:
             return True
 
     def _clicar_se_existir(
-            self, btn_id: Elem, silent: bool = True
+        self, btn_id: Elem, silent: bool = True
     ) -> Union[str, None, Any]:
         if self.check_element_exists(btn_id):
             return self._clicar(btn_id, silent)

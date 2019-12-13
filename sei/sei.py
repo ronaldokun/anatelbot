@@ -7,7 +7,7 @@ from time import sleep
 from typing import Any, Dict
 
 # Other Helpful Libs
-import unidecode
+#import unidecode
 from bs4 import BeautifulSoup as soup
 
 # Selenium Dependencies
@@ -24,8 +24,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
 # Others modules from this package
-from tool.functions import add_point_cpf_cnpj, get_browser
-from tool.page import Page
+from ..tools.functions import add_point_cpf_cnpj, get_browser
+from ..tools.page import Page
 
 from . import config
 from .common import armazena_tags, cria_dict_acoes, pode_expedir, string_endereço
@@ -43,7 +43,7 @@ def login_sei(
     timeout: int = 10,
     teste: bool = False,
     is_headless: bool = False,
-) -> "Sei":
+) -> Union["Sei", None]:
     """
     Esta função recebe uma string com o nome do webdriver, e as credenciais
     do usuário, loga no SEI - ANATEL e retorna uma instância da classe
@@ -63,7 +63,7 @@ def login_sei(
     except WebDriverException as e:
         print("Problema ao carregar a página")
         repr(e)
-        return
+        return None
     page.driver.maximize_window()
 
     page._atualizar_elemento(helper.get("log"), usr)
@@ -97,7 +97,7 @@ class Sei:
         self._processos = OrderedDict((p["numero"], p) for p in processos)
 
     # TODO: generalize
-    # noinspection PyProtectedMember,PyProtectedMember,PyProtectedMember
+    # DEPRECATED
     def pesquisa_contato(self, termo: str):
         """Pesquisa a existência de cadastro de contato `nome`
 
@@ -106,7 +106,7 @@ class Sei:
         """
         helper = config.Contato
 
-        termo = unidecode._unidecode(termo)
+        #termo = unidecode._unidecode(termo)
 
         if self.page.get_title() != helper.TITLE:
             with self.page.wait_for_page_load():
@@ -520,18 +520,18 @@ class Processo(Sei):
         if click:
             if doc is None:
                 self._click_na_arvore(self.numero)
-
             else:
                 self._click_na_arvore(doc)
 
         return self._acoes_central_frame()
 
-    def _info_unidades(self):
-        #self._get_acoes()
+    #TODO: Retornar lista de setores e atribuições
+    def _info_unidades(self)->str:
+        # self._get_acoes()
         with self._go_to_central_frame():
             source = soup(self.page.driver.page_source, "lxml")
             result = source.find("div", id="divInformacao")
-            if hasattr(result, 'text'):
+            if hasattr(result, "text"):
                 return result.text
             else:
                 ""
@@ -539,10 +539,8 @@ class Processo(Sei):
     def is_open(self, setor: str = None):
         info_unidades = self._info_unidades()
         if setor is not None:
-            return info_unidades.find(string=setor)
-        if hasattr(info_unidades, "text"):
-            return info_unidades.text
-        return False
+            return setor in info_unidades
+        return info_unidades
 
     def close_processo(self):
         self.page.fechar()
@@ -550,7 +548,7 @@ class Processo(Sei):
     def concluir_processo(self):
 
         assert (
-                self.page.get_title() == config.Proc_incluir.TITLE
+            self.page.get_title() == config.Proc_incluir.TITLE
         ), "Erro ao navegar para o processo"
 
         concluir = self._get_acoes(click=False).get("Concluir Processo")
@@ -559,8 +557,20 @@ class Processo(Sei):
             with self._go_to_central_frame():
                 self.page._clicar(concluir)
 
+    def abrir_processo(self):
 
-    #todo: Implementar click_central_frame
+        assert (
+                self.page.get_title() == config.Proc_incluir.TITLE
+        ), "Erro ao navegar para o processo"
+
+        abrir = self._get_acoes(click=False).get("Reabrir Processo")
+
+        if abrir is not None:
+            with self._go_to_central_frame():
+                self.page._clicar(abrir)
+
+
+    # todo: Implementar click_central_frame
 
     @contextmanager
     def _go_to_arvore(self):
@@ -613,7 +623,6 @@ class Processo(Sei):
             if label in k:
                 with self._go_to_arvore():
                     self.page._clicar((By.ID, v["id"]))
-
                 return
 
         else:
@@ -643,25 +652,24 @@ class Processo(Sei):
 
         if env_email:
             with self._go_to_central_frame():
-                with self.page._go_new_win():
-                    self.page._click_button_new_win(env_email)
+                self.page._clicar(env_email)
 
-                    destinatario, assunto, mensagem = dados
+                destinatario, assunto, mensagem = dados
 
-                    self.page._atualizar_elemento(
-                        helper.get("destinatario"), destinatario
-                    )
+                self.page._atualizar_elemento(
+                    helper.get("destinatario"), destinatario
+                )
 
-                    self.page._atualizar_elemento(helper.get("assunto"), assunto)
+                self.page._atualizar_elemento(helper.get("assunto"), assunto)
 
-                    self.page._selecionar_por_texto(helper.get("mensagem"), mensagem)
+                self.page._selecionar_por_texto(helper.get("mensagem"), mensagem)
 
-                    # After putting the email, we must validate ir by clicking it or pressing ENTER
-                    self.page._atualizar_elemento(
-                        helper["destinatario"], 2 * Keys.ENTER
-                    )
+                # After putting the email, we must validate it by clicking it or pressing ENTER
+                self.page._atualizar_elemento(
+                    helper["destinatario"], 2 * Keys.ENTER
+                )
 
-                    self.page._clicar(helper.get("enviar"))
+                self.page._clicar(helper.get("enviar"))
 
     def info_oficio(self, num_doc):
 
@@ -1019,7 +1027,9 @@ class Processo(Sei):
         self, tipo: str, txt_inicial: str, acesso="publico", hipotese=None
     ):
 
-        txt = unidecode.unidecode(txt_inicial).lower()
+        #txt = unidecode.unidecode(txt_inicial).lower()
+
+        txt = txt_inicial.lower()
 
         assert txt in ("modelo", "padrao", "nenhum"), f"Opção Inválida: {txt_inicial}"
 

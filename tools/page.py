@@ -27,7 +27,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
 # Local application imports
-from tool.functions import get_browser
+from .functions import get_browser
 
 Elem = Tuple[Any, str]
 
@@ -140,7 +140,7 @@ class Page:
 
             lista.select_by_visible_text(text)
 
-        except NoSuchElementException as e:
+        except NoSuchElementException:
             print(f"Não existe a opção {text} no Menu mencionado")
 
         alerta = self.alert_is_present()
@@ -286,7 +286,7 @@ class Page:
         self.driver.get(link)
 
         return None
-
+    @_go_new_win
     def _click_button_new_win(self, btn_id: Elem, silent: bool = True):
         """               
 
@@ -298,5 +298,5 @@ class Page:
             Método auxiliar para clicar num elemento da página que abre uma nova janela. Muda o foco para
             a nova janela.
         """
-        with self._go_new_win():
-            self._clicar(btn_id=btn_id, silent=silent)
+
+        self._clicar(btn_id=btn_id, silent=silent)

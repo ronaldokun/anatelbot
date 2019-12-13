@@ -65,10 +65,8 @@ def get_browser(browser: str = "Chrome", is_headless: bool = False):
     e com o navegador logado na rede da Anatel
 
     Args:
+        is_headless (bool): [Parâmetro para usar o browser de maneira oculta]. Defaults to False.
         browser (str, optional): [String com o nome do navegador]. Defaults to "Chrome".
-        login (str, optional): [Nome do Usuário]. Defaults to None.
-        senha (str, optional): [Senha do Usuário]. Defaults to None.
-        timeout (int, optional): [Tempo máximo de espera na navegação]. Defaults to 10.
 
     Returns:
         [webdriver]: [Webdriver instance]
@@ -179,33 +177,9 @@ def transform_date(date):
     return formated
 
 
-# TODO: Remove
-def lastRow(ws, col=2):
-    """ Find the last row in the worksheet that contains data.
-
-    idx: Specifies the worksheet to select. Starts counting from zero.
-
-    workbook: Specifies the workbook
-
-    col: The column in which to look for the last cell containing data.
-    """
-
-    # ws = workbook.sheets[idx]
-
-    lwr_r_cell = ws.cells.last_cell  # lower right cell
-    lwr_row = lwr_r_cell.row  # row of the lower right cell
-    lwr_cell = ws.range((lwr_row, col))  # change to your specified column
-
-    if lwr_cell.value is None:
-        lwr_cell = lwr_cell.end("up")  # go up untill you hit a non-empty cell
-
-    return lwr_cell.row
-
-
 def extrai_pares_tabulação(source):
     trs = source.find_all("tr")
     dados = {}
-    i = 1
     for tr in trs:
         td = tr.find_all("td", string=True)
         label = tr.find_all("label", string=True)
@@ -221,6 +195,7 @@ def extrai_pares_tabulação(source):
 
 
 def add_point_cpf_cnpj(ident):
+
     ident = strip_string(ident)
 
     while len(ident) < 11:
@@ -231,3 +206,30 @@ def add_point_cpf_cnpj(ident):
 
     if len(ident) == 14:
         return f"{ident[:2]}.{ident[2:5]}.{ident[5:8]}/{ident[8:12]}-{ident[12:]}"
+
+
+def string_endereço(dados):
+    d = {}
+
+    s = 'A(o)<br>'
+
+    s += dados["Nome/Razão Social"].title()
+
+    s += '<br>' + dados["Logradouro"].title() + ", " + dados["Número"] + " "
+
+    s += dados["Complemento"].title() + " "
+
+    s += dados["Bairro"].title() + '<br>'
+
+    s += "CEP: " + dados["Cep"] + " - " + dados["Município"].title() + " - " + dados["UF"]
+
+    s += "<br><br>" + "<b>FISTEL: " + dados["Número Fistel"] + "</b>"
+
+    s += "<br><br>" + "<b>Validade: " + dados["Validade Radiofreqüência"] + "</b>"
+
+    d["À"] = s
+
+    # d[r'vencem(ram)'] = 'vencem(ram) em {0}'.format(dado['Validade Radiofreqüência'])
+
+    return d
+

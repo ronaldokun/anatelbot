@@ -4,10 +4,10 @@ import re
 from collections import OrderedDict
 from contextlib import contextmanager
 from time import sleep
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 # Other Helpful Libs
-#import unidecode
+# import unidecode
 from bs4 import BeautifulSoup as soup
 
 # Selenium Dependencies
@@ -23,9 +23,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
+from . import context
+
 # Others modules from this package
-from ..tools.functions import add_point_cpf_cnpj, get_browser
-from ..tools.page import Page
+from tools.functions import add_point_cpf_cnpj, get_browser
+from tools.page import Page
 
 from . import config
 from .common import armazena_tags, cria_dict_acoes, pode_expedir, string_endereço
@@ -106,7 +108,7 @@ class Sei:
         """
         helper = config.Contato
 
-        #termo = unidecode._unidecode(termo)
+        # termo = unidecode._unidecode(termo)
 
         if self.page.get_title() != helper.TITLE:
             with self.page.wait_for_page_load():
@@ -438,28 +440,41 @@ class Sei:
         if not self.page._clicar_se_existir(("link text", str(numero))):
             print(f"O Bloco de Assinatura {numero} não existe ou está concluído!")
 
-    def cria_processo(self, tipo, desc="", inter="", nivel="público"):
+    def criar_processo(
+        self,
+        tipo,
+        especificacao="",
+        interessado="",
+        obs="",
+        nivel="público",
+        salvar: bool = False,
+    ):
         tipo = str(tipo)
 
-        assert tipo in config.Criar_Processo.PROCS, print(
+        assert tipo in config.Iniciar_Processo.PROCS, print(
             "O tipo de processo digitado {0}, não é válido".format(str(tipo))
         )
 
-        helper = config.Proc_incluir
+        helper = config.Iniciar_Processo
 
         self.show_lat_menu()
 
         self.page._clicar(config.Sei_Menu.INIT_PROC)
 
-        self.page._clicar(config.Criar_Processo.FILTRO)
+        self.page._clicar(config.Iniciar_Processo.EXIBE_ALL)
 
         self.page._clicar((By.LINK_TEXT, tipo))
 
-        if desc:
-            self.page._clicar(helper.ESPEC)
+        if especificacao:
+            self.page._atualizar_elemento(helper.ESPEC, especificacao)
 
-        if inter:
-            self.pesquisa_contato(inter)
+        if interessado:
+
+            with self.page._click_button_new_win(helper.LUPA["el"]):
+                pass
+
+        if obs:
+            self.page._atualizar_elemento(helper.OBS, obs)
 
         if nivel == "público":
             self.page._clicar(helper.PUBL)
@@ -469,6 +484,13 @@ class Sei:
 
         else:
             self.page._clicar(helper.SIG)
+
+        if salvar:
+
+            try:
+                self.page._clicar(helper.SALVAR["el"])
+            except (TimeoutException, NoSuchElementException):
+                self.page.driver.execute_script(helper.SALVAR["js"])
 
 
 class Processo(Sei):
@@ -498,7 +520,7 @@ class Processo(Sei):
     def _acoes_central_frame(self):
 
         assert (
-            self.page.get_title() == config.Proc_incluir.TITLE
+            self.page.get_title() == config.Iniciar_Processo.TITLE
         ), "Erro ao navegar para o processo"
 
         with self._go_to_central_frame():
@@ -525,8 +547,8 @@ class Processo(Sei):
 
         return self._acoes_central_frame()
 
-    #TODO: Retornar lista de setores e atribuições
-    def _info_unidades(self)->str:
+    # TODO: Retornar lista de setores e atribuições
+    def _info_unidades(self) -> str:
         # self._get_acoes()
         with self._go_to_central_frame():
             source = soup(self.page.driver.page_source, "lxml")
@@ -548,7 +570,7 @@ class Processo(Sei):
     def concluir_processo(self):
 
         assert (
-            self.page.get_title() == config.Proc_incluir.TITLE
+            self.page.get_title() == config.Iniciar_Processo.TITLE
         ), "Erro ao navegar para o processo"
 
         concluir = self._get_acoes(click=False).get("Concluir Processo")
@@ -560,7 +582,7 @@ class Processo(Sei):
     def abrir_processo(self):
 
         assert (
-                self.page.get_title() == config.Proc_incluir.TITLE
+            self.page.get_title() == config.Iniciar_Processo.TITLE
         ), "Erro ao navegar para o processo"
 
         abrir = self._get_acoes(click=False).get("Reabrir Processo")
@@ -568,7 +590,6 @@ class Processo(Sei):
         if abrir is not None:
             with self._go_to_central_frame():
                 self.page._clicar(abrir)
-
 
     # todo: Implementar click_central_frame
 
@@ -656,25 +677,21 @@ class Processo(Sei):
 
                 destinatario, assunto, mensagem = dados
 
-                self.page._atualizar_elemento(
-                    helper.get("destinatario"), destinatario
-                )
+                self.page._atualizar_elemento(helper.get("destinatario"), destinatario)
 
                 self.page._atualizar_elemento(helper.get("assunto"), assunto)
 
                 self.page._selecionar_por_texto(helper.get("mensagem"), mensagem)
 
                 # After putting the email, we must validate it by clicking it or pressing ENTER
-                self.page._atualizar_elemento(
-                    helper["destinatario"], 2 * Keys.ENTER
-                )
+                self.page._atualizar_elemento(helper["destinatario"], 2 * Keys.ENTER)
 
                 self.page._clicar(helper.get("enviar"))
 
     def info_oficio(self, num_doc):
 
         assert (
-            self.page.get_title() == config.Proc_incluir.TITLE
+            self.page.get_title() == config.Iniciar_Processo.TITLE
         ), "Erro ao navegar para o processo"
 
         # Switch to tree frame
@@ -696,7 +713,7 @@ class Processo(Sei):
     # TODO: Criar helper para verificação bs4 DRY principle
     def update_andamento(self, buttons, info):
         assert (
-            self.page.get_title() == config.Proc_incluir.TITLE
+            self.page.get_title() == config.Iniciar_Processo.TITLE
         ), "Erro ao navegar para o processo"
 
         andamento = buttons[4]
@@ -723,7 +740,7 @@ class Processo(Sei):
 
         with self.page.wait_for_page_load():
             assert (
-                self.page.get_title() == config.Proc_incluir.TITLE
+                self.page.get_title() == config.Iniciar_Processo.TITLE
             ), "Erro na função 'send_proc_to_sede"
 
             enviar = buttons[3]
@@ -1027,7 +1044,7 @@ class Processo(Sei):
         self, tipo: str, txt_inicial: str, acesso="publico", hipotese=None
     ):
 
-        #txt = unidecode.unidecode(txt_inicial).lower()
+        # txt = unidecode.unidecode(txt_inicial).lower()
 
         txt = txt_inicial.lower()
 

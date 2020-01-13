@@ -286,7 +286,8 @@ class Page:
         self.driver.get(link)
 
         return None
-    @_go_new_win
+
+    @contextmanager
     def _click_button_new_win(self, btn_id: Elem, silent: bool = True):
         """               
 
@@ -298,5 +299,5 @@ class Page:
             Método auxiliar para clicar num elemento da página que abre uma nova janela. Muda o foco para
             a nova janela.
         """
-
-        self._clicar(btn_id=btn_id, silent=silent)
+        with self._go_new_win():
+            self._clicar(btn_id=btn_id, silent=silent)

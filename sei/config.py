@@ -145,131 +145,16 @@ class Bloco:
     RET_BLOCO: Elem = ("id", "btnExcluir")
 
 
-class Proc_incluir:
-    TITLE = "SEI - Processo"
+# TODO: Extrair constantes textuais do SEI para arquivo separado
+class Iniciar_Processo:
 
-    ESPEC: Elem = ("id", "txtDescricao")
-
-    INTER: Elem = ("id", "txtInteressadoProcedimento")
-
-    SIG: Elem = ("id", "optSigiloso")
-
-    REST: Elem = ("id", "optRestrito")
-
-    PUBL: Elem = ("id", "optPublico")
-
-    HIP_LEGAL: Elem = ("id", "selHipoteseLegal")
-
-    HIPS = [
-        "",
-        "Controle Interno (Art. 26, § 3º, da Lei nº 10.180/2001)",
-        "Direito Autoral (Art. 24, III, da Lei nº 9.610/1998)",
-        "Documento Preparatório (Art. 7º, § 3º, da Lei nº 12.527/2011)",
-        "Fiscalização / Investigação da Anatel (Art. 174 da Lei nº 9.472/1997)",
-        "Informação Pessoal (Art. 31 da Lei nº 12.527/2011)",
-        "Informações Contábeis de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)",
-        "Informações Econômico-Financeiras de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)",
-        "Informações Operacionais de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)",
-        "Informações Privilegiadas de Sociedades Anônimas (Art. 155, § 2º, da Lei nº 6.404/1976)",
-        "Informações Técnicas de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)",
-        "Interceptação de Comunicações Telefônicas (Art. 8º, caput, da Lei nº 9.296/1996)",
-        "Investigação de Responsabilidade de Servidor (Art. 150 da Lei nº 8.112/1990)",
-        "Livros e Registros Contábeis Empresariais (Art. 1.190 do Código Civil)",
-        "Operações Bancárias (Art. 1º da Lei Complementar nº 105/2001)",
-        "Proteção da Propriedade Intelectual de Software (Art. 2º da Lei nº 9.609/1998)",
-        "Protocolo -Pendente Análise de Restrição de Acesso (Art. 6º, III, da Lei nº 12.527/2011)",
-        "Segredo de Justiça no Processo Civil (Art. 189 do Código de Processo Civil)",
-        "Segredo de Justiça no Processo Penal (Art. 201, § 6º, do Código de Processo Penal)",
-        "Segredo Industrial (Art. 195, XIV, Lei nº 9.279/1996)",
-        "Sigilo das Comunicações (Art. 3º, V, da Lei nº 9.472/1997)",
-        "Sigilo de Empresa em Situação Falimentar (Art. 169 da Lei nº 11.101/2005)",
-        "Sigilo do Inquérito Policial (Art. 20 do Código de Processo Penal)",
-        "Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)",
-    ]
-
-    # BTN_SALVAR: Elem = (By.CLASS_NAME, "cke_button cke_button__save cke_button_disabled")
-
-
-class Proc_central:
-    ACOES: Elem = ("id", "divArvoreAcoes")
-
-    IN_AND: Elem = ("id", "txaDescricao")
-
-    BT_POSTIT: Elem = (By.NAME, "sbmRegistrarAnotacao")
-
-    CHK_PRIOR: Elem = ("id", "chkSinPrioridade")
-
-    # OPT_MARCADORES: Elem = (By.CLASS_NAME, "dd-pointer dd-pointer-down")
-
-    SV_AND: Elem = ("id", "sbmSalvar")
-
-    AND_PRE = "Solicita-se ao protocolo a expedição do "
-
-    AND_MID = " ( SEI nº "
-
-    AND_POS = "por meio de correspondência simples com aviso de recebimento."
-
-
-class Marcador:
-    SELECT_MARCADOR: Elem = ("id", "selMarcador")
-
-    LISTA_MARCADORES: Elem = (By.CLASS_NAME, "dd-options dd-click-off-fechar")
-
-    TXT_MARCADOR: Elem = ("id", "txaTexto")
-
-    SALVAR: Elem = (By.NAME, "sbmGerenciarMarcador")
-
-
-class Acompanhamento_Especial:
-    GRUPOS: Elem = ("id", "selGrupoAcompanhamento")
-
-    TXT: Elem = ("id", "txaObservacao")
-
-    SALVAR: Elem = (By.NAME, "sbmCadastrarAcompanhamento")
-
-    EXCLUIR: Elem = ("id", "btnExcluir")
-
-
-class Envio:
-    TITLE = "SEI - Enviar Processo"
-
-    UNIDS = "SEI - Selecionar Unidades"
-
-    PRAZO = "5"
-
-    IN_SIGLA: Elem = ("id", "txtSiglaUnidade")
-
-    SIGLA = "Protocolo.Sede"
-
-    SEDE = "Protocolo.Sede - Protocolo da Sede"
-
-    ID_SEDE: Elem = ("id", "chkInfraItem0")
-
-    B_TRSP: Elem = ("id", "btnTransportarSelecao")
-
-    LUPA = "objLupaUnidades.selecionar(700,500)"
-
-    IDUNIDADE: Elem = ("id", "txtUnidade")
-
-    OPEN: Elem = ("id", "chkSinManterAberto")
-
-    IDRETDATA: Elem = ("id", "optDataCerta")
-
-    RET_DIAS: Elem = ("id", "optDias")
-
-    NUM_DIAS: Elem = ("id", "txtDias")
-
-    UTEIS: Elem = ("id", "chkSinDiasUteis")
-
-    ENVIAR: Elem = ("id", "sbmEnviar")
-
-
-class Criar_Processo:
-    EXIBE_ALL: Elem = ("id", "imgExibirTiposProcedimento")
+    EXIBE_ALL: Elem = ("xpath", '//*[@id="imgExibirTiposProcedimento"]')
 
     FILTRO: Elem = ("id", "txtFiltro")
 
     SL_TIP_PROC: Elem = ("id", "selTipoProcedimento")
+
+    SALVAR = {"el": ("xpath", '//*[@id="btnSalvar"]'), "js": "confirmarDados()"}
 
     PROCS = {
         "",
@@ -1011,6 +896,130 @@ class Criar_Processo:
         "Viagem: Publicação de Boletim",
     }
 
+    TITLE = "SEI - Processo"
+
+    ESPEC: Elem = ("id", "txtDescricao")
+
+    INTER: Elem = ("id", "txtInteressadoProcedimento")
+
+    LUPA = {
+        "el": ("xpath", '//*[@id="imgSelecionarGrupo"]'),
+        "js": "objLupaInteressados.selecionar(700,500);",
+    }
+
+    OBS: Elem = ("xpath", '//*[@id="txaObservacoes"]')
+
+    SIG: Elem = ("id", "optSigiloso")
+
+    REST: Elem = ("id", "optRestrito")
+
+    PUBL: Elem = ("id", "optPublico")
+
+    HIP_LEGAL: Elem = ("id", "selHipoteseLegal")
+
+    HIPS = [
+        "",
+        "Controle Interno (Art. 26, § 3º, da Lei nº 10.180/2001)",
+        "Direito Autoral (Art. 24, III, da Lei nº 9.610/1998)",
+        "Documento Preparatório (Art. 7º, § 3º, da Lei nº 12.527/2011)",
+        "Fiscalização / Investigação da Anatel (Art. 174 da Lei nº 9.472/1997)",
+        "Informação Pessoal (Art. 31 da Lei nº 12.527/2011)",
+        "Informações Contábeis de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)",
+        "Informações Econômico-Financeiras de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)",
+        "Informações Operacionais de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)",
+        "Informações Privilegiadas de Sociedades Anônimas (Art. 155, § 2º, da Lei nº 6.404/1976)",
+        "Informações Técnicas de Empresa (Art. 39, parágrafo único, da Lei nº 9.472/1997)",
+        "Interceptação de Comunicações Telefônicas (Art. 8º, caput, da Lei nº 9.296/1996)",
+        "Investigação de Responsabilidade de Servidor (Art. 150 da Lei nº 8.112/1990)",
+        "Livros e Registros Contábeis Empresariais (Art. 1.190 do Código Civil)",
+        "Operações Bancárias (Art. 1º da Lei Complementar nº 105/2001)",
+        "Proteção da Propriedade Intelectual de Software (Art. 2º da Lei nº 9.609/1998)",
+        "Protocolo -Pendente Análise de Restrição de Acesso (Art. 6º, III, da Lei nº 12.527/2011)",
+        "Segredo de Justiça no Processo Civil (Art. 189 do Código de Processo Civil)",
+        "Segredo de Justiça no Processo Penal (Art. 201, § 6º, do Código de Processo Penal)",
+        "Segredo Industrial (Art. 195, XIV, Lei nº 9.279/1996)",
+        "Sigilo das Comunicações (Art. 3º, V, da Lei nº 9.472/1997)",
+        "Sigilo de Empresa em Situação Falimentar (Art. 169 da Lei nº 11.101/2005)",
+        "Sigilo do Inquérito Policial (Art. 20 do Código de Processo Penal)",
+        "Situação Econômico-Financeira de Sujeito Passivo (Art. 198, caput, da Lei nº 5.172/1966 - CTN)",
+    ]
+
+    # BTN_SALVAR: Elem = (By.CLASS_NAME, "cke_button cke_button__save cke_button_disabled")
+
+
+class Proc_central:
+    ACOES: Elem = ("id", "divArvoreAcoes")
+
+    IN_AND: Elem = ("id", "txaDescricao")
+
+    BT_POSTIT: Elem = (By.NAME, "sbmRegistrarAnotacao")
+
+    CHK_PRIOR: Elem = ("id", "chkSinPrioridade")
+
+    # OPT_MARCADORES: Elem = (By.CLASS_NAME, "dd-pointer dd-pointer-down")
+
+    SV_AND: Elem = ("id", "sbmSalvar")
+
+    AND_PRE = "Solicita-se ao protocolo a expedição do "
+
+    AND_MID = " ( SEI nº "
+
+    AND_POS = "por meio de correspondência simples com aviso de recebimento."
+
+
+class Marcador:
+    SELECT_MARCADOR: Elem = ("id", "selMarcador")
+
+    LISTA_MARCADORES: Elem = (By.CLASS_NAME, "dd-options dd-click-off-fechar")
+
+    TXT_MARCADOR: Elem = ("id", "txaTexto")
+
+    SALVAR: Elem = (By.NAME, "sbmGerenciarMarcador")
+
+
+class Acompanhamento_Especial:
+    GRUPOS: Elem = ("id", "selGrupoAcompanhamento")
+
+    TXT: Elem = ("id", "txaObservacao")
+
+    SALVAR: Elem = (By.NAME, "sbmCadastrarAcompanhamento")
+
+    EXCLUIR: Elem = ("id", "btnExcluir")
+
+
+class Envio:
+    TITLE = "SEI - Enviar Processo"
+
+    UNIDS = "SEI - Selecionar Unidades"
+
+    PRAZO = "5"
+
+    IN_SIGLA: Elem = ("id", "txtSiglaUnidade")
+
+    SIGLA = "Protocolo.Sede"
+
+    SEDE = "Protocolo.Sede - Protocolo da Sede"
+
+    ID_SEDE: Elem = ("id", "chkInfraItem0")
+
+    B_TRSP: Elem = ("id", "btnTransportarSelecao")
+
+    LUPA = "objLupaUnidades.selecionar(700,500)"
+
+    IDUNIDADE: Elem = ("id", "txtUnidade")
+
+    OPEN: Elem = ("id", "chkSinManterAberto")
+
+    IDRETDATA: Elem = ("id", "optDataCerta")
+
+    RET_DIAS: Elem = ("id", "optDias")
+
+    NUM_DIAS: Elem = ("id", "txtDias")
+
+    UTEIS: Elem = ("id", "chkSinDiasUteis")
+
+    ENVIAR: Elem = ("id", "sbmEnviar")
+
 
 class Selecionar_Contatos:
     B_TRSP: Elem = ("id", "btnTransportarSelecao")
@@ -1039,7 +1048,6 @@ class Gerar_Doc:
         id_txt_tree=("id", "txtNumero"),
         id_nato=("id", "optNato"),
         id_digit=("id", "optDigitalizado"),
-
         id_pub=("id", "optPublico"),
         id_restrito=("id", "optRestrito"),
         id_hip_legal=("id", "selHipoteseLegal"),

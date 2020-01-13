@@ -8,6 +8,7 @@ black = "*"
 isort = "*"
 flake8 = "*"
 mypy = "*"
+pandas = "*"
 pre-commit = "*"
 pytest = "*"
 pytest-cov = "*"
@@ -16,8 +17,8 @@ ipykernel = "*"
 [packages]
 selenium = "*"
 beautifulsoup4 = "*"
-pandas = "*"
 lxml = "*"
+xlrd = "*"
 
 [requires]
 python_version = "3.7"

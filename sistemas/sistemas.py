@@ -9,8 +9,9 @@ from bs4 import BeautifulSoup as soup
 from selenium.webdriver.common.by import By
 
 from sistemas import sis_helpers
-from tool import functions
-from tool.page import *
+
+from ..tools import functions
+from ..tools.page import *
 
 # This add the ../folder to the path while in development mode
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))

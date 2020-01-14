@@ -23,13 +23,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
-from . import context
-
 # Others modules from this package
 from tools.functions import add_point_cpf_cnpj, get_browser
 from tools.page import Page
 
-from . import config
+from . import config, context
 from .common import armazena_tags, cria_dict_acoes, pode_expedir, string_endereço
 
 Processos = Dict[str, Any]
@@ -470,8 +468,13 @@ class Sei:
 
         if interessado:
 
-            with self.page._click_button_new_win(helper.LUPA["el"]):
-                pass
+            with self.page._go_new_win():
+                self.page._clicar(helper.LUPA["el"])
+
+                campo = config.Selecionar_Contatos.INPUT_PESQUISAR
+
+                self.page._atualizar_elemento(campo, interessado)
+
 
         if obs:
             self.page._atualizar_elemento(helper.OBS, obs)
@@ -671,22 +674,27 @@ class Processo(Sei):
             "Enviar Documento por Correio Eletrônico"
         )
 
+        destinatario, assunto, mensagem, txt_mensagem = dados
+
         if env_email:
             with self._go_to_central_frame():
-                self.page._clicar(env_email)
+                with self.page._clica_abre_nova_janela(env_email):
 
-                destinatario, assunto, mensagem = dados
+                    self.page._atualizar_elemento(helper.get("destinatario"), destinatario)
 
-                self.page._atualizar_elemento(helper.get("destinatario"), destinatario)
+                    self.page._atualizar_elemento(helper.get("assunto"), assunto)
 
-                self.page._atualizar_elemento(helper.get("assunto"), assunto)
+                    if mensagem:
+                        self.page._selecionar_por_texto(helper.get('mensagem'), mensagem)
 
-                self.page._selecionar_por_texto(helper.get("mensagem"), mensagem)
+                    if txt_mensagem:
 
-                # After putting the email, we must validate it by clicking it or pressing ENTER
-                self.page._atualizar_elemento(helper["destinatario"], 2 * Keys.ENTER)
+                        self.page._atualizar_elemento(helper.get('txt_mensagem'), txt_mensagem)
 
-                self.page._clicar(helper.get("enviar"))
+                    # After putting the email, we must validate it by clicking it or pressing ENTER
+                    self.page._atualizar_elemento(helper["destinatario"], 2 * Keys.ENTER)
+
+                    self.page._clicar(helper.get("enviar"))
 
     def info_oficio(self, num_doc):
 
@@ -993,7 +1001,7 @@ class Processo(Sei):
 
             with self.page._go_new_win():
 
-                self.page._click_button_new_win(h.LUPA)
+                self.page._clica_abre_nova_janela(h.LUPA)
 
                 for dado in dados:
 
@@ -1086,7 +1094,7 @@ class Processo(Sei):
 
         with self.page._go_new_win():
 
-            self.page._click_button_new_win(helper.get("submit"))
+            self.page._clica_abre_nova_janela(helper.get("submit"))
 
             if dados:
                 self.editar_oficio(string_endereço(dados), timeout=10)
@@ -1137,7 +1145,7 @@ class Processo(Sei):
 
         with self.page._go_new_win():
 
-            self.page._click_button_new_win(helper.get("submit"))
+            self.page._clica_abre_nova_janela(helper.get("submit"))
 
             if dados:
                 self.editar_oficio(string_endereço(dados), timeout=10)

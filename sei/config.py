@@ -20,6 +20,7 @@ Enviar_Doc_Email = dict(
     destinatario=("id", "s2id_autogen1"),
     assunto=("id", "txtAssunto"),
     mensagem=("id", "selTextoPadrao"),
+    txt_mensagem=('xpath', '//*[@id="txaMensagem"]'),
     enviar=(By.NAME, "btnEnviar"),
 )
 
@@ -1026,7 +1027,7 @@ class Selecionar_Contatos:
 
     ALT_INTERESSADO: Elem = ("id", "imgAlterarInteressado")
 
-    INPUT_PESQUISAR: Elem = ("id", "txtPalavrasPesquisaContatos")
+    INPUT_PESQUISAR: Elem = ("xpath", '//*[@id="txtPalavrasPesquisaContatos"]')
 
     BTN_PESQUISAR: Elem = ("id", "btnPesquisar")
 

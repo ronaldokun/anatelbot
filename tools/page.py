@@ -246,10 +246,27 @@ class Page:
             EC.element_to_be_clickable(*locator)
         )
 
-    def wait_for_new_window(self, windows: Sequence):
+    def wait_for_new_window(self, windows: Optional[Sequence]=None):
+        """
+
+        Args:
+            windows (Sequence):
+        """
+        if windows is None:
+            windows = self.driver.window_handles
+
         return WebDriverWait(self.driver, self.timeout).until(
             EC.new_window_is_opened(windows)
         )
+
+    @contextmanager
+    def switch_to_win_opened(self):
+
+        yield
+
+        windows = self.driver.window_handles
+
+        self.driver.switch_to.window(windows[-1])
 
     @_go_new_win
     def nav_elem_to_new_win(self, elem):
@@ -288,7 +305,7 @@ class Page:
         return None
 
     @contextmanager
-    def _click_button_new_win(self, btn_id: Elem, silent: bool = True):
+    def _clica_abre_nova_janela(self, btn_id: Elem):
         """               
 
         :param btn_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
@@ -300,4 +317,7 @@ class Page:
             a nova janela.
         """
         with self._go_new_win():
-            self._clicar(btn_id=btn_id, silent=silent)
+            with self.switch_to_win_opened():
+                self._clicar(btn_id=btn_id)
+            print(self.driver.current_window_handle)
+            yield

@@ -812,17 +812,17 @@ class Sec(Sistema):
 
         identificador = functions.check_input(identificador, tipo_id)
 
-        if tipo_id == "id_cpf":
+        if tipo_id == "id_cpf" and self.page.check_element_exists(
+            (By.LINK_TEXT, identificador)
+        ):
 
-            if self.page.check_element_exists((By.LINK_TEXT, identificador)):
+            try:
 
-                try:
+                self.page._clicar((By.LINK_TEXT, identificador))
 
-                    self.page._clicar((By.LINK_TEXT, identificador))
+            except (NoSuchElementException, TimeoutException):
 
-                except (NoSuchElementException, TimeoutException):
-
-                    pass
+                pass
 
     def incluir_cadastro(
         self, dados: dict, menor: bool = False, timeout: int = 5
@@ -1483,9 +1483,6 @@ class Sigec(Sistema):
         h = self.sis.consulta["geral"]
 
         acoes = self._get_acoes(h, ("link", tipo_id, "submit"))
-
-        if not simples:
-            pass
 
         self._navigate(ident, tipo_id, acoes)
 

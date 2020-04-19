@@ -165,7 +165,7 @@ class Page:
         try:
             # yield the state with the main window
             yield
-            # inside the context manager there is a window switch
+            # inside the context manager there is a window creation event
 
         finally:
             # return to the main window
@@ -259,13 +259,9 @@ class Page:
             EC.new_window_is_opened(windows)
         )
 
-    @contextmanager
-    def switch_to_win_opened(self):
-
-        yield
+    def _foca_nova_janela(self):
 
         windows = self.driver.window_handles
-
         self.driver.switch_to.window(windows[-1])
 
     @_go_new_win
@@ -306,18 +302,15 @@ class Page:
 
     @contextmanager
     def _clica_abre_nova_janela(self, btn_id: Elem):
-        """               
+        """
 
         :param btn_id: localizador da página html: (id, conteúdo), (title, conteúdo), (link_text, conteúdo)
-        :param silent: se verdadeiro confirma o pop-up após o clique no botão
-        :param timeout: tempo de espera fornecido aos métodos no carregamento/atualização dos elementos da página
         :return: None
 
             Método auxiliar para clicar num elemento da página que abre uma nova janela. Muda o foco para
             a nova janela.
         """
         with self._go_new_win():
-            with self.switch_to_win_opened():
-                self._clicar(btn_id=btn_id)
-            print(self.driver.current_window_handle)
+            self._clicar(btn_id=btn_id)
+            self._foca_nova_janela()
             yield

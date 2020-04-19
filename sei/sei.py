@@ -5,6 +5,8 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from time import sleep
 from typing import Any, Dict, Union
+import logging
+from pathlib import Path
 
 # Other Helpful Libs
 # import unidecode
@@ -28,10 +30,11 @@ from tools.functions import add_point_cpf_cnpj, get_browser
 from tools.page import Page
 
 from . import config, context
-from .common import armazena_tags, cria_dict_acoes, pode_expedir, string_endereço
+from .common import cria_dict_acoes, pode_expedir, string_endereço, parse_hash_links, tag_mouseover
 
 Processos = Dict[str, Any]
 
+logging.basicConfig(filename=f'{Path(__file__).parent}/sei.log', level=logging.INFO)
 
 # TODO: Add password Encryption
 # TODO: Select Normal/Teste
@@ -41,7 +44,7 @@ def login_sei(
     pwd: str,
     browser: str = None,
     timeout: int = 10,
-    teste: bool = False,
+    teste: bool = True,
     is_headless: bool = False,
 ) -> Union["Sei", None]:
     """
@@ -83,6 +86,7 @@ class Sei:
         self, page: Page, processos: Processos = None, teste: bool = False
     ) -> None:
         self.teste = teste
+        self.url = config.Sei_Login.Base['url_test'] if teste else config.Sei_Login.Base['url']
         self.page = page
         self._processos = processos if processos is not None else OrderedDict()
 
@@ -133,6 +137,52 @@ class Sei:
         else:
 
             return None
+
+    def seleciona_contato(self, chave: str, index: int=0)->bool:
+        """ Pesquisa e seleciona o primeiro contato na página de pesquisa.
+        Assume que a página de pesquisa foi aberta, seja pelo menu principal ou
+        ao clicar na Lupa no campo interessado de qualquer documento SEI.
+
+        Args:
+            chave (): string com a chave de pesquisa
+
+        Returns: None
+
+        """
+        ids = config.Selecionar_Contatos
+
+        self.page._atualizar_elemento(ids.INPUT_PESQUISAR, chave)
+
+        self.page._clicar(ids.BTN_PESQUISAR)
+
+        try:
+            str_res = self.page.wait_for_element_to_be_visible(ids.NUM_RESULTADOS)
+        except TimeoutException:
+            logging.info(f"A pesquisa de contato não retornou nenhum resultado\
+                                     para a chave: {chave}!")
+            self.page._clicar(ids.BTN_FECHAR)
+
+            return False
+
+        num_resultados = int(re.match(r".*\((\d+).*\)", str_res.text).group(1))
+
+        if not num_resultados > 0:
+            logging.info(f"A pesquisa de contato não retornou nenhum resultado\
+                         para a chave: {chave}!")
+            self.page._clicar(ids.BTN_FECHAR)
+
+            return False
+
+        try:
+            self.page._clicar(('xpath', f'//*[@id="chkInfraItem{index}"]'))
+            self.page._clicar(ids.B_TRSP)
+            self.page._clicar(ids.BTN_FECHAR)
+
+        except (TimeoutException, NoSuchElementException):
+            self.page.driver.execute_script(f"infraTransportarItem({index},'Infra');")
+
+        return True
+
 
     # noinspection PyProtectedMember
     def _cria_contato(self, dados: Dict) -> None:
@@ -229,6 +279,93 @@ class Sei:
         link = tag.a.attrs["href"]
 
         self.go(link)
+
+    def armazena_tags(self, lista_tags: list) -> dict:
+        """Recebe uma lista de tags de cada linha do processo  da página inicial
+        do Sei, retorna um dicionário dessas tags
+
+        Args:
+            lista_tags (list): Lista de Tags contida na tag tabular definida por
+            cada linha de processo da página inicial do SEI
+
+        Returns:
+            dict: dicionário - key=Nome da Tag, value=string ou objeto tag
+        """
+
+        assert (
+                len(lista_tags) == 6
+        ), "Verifique o nº de tags de cada linha do \
+            processo: {}. O valor diferente de 6".format(
+            len(lista_tags)
+        )
+
+        dict_tags = {}
+
+        dict_tags["checkbox"] = lista_tags[0].find("input", class_="infraCheckbox")
+
+        controles = lista_tags[1].find_all("a")
+
+        dict_tags["aviso"] = ""
+
+        for tag_a in controles:
+
+            img = str(tag_a.img["src"])
+
+            if "imagens/sei_anotacao" in img:
+
+                dict_tags["anotacao"] = tag_mouseover(tag_a, "anotacao")
+
+                dict_tags["anotacao_link"] = self.url + tag_a.attrs['href']
+
+            elif "imagens/sei_situacao" in img:
+
+                dict_tags["situacao"] = tag_mouseover(tag_a, "situacao")
+
+                dict_tags["situacao_link"] = self.url + tag_a.attrs['href']
+
+            elif "imagens/marcador" in img:
+
+                dict_tags["marcador"] = tag_mouseover(tag_a, "marcador")
+
+                dict_tags["marcador_link"] = self.url + tag_a.attrs['href']
+
+            elif "imagens/exclamacao" in img:
+
+                dict_tags["aviso"] = True
+
+            peticionamento = lista_tags[1].find(src=re.compile("peticionamento"))
+
+            if peticionamento:
+
+                pattern = re.search("\((.*)\)", peticionamento.attrs["onmouseover"])
+                if pattern:
+                    dict_tags["peticionamento"] = pattern.group().split('"')[1]
+
+            else:
+
+                dict_tags["peticionamento"] = ""
+
+        processo = lista_tags[2].find("a")
+
+        dict_tags["link"] = parse_hash_links(processo.attrs['href'], self.url)
+
+        dict_tags["numero"] = processo.string
+
+        dict_tags["visualizado"] = (
+            True if processo.attrs["class"] == "processoVisualizado" else False
+        )
+
+        tag = lista_tags[3].find("a")
+
+        dict_tags["atribuicao"] = tag.string if tag else ""
+
+        dict_tags["tipo"] = lista_tags[4].string
+
+        tag = lista_tags[5].find(class_="spanItemCelula")
+
+        dict_tags["interessado"] = tag.string if tag else ""
+
+        return dict_tags
 
     def go(self, link):
         """ Simplifies the navigation of href pages on sei.anatel.gov.br
@@ -385,7 +522,7 @@ class Sei:
             tags = line("td")
 
             if len(tags) == 6:
-                processos_abertos.append(armazena_tags(tags))
+                processos_abertos.append(self.armazena_tags(tags))
 
         self._set_processos(processos_abertos)
 
@@ -444,7 +581,7 @@ class Sei:
         especificacao="",
         interessado="",
         obs="",
-        nivel="público",
+        nivel="Público",
         salvar: bool = False,
     ):
         tipo = str(tipo)
@@ -453,47 +590,42 @@ class Sei:
             "O tipo de processo digitado {0}, não é válido".format(str(tipo))
         )
 
-        helper = config.Iniciar_Processo
+        nivel = str(nivel).lower()
+
+        ids = config.Iniciar_Processo
 
         self.show_lat_menu()
 
         self.page._clicar(config.Sei_Menu.INIT_PROC)
 
-        self.page._clicar(config.Iniciar_Processo.EXIBE_ALL)
+        self.page._clicar(ids.EXIBE_ALL)
+
+        self.page._atualizar_elemento(ids.FILTRO, tipo)
 
         self.page._clicar((By.LINK_TEXT, tipo))
 
         if especificacao:
-            self.page._atualizar_elemento(helper.ESPEC, especificacao)
-
-        if interessado:
-
-            with self.page._go_new_win():
-                self.page._clicar(helper.LUPA["el"])
-
-                campo = config.Selecionar_Contatos.INPUT_PESQUISAR
-
-                self.page._atualizar_elemento(campo, interessado)
-
+            self.page._atualizar_elemento(ids.ESPEC, especificacao)
 
         if obs:
-            self.page._atualizar_elemento(helper.OBS, obs)
-
+            self.page._atualizar_elemento(ids.OBS, obs)
         if nivel == "público":
-            self.page._clicar(helper.PUBL)
-
+            self.page._clicar(ids.PUBL)
         elif nivel == "restrito":
-            self.page._clicar(helper.REST)
-
+            self.page._clicar(ids.REST)
         else:
-            self.page._clicar(helper.SIG)
+            self.page._clicar(ids.SIG)
 
+        if interessado:
+            with self.page._clica_abre_nova_janela(ids.LUPA["el"]):
+                if not self.seleciona_contato(interessado):
+                    logging.info(f"O Processo criado para o interessado {interessado}\
+                                 sem informação de interessado por ausência de Cadastro deste")
         if salvar:
-
             try:
-                self.page._clicar(helper.SALVAR["el"])
+                self.page._clicar(ids.SALVAR["el"])
             except (TimeoutException, NoSuchElementException):
-                self.page.driver.execute_script(helper.SALVAR["js"])
+                self.page.driver.execute_script(ids.SALVAR["js"])
 
 
 class Processo(Sei):
@@ -1031,17 +1163,21 @@ class Processo(Sei):
     # TODO: Replicate logic of send_doc_por_email
     def incluir_documento(self, tipo):
 
-        if tipo not in config.Gerar_Doc.TIPOS:
-            raise ValueError("Tipo de Documento inválido: {}".format(tipo))
-
         doc_incluir = self._get_acoes().get("Incluir Documento")
+
+        ids = config.GerarDocumento
 
         if doc_incluir is not None:
 
             with self._go_to_central_frame():
                 self.page._clicar(doc_incluir)
-                self.page._clicar((By.LINK_TEXT, tipo))
-
+                self.page._clicar(ids.EXIBE_TODOS)
+                self.page._atualizar_elemento(ids.FILTRO, tipo)
+                try:
+                    self.page._clicar(("link text", tipo))
+                except (NoSuchElementException, TimeoutException):
+                    raise ValueError(f"Verifique o se o tipo {tipo} de documento\
+                                     é válido")
         else:
 
             raise ValueError(
@@ -1049,59 +1185,56 @@ class Processo(Sei):
             )
 
     def incluir_doc_sei(
-        self, tipo: str, txt_inicial: str, acesso="publico", hipotese=None
+        self, tipo: str,
+        txt_inicial: str = 'nenhum',
+        modelo: str='',
+        acesso="público",
+        hipotese=None
     ):
-
-        # txt = unidecode.unidecode(txt_inicial).lower()
 
         txt = txt_inicial.lower()
 
-        assert txt in ("modelo", "padrao", "nenhum"), f"Opção Inválida: {txt_inicial}"
+        ids = config.GerarDocumento.doc_sei
 
-        helper = config.Gerar_Doc.oficio
+        assert txt in ("modelo", "padrão", "nenhum"), f"Opção Inválida: {txt_inicial}"
 
-        if tipo not in config.Gerar_Doc.TEXTOS_PADRAO:
-            raise ValueError("Tipo de Ofício inválido: {}".format(tipo))
+        self.incluir_documento(tipo)
 
-        self.incluir_documento("Ofício")
+        with self._go_to_central_frame():
 
-        self.page._clicar(helper.get("id_txt_padrao"))
+            if txt_inicial == 'padrão':
+                assert modelo != '', "Ao Selecionar um Texto Padrão é preciso informar um " \
+                                     "modelo"
+                self.page._clicar(ids.get("id_txt_padrao"))
 
-        self.page._selecionar_por_texto(helper.get("id_modelos"), tipo)
+                self.page._selecionar_por_texto(ids.get("id_modelos"), modelo)
 
-        if acesso == "publico":
+            if acesso == "público":
 
-            self.page._clicar(helper.get("id_pub"))
+                self.page._clicar(ids.get("id_pub"))
 
-        elif acesso == "restrito":
+            elif acesso == "restrito":
 
-            self.page._clicar(helper.get("id_restrito"))
+                self.page._clicar(ids.get("id_restrito"))
 
-            hip = Select(
-                self.page.wait_for_element_to_click(helper.get("id_hip_legal"))
-            )
+                hip = Select(
+                    self.page.wait_for_element_to_click(ids.get("id_hip_legal"))
+                )
 
-            if hipotese not in config.Gerar_Doc.HIPOTESES:
-                raise ValueError("Hipótese Legal Inválida: ", hipotese)
+                if hipotese not in config.GerarDocumento.HIPOTESES:
+                    raise ValueError("Hipótese Legal Inválida: ", hipotese)
 
-            hip.select_by_visible_text(hipotese)
+                hip.select_by_visible_text(hipotese)
 
-        else:
+            else:
 
-            raise ValueError(
-                "Você provavelmente não vai querer mandar um Ofício Sigiloso"
-            )
+                raise ValueError(
+                    "Você provavelmente não vai querer mandar um Ofício Sigiloso"
+                )
 
-        with self.page._go_new_win():
-
-            self.page._clica_abre_nova_janela(helper.get("submit"))
-
-            if dados:
-                self.editar_oficio(string_endereço(dados), timeout=10)
-
+            with self.page._clica_abre_nova_janela(ids.get("submit")):
                 self.page.fechar()
 
-        self.page.driver.get(self.link)
 
     def incluir_oficio(
         self, tipo, dados=None, anexo=False, acesso="publico", hipotese=None
@@ -1109,9 +1242,9 @@ class Processo(Sei):
 
         # TODO:Inclui anexo
 
-        helper = config.Gerar_Doc.oficio
+        helper = config.GerarDocumento.doc_sei
 
-        if tipo not in config.Gerar_Doc.TEXTOS_PADRAO:
+        if tipo not in config.GerarDocumento.TEXTOS_PADRAO:
             raise ValueError("Tipo de Ofício inválido: {}".format(tipo))
 
         self.incluir_documento("Ofício")
@@ -1132,7 +1265,7 @@ class Processo(Sei):
                 self.page.wait_for_element_to_click(helper.get("id_hip_legal"))
             )
 
-            if hipotese not in config.Gerar_Doc.HIPOTESES:
+            if hipotese not in config.GerarDocumento.HIPOTESES:
                 raise ValueError("Hipótese Legal Inválida: ", hipotese)
 
             hip.select_by_visible_text(hipotese)
@@ -1165,51 +1298,52 @@ class Processo(Sei):
         formato="nato",
         acesso="publico",
         hipotese=None,
-        timeout=5,
     ):
 
-        helper = config.Gerar_Doc.doc_externo
+        helper = config.GerarDocumento.doc_externo
 
         # if tipo not in helpers.Gerar_Doc.EXTERNO_TIPOS:
 
         #    raise ValueError("Tipo de Documento Externo Inválido: {}".format(tipo))
 
-        self.incluir_documento("Externo", timeout=10)
+        self.incluir_documento("Externo")
 
-        self.page._selecionar_por_texto(helper.get("id_tipo"), tipo)
+        with self._go_to_central_frame():
 
-        today = dt.datetime.today().strftime("%d%m%Y")
+            self.page._selecionar_por_texto(helper.get("id_tipo"), tipo)
 
-        self.page._atualizar_elemento(helper.get("id_data"), today)
+            today = dt.datetime.today().strftime("%d%m%Y")
 
-        if arvore:
-            self.page._atualizar_elemento(helper.get("id_txt_tree"), arvore)
+            self.page._atualizar_elemento(helper.get("id_data"), today)
 
-        if formato.lower() == "nato":
-            self.page._clicar(helper.get("id_nato"))
+            if arvore:
+                self.page._atualizar_elemento(helper.get("id_txt_tree"), arvore)
 
-        if acesso == "publico":
+            if formato.lower() == "nato":
+                self.page._clicar(helper.get("id_nato"))
 
-            self.page._clicar(helper.get("id_pub"))
+            if acesso == "publico":
 
-        elif acesso == "restrito":
+                self.page._clicar(helper.get("id_pub"))
 
-            self.page._clicar(helper.get("id_restrito"))
+            elif acesso == "restrito":
 
-            if hipotese not in config.Gerar_Doc.HIPOTESES:
-                raise ValueError("Hipótese Legal Inválida: ", hipotese)
+                self.page._clicar(helper.get("id_restrito"))
 
-            self.page._selecionar_por_texto(helper.get("id_hip_legal"), hipotese)
+                if hipotese not in config.GerarDocumento.HIPOTESES:
+                    raise ValueError("Hipótese Legal Inválida: ", hipotese)
 
-        else:
+                self.page._selecionar_por_texto(helper.get("id_hip_legal"), hipotese)
 
-            raise ValueError(
-                "Você provavelmente não vai querer um documento Externo Sigiloso"
-            )
+            else:
 
-        self.page._atualizar_elemento(helper.get("id_file_upload"), path)
+                raise ValueError(
+                    "Você provavelmente não vai querer um documento Externo Sigiloso"
+                )
 
-        self.page._clicar(helper.get("submit"))
+            self.page._atualizar_elemento(helper.get("id_file_upload"), path)
+    
+            self.page._clicar(helper.get("submit"))
 
         self.go(self.link)
 

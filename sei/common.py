@@ -1,6 +1,6 @@
 # Standard Library Imports
 import re
-from typing import Union
+from typing import Union, Dict
 
 # Third party imports
 import bs4
@@ -52,6 +52,7 @@ def dict_to_df(processos):
     processo aberto no SEI. Retorna um Data Frame cujos registros
     são as string das tags.
     """
+    import pandas as pd
 
     cols = [
         "processo",
@@ -170,15 +171,26 @@ def tag_mouseover(tag, tipo: str):
 
         raise ValueError("O tipo de tag repassado não é válido: {}".format(tipo))
 
+def parse_hash_links(href: str, base)->Dict:
+    base = fr'{base}controlador.php?acao=procedimento_trabalhar&'
+    d = dict([st.split("=") for st in href.split("&")])
+    id_proc = 'id_procedimento'
+    id_doc = 'id_documento'
+    link = f'{base}{id_proc}={d[id_proc]}'
+
+    if id_doc in d:
+        link  += f'&{id_doc}={d[id_doc]}'
+
+    return link
 
 def armazena_tags(lista_tags: list) -> dict:
     """Recebe uma lista de tags de cada linha do processo  da página inicial
     do Sei, retorna um dicionário dessas tags
-    
+
     Args:
-        lista_tags (list): Lista de Tags contida na tag tabular definida por 
+        lista_tags (list): Lista de Tags contida na tag tabular definida por
         cada linha de processo da página inicial do SEI
-    
+
     Returns:
         dict: dicionário - key=Nome da Tag, value=string ou objeto tag
     """

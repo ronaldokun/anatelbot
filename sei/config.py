@@ -151,7 +151,7 @@ class Iniciar_Processo:
 
     EXIBE_ALL: Elem = ("xpath", '//*[@id="imgExibirTiposProcedimento"]')
 
-    FILTRO: Elem = ("id", "txtFiltro")
+    FILTRO: Elem = ('xpath', '//*[@id="txtFiltro"]')
 
     SL_TIP_PROC: Elem = ("id", "selTipoProcedimento")
 
@@ -1031,6 +1031,10 @@ class Selecionar_Contatos:
 
     BTN_PESQUISAR: Elem = ("id", "btnPesquisar")
 
+    NUM_RESULTADOS: Elem = ('xpath', '//*[@id="divInfraAreaTabela"]/table/caption')
+
+    TABELA_RESULTADOS: Elem = ('xpath', '//*[@id="divInfraAreaTabela"]/table/tbody')
+
     BTN_FECHAR: Elem = ("id", "btnFecharSelecao")
 
     SALVAR: Elem = ("id", "btnSalvar")
@@ -1038,8 +1042,11 @@ class Selecionar_Contatos:
     LUPA: Elem = ("id", "imgSelecionarGrupo")
 
 
-class Gerar_Doc:
-    TIPOS = ("Externo", "Ofício", "Informe")
+class GerarDocumento:
+
+    EXIBE_TODOS = ('xpath', '//*[@id="imgExibirSeries"]')
+
+    FILTRO = ('xpath', '//*[@id="txtFiltro"]')
 
     EXTERNO_TIPOS = ("Boleto", "E-mail", "Relação", "Relatório", "Licença")
 
@@ -1056,8 +1063,8 @@ class Gerar_Doc:
         submit=("id", "btnSalvar"),
     )
 
-    oficio = dict(
-        id_txt_padrao=("id", "optTextoPadrao"),
+    doc_sei = dict(
+        id_txt_padrao=("xpath", '//*[@id="optTextoPadrao"]'),
         id_modelos=("id", "selTextoPadrao"),
         id_descricao=("id", "txtDescricao"),
         id_dest=("id", "txtDestinatario"),

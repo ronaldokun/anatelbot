@@ -38,10 +38,14 @@ def xpath_soup(element: Union[bs4.element.Tag, bs4.element.NavigableString]) -> 
         siblings = parent.find_all(child.name, recursive=False)
         components.append(
             child.name
-            if 1 == len(siblings)
+            if len(siblings) == 1
             else "%s[%d]"
-                 % (child.name, next(i for i, s in enumerate(siblings, 1) if s is child))
+            % (
+                child.name,
+                next(i for i, s in enumerate(siblings, 1) if s is child),
+            )
         )
+
         child = parent
     components.reverse()
     return "/%s" % "/".join(components)
@@ -202,9 +206,7 @@ def armazena_tags(lista_tags: list) -> dict:
         len(lista_tags)
     )
 
-    dict_tags = {}
-
-    dict_tags["checkbox"] = lista_tags[0].find("input", class_="infraCheckbox")
+    dict_tags = {'checkbox': lista_tags[0].find('input', class_='infraCheckbox')}
 
     controles = lista_tags[1].find_all("a")
 
@@ -304,11 +306,7 @@ def string_endereço(dados, extra=True):
 
         debitos = dados["Entidade Devedora"].upper()
 
-        if debitos == "SIM":
-            color = r"#FF0000"
-        else:
-            color = r"#0000FF"
-
+        color = '#FF0000' if debitos == 'SIM' else '#0000FF'
         s += f'<br><b>Possui débitos? : <span style="color:{color};">{debitos}</span></b>'
 
     d["À"] = s

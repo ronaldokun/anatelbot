@@ -260,7 +260,6 @@ class Page:
         )
 
     def _foca_nova_janela(self):
-
         windows = self.driver.window_handles
         self.driver.switch_to.window(windows[-1])
 

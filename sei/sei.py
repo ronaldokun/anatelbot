@@ -540,19 +540,20 @@ class Sei:
 
                 for child in tag.children:
 
-                    if hasattr(child, "attrs"):
+                    if (
+                        hasattr(child, "attrs")
+                        and child.get("title") == "Alterar Contato"
+                    ):
 
-                        if child.get("title") == "Alterar Contato":
+                        link = tag.get("href")
 
-                            link = tag.get("href")
+                        if link:
+                            with self.page.wait_for_page_load():
+                                self.go(link)
 
-                            if link:
-                                with self.page.wait_for_page_load():
-                                    self.go(link)
+                            self._mudar_dados_contato(dados, novo=False)
 
-                                self._mudar_dados_contato(dados, novo=False)
-
-                                return
+                            return
 
     def go_to_blocos(self):
 
@@ -1022,7 +1023,7 @@ class Processo(Sei):
 
             self.page.driver.switch_to.window(main)
 
-            if "anotacao" and "anotacao_link" in self.tags:
+            if 'anotacao_link' in self.tags:
                 self.tags["anotacao"] = content
 
                 self.tags["anotacao_link"] = ""
@@ -1063,34 +1064,34 @@ class Processo(Sei):
 
         (main, new) = self.go_to_acomp_especial()
 
-        if new is not None:
+        if new is not None and self.page.check_element_exists(
+            config.Acompanhamento_Especial.EXCLUIR
+        ):
 
-            if self.page.check_element_exists(config.Acompanhamento_Especial.EXCLUIR):
+            try:
 
-                try:
+                self.page._clicar(config.Acompanhamento_Especial.EXCLUIR)
 
-                    self.page._clicar(config.Acompanhamento_Especial.EXCLUIR)
+            except TimeoutException:
 
-                except TimeoutException:
+                print("Não foi possível excluir o Acompanhamento Especial")
 
-                    print("Não foi possível excluir o Acompanhamento Especial")
+            try:
 
-                try:
+                alert = self.page.alert_is_present()
 
-                    alert = self.page.alert_is_present()
+                if alert:
+                    alert.accept()
 
-                    if alert:
-                        alert.accept()
+            except NoAlertPresentException:
 
-                except NoAlertPresentException:
+                print("Não houve pop-up de confirmação")
 
-                    print("Não houve pop-up de confirmação")
+            self.page.fechar()
 
-                self.page.fechar()
+            self.page.driver.switch_to.window(main)
 
-                self.page.driver.switch_to.window(main)
-
-                self.tags["Acompanhamento Especial"] = ""
+            self.tags["Acompanhamento Especial"] = ""
 
     def edita_marcador(self, tipo="", content="", timeout=5):
 

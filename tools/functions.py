@@ -96,7 +96,7 @@ def get_browser(browser: str = "Chrome", is_headless: bool = False):
     else:
         driver = _browser["instance"]()
 
-    if not _browser["name"] == "chrome":
+    if _browser["name"] != "chrome":
         driver.maximize_window()
 
     return driver
@@ -130,7 +130,7 @@ def check_input(identificador: str, tipo: str) -> str:
                 f"O identificador {identificador} do tipo {tipo} é inválido"
             )
 
-    elif tipo == "cpf" or tipo == "fistel":
+    elif tipo in ["cpf", "fistel"]:
         if len(identificador) > size:
             raise ValueError(
                 f"O identificador {identificador} do tipo {tipo} deve ter 11 dígitos"
